@@ -1,0 +1,130 @@
+
+<template>
+
+    <div class="p-2 row">
+        <div class="col">
+
+            <span>
+                <h1 style="display: inline;">Procedure Mapper</h1>
+                <span class="p-2">
+                    <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Map Modalities to Procedures" data-content="This tool allows you to search for a modality and procedure to create a mapping. With a mapping in place, when a PT Daysheet is saved with the mapped modality, the mapped procedure will be added to the patient's chart with the units pre-calucated according to the '8-minute rule.'"></i>
+                </span>
+
+            </span>
+
+        </div>
+    </div>
+
+    <div class="p-2 row">
+        <div class="col d-flex justify-content-end">
+
+            <template if.bind="mode === 'edit'">
+
+                <button click.delegate="deleteMapping()" class="btn btn-danger mr-1">
+
+                    Delete Mapping
+
+                </button>
+                <button click.delegate="changeMode('')" class="btn btn-outline-secondary">
+
+                    Cancel
+
+                </button>
+
+            </template>
+
+            <template if.bind="mode === 'add'">
+
+                <div class="d-flex flex-column">
+                    <div class="d-flex justify-content-end">
+                        <button click.delegate="saveMapping()" class="btn btn-success mr-1">
+
+                            Save Mapping
+
+                        </button>
+                        <button click.delegate="toggleAddMode()" class="btn btn-outline-secondary">
+
+                            Cancel
+
+                        </button>
+
+                    </div>
+                    <div show.bind="procError" class="text-danger p-2">${procError}</div>
+
+                </div>
+
+            </template>
+
+
+            <template if.bind="mode === ''">
+
+                <button click.delegate="toggleAddMode()" class="btn btn-success">
+
+                    Add Mapping
+
+                </button>
+
+            </template>
+
+        </div>
+    </div>
+    <div class="p-2 row">
+        <div class="col">
+
+            <table class="table table-striped">
+
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Modality</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">Procedure Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr show.bind="mode === 'add'">
+                    <th scope="row">&nbsp;</th>
+                    <td>
+
+                        <div class="dropdown">
+                            <input style="width: 90%;" class="dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" placeholder="search modalities" type="text" keyup.delegate="searchListCombos()" value.bind="listComboSearchTerm">
+                            <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Modality Search" data-content="Search for a modality to map to the procedure."></i>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                <button click.delegate="modSelected(mod)" class="dropdown-item" type="button" repeat.for="mod of allListCombos">${mod.Description1}</button>
+                            </div>
+                        </div>
+
+                    </td>
+                    <td><i class="fa fa-arrow-right"></i></td>
+                    <td>
+
+                        <div class="dropdown mr-1">
+                            <input style="width: 90%;" class="dropdown-toggle" id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" placeholder="search procedures" type="text" keyup.delegate="searchProcedures()" value.bind="procSearchTerm">
+                            <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Procedure Search" data-content="Search for a procedure to map to the modality. You can search by CPT code or description."></i>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuOffset">
+                                <div click.delegate="procSelected(proc)" class="dropdown-item" repeat.for="proc of procedures">
+                                    ${proc.CptKey} &nbsp; | &nbsp; ${proc.Description}
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+                <tr style="cursor: pointer;" class.bind="mapping == selectedMapping ? 'bg-primary text-white' : ''" click.delegate="mappingSelected(mapping)" repeat.for="mapping of mappings">
+                    <th scope="row">${mapping.Id}</th>
+                    <td>
+                        ${mapping.FromValue}
+                    </td>
+                    <td><i class="fa fa-arrow-right"></i></td>
+                    <td>
+                        ${mapping.ToValue}
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</template>

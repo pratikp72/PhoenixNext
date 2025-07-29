@@ -1,0 +1,318 @@
+<template>
+
+
+
+  <style>
+    * {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .calendar-container {
+    background: #fff;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  }
+  
+  .calendar-container header {
+    display: flex;
+    align-items: center;
+    padding: 25px 30px 10px;
+    justify-content: space-between;
+  }
+    
+  header .calendar-current-date {
+    font-weight: 500;
+    font-size: 1.45rem;
+  }
+  
+  .calendar-weekdays div {
+    /* width: calc(100% / 7); */
+    cursor: default;
+    font-weight: 500;
+    /* padding-left: 5px; */
+  }
+
+  .calendar-weekdays-month div {
+    width: calc(100% / 7);
+    cursor: default;
+    /* font-weight: bold; */
+    color: #444444;
+    /* text-align: center; */
+    /* padding-left: 5px; */
+  }
+  
+  .calendar-day{
+    border: 1px solid #f2f2f2;
+  }
+
+  .row {
+    /* display: flex; */
+    flex-direction: row;
+    /* flex-wrap: wrap;
+    width: 100%; */
+    margin: 0;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+  }
+
+  .time-slot-column{
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 57px;
+    text-align: right;
+    color: #888888;
+  }
+
+  .time-slot-hour{
+    border-bottom: 1px solid #f2f2f2;
+    border-top: 1px solid #c7c7c7!important;
+  }
+
+  .time-slot{
+    border-bottom: 1px solid #f2f2f2;
+  }
+
+  .time-current{
+    border-top: 1px solid red!important;
+  }
+
+  .weekview-day-name{
+    display: block;
+    margin: auto;
+    width: 50%!important;
+    color: #888888;
+    font-size: small;
+  }
+
+  .weekview-day-name.active{
+    color: #007bff!important;
+  }
+
+  .weekview-day-date{
+    font-size: 30px;
+    padding: 8px;
+    line-height: normal;
+    margin-bottom: 5px;
+    width: 50px !important;
+    display: inline-block;
+    color: #888888;
+    margin: auto;
+  }
+
+  .weekview-day-date.active {
+    height: 50px !important;
+    width: 50px !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    background-color: #007bff!important;
+  }
+
+  .monthview-day.active{
+    height: 25px !important;
+    width: 25px !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    background-color: #007bff!important;
+    text-align: center;
+  }
+
+  .monthview-day.inactive{
+    color: #888888 !important;
+    font-weight: inherit !important;
+  }
+
+  .monthview-day{
+    /* font-weight: bold; */
+    color: #444444;
+  }
+
+  .monthview-day-content{
+    font-size: smaller;
+    border: 1px solid #047bff;
+    border-radius: 4px;
+    background-color: rgba(4, 123, 255, 0.15);
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-top: 2px;
+  }
+
+  .monthview-day-content.inactive{
+    color: #888888 !important;
+    border-color: #888888;
+    background-color: rgba(0,0,0,0.15);
+  }
+
+  .time-description-hour{
+    font-weight: bold;
+  }
+
+  .time-description-min{
+    color: #888888;
+  }
+
+  .time-line{
+    border-top: 1px solid red;
+    width: 100%;
+    display: block;
+    position: absolute;
+    left: 0;
+  }
+
+  .appointment-block{
+    /* border: 1px solid grey;
+    border-radius: 4px;
+    background-color: lightblue; */
+    font-size: smaller;
+    padding: 2px;
+    margin-right: 2px;
+    position: absolute;
+    overflow: hidden;
+  }
+
+  .add-plus{
+    z-index: 2000;
+    position: relative;
+    float: right;
+    margin-top: 3px;
+    margin-right: 3px;
+    background-color: rgb(255 255 255 / 75%);
+    border-radius: 2px;
+    height: 13px;
+    color: #8e8e8e;
+  }
+  
+  </style>
+
+
+
+
+  <div ref="calContainer" class="calendar-container" css="width: ${calendarContainerWidth}px;">
+
+    <div class="d-flex align-items-center" style="padding: 0.75rem 1.25rem;">
+      <div class="h3">${months[month]} ${year}</div>
+      <select value.bind="currentProvider" class="form-control ml-auto mr-2" style="width: auto;" change.delegate="providerSelected()">
+        <option model.bind="null">Choose...</option>
+        <option repeat.for="p of home.providers" model.bind="p" >${p.ProviderEntity}</option>
+      </select>
+      <button class="btn btn-outline-secondary mr-1" type="button" click.delegate="goToToday()">Today</button>
+      <button class="btn mr-1" type="button" click.delegate="prevNextClick(true)">
+        <i class="fa fa-chevron-left text-muted"></i></button>
+      <button class="btn mr-1" type="button" click.delegate="prevNextClick(false)">
+        <i class="fa fa-chevron-right text-muted"></i></button>
+      <div class="dropdown mr-1">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+          ${currentView}
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#" click.delegate="switchView('month')">Month</a>
+          <a class="dropdown-item" href="#" click.delegate="switchView('week')">Week</a>
+        </div>
+      </div>
+      <button class="btn mr-1" type="button" click.delegate="openSettings()">
+        <i class="fa fa-cog fa-2x text-muted"></i></button>
+    </div>
+
+    <!--MONTH VIEW-->
+    <div if.bind="currentView=='month'">
+      <div class="d-flex align-items-center calendar-weekdays-month">
+        <div>SUN</div>
+        <div>MON</div>
+        <div>TUE</div>
+        <div>WED</div>
+        <div>THU</div>
+        <div>FRI</div>
+        <div>SAT</div>
+      </div>
+      <div ref="calendardays" class="d-flex flex-wrap align-items-stretch" style="height: 750px;">
+        <div repeat.for="d of days" 
+          style="width: calc(100%/ 7); border: 1px solid #f2f2f2; overflow: hidden;" 
+          css="height: ${dayBlockHeight}px;"
+          class="p-1"><!-- click.delegate="goToDay(d.dateObj)">-->
+          <div class="monthview-day ${d.class}">${d.number}</div>
+          <!-- <div repeat.for="s of d.timeSlots" class="d-flex monthview-day-content ${d.class}" style="color: #444444;">
+            <template repeat.for="a of s.appointments">
+              <div class="mr-1 w-100" style="font-weight: bold;">${a.schedule.Time}</div>
+              <div class="text-truncate flex-shrink-1">${a.schedule.Patient_Name}</div>
+            </template>
+          </div> -->
+          <div repeat.for="a of d.providersAndScheduleCount" 
+              class="d-flex monthview-day-content ${d.class}" 
+              style="color: #444444;" click.delegate="goToDayWithProviderId(d.dateObj, a.providerId)">
+
+              <div class="mr-1 w-100" style="font-weight: bold;">${a.providerName}</div>
+              <div class="flex-shrink-1">${a.count}</div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <!--WEEK VIEW-->
+    <div if.bind="currentView=='week'">
+      <div class="row">
+        <div class="time-slot-column">
+          <!--PLACEHOLDER-->
+        </div>
+        <div class="col-md-11 pl-0">
+          <div class="d-flex align-items-center calendar-weekdays">
+            <!--DAY COLUMN HEADERS-->
+            <div repeat.for="d of currentDays" 
+                if.bind="d.display"
+                class="column" style="text-align: center;" css="width: ${dayColumnWidth}px;">
+              <div class="weekview-day-name ${d.class}">${d.name}</div>
+              <div class="weekview-day-date ${d.class}">${d.number}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="time-slot-column">
+          <!--VERTICAL TIME SLOTS-->
+          <div repeat.for="s of weekTimeDescriptions" class.bind="s.class">
+            ${s.time}
+          </div>
+        </div>
+        <div class="col-md-11 pl-0">    
+          <div ref="weekContainer" class='row'>
+            <!--DAY COLUMN-->
+            <div repeat.for="d of currentDays" 
+                if.bind="d.display"
+                class='column' style="border: 1px solid #f2f2f2; overflow: hidden;" 
+                css="width: ${dayColumnWidth}px;">
+              <div repeat.for="s of d.timeSlots" 
+                  class="${s.topOfHour ? 'time-slot-hour' : 'time-slot'}" 
+                  css="height: ${timeslotHeightPixels}px;">
+                <div repeat.for="apt of s.appointments" 
+                  click.delegate="appointmentClicked(s, apt)" 
+                  class="appointment-block ${apt.class} d-flex align-items-center" 
+                  css="width: ${apt.width}px; height: ${apt.height}px; top: ${apt.top}px; left: ${apt.left}px;">
+                  <div class="text-muted text-nowrap">${apt.schedule.Patient_Name}</div>
+                  <i if.bind="!canAddAppointment" class="fa fa-info-circle ml-auto mr-1" aria-hidden="true" click.delegate="slotClicked(s, $event)"></i>
+                </div>
+                <div class="time-line" css="top: ${timelineTopOffset}px;"></div>
+                <i if.bind="canAddAppointment" class="fa fa-plus-square-o add-plus" aria-hidden="true" click.delegate="slotClicked(s, $event)"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+</template>

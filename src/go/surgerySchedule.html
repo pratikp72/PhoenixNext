@@ -1,0 +1,258 @@
+<template>
+
+  <require from="./customElements/myCheckbox"></require>
+
+  <style>
+    .returnToDate input{
+      width: 120px;
+    }
+    /* .form-control{
+      width: unset;
+    } */
+    .form-group{
+      margin-bottom: 0.5rem;
+    }
+    .body-side{
+      color: rgba(0,0,0,0.4);
+    }
+    .my-date-picker{
+      flex: 1 1 auto !important;
+    }
+    .my-date-picker input{
+      border-top-right-radius: unset;
+      border-bottom-right-radius: unset;
+      border-right: none;
+    }
+  </style>
+
+
+  <div class="card" style="height: inherit;">
+
+    <!--HEADER-->
+    <div class="card-header d-flex align-items-center">
+      <h4 class="mr-2 mb-0 d-inline-block">
+        <i class="fa fa-sticky-note-o mr-2"></i>Surgery Schedule</h4>
+
+
+        <!-- <fieldset disabled.bind="!formTypeSchool"> -->
+          <div class="input-group" style="width: auto;">
+            <select value.bind="selectedPref" class="custom-select" style="width: 120px;" aria-label="Example select with button addon">
+              <option selected>Choose...</option>
+              <option repeat.for="p of preferences" model.bind="p">${p.Surgery.SurgPrefDesc}</option>
+            </select>
+            <div class="input-group-append">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-user mr-1" aria-hidden="true"></i>Pref</button></button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" click.delegate="createPref()"><i class="fa fa-user mr-1 text-danger" aria-hidden="true"></i>New Preference</a>
+                <a class="dropdown-item" click.delegate="updatePref()"><i class="fa fa-user mr-1 text-success" aria-hidden="true"></i>Update Preference</a>
+              </div>
+            </div>
+          </div>
+        <!-- </fieldset> -->
+
+      <i class="fa fa-close fa-2x ml-auto" click.delegate="cancel()"></i></a>
+    </div>
+
+    <!--BODY-->
+    <div class="card-body py-2" style="overflow-y: scroll;">
+
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <small class="form-text text-muted">Scheduled By</small>
+          <input type="text" class="form-control" value.bind="OD_Surg_Schedule.ScheduledBy">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small  class="form-text text-muted">Surgeon</small>
+          <select value.bind="OD_Surg_Schedule.Surgeon" class="form-control" matcher.bind="surgeonMatcher" aria-describedby="languageHelp">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="s of surgeons" model.bind="s" >${s.ProviderEntity}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <small  class="form-text text-muted">Assistant</small>
+          <select value.bind="OD_Surg_Schedule.Assistant" class="form-control" matcher.bind="assistantMatcher" aria-describedby="languageHelp">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="s of assistants" model.bind="s" >${s.ProviderEntity}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-sm-6 col-md-6">
+          <small class="form-text text-muted">Surgery Date | Time</small>
+          <div class="input-group">
+            <abp-datetime-picker class="my-date-picker" icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" value.bind="surgeryDateTime" options.bind="{ format: 'MM/DD/YYYY hh:mm a', sideBySide: true }"></abp-datetime-picker>
+            <div class="input-group-append ml-auto">
+              <button class="btn btn-outline-secondary"  style="border-color: #ced4da;" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group col-sm-6 col-md-6">
+          <small  class="form-text text-muted">Duration</small>
+          <div class="input-group">
+            <input type="text" value.bind="OD_Surg_Schedule.Surg_Duration" class="form-control" aria-label="Text input with dropdown button">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary dropdown-toggle" style="border-color: #ced4da;" type="button" data-toggle="dropdown" aria-expanded="false"></button>
+              <div class="dropdown-menu">
+                <a repeat.for="f of durationTimes" style="font-family: 'arial';" class="dropdown-item" href="#" click.delegate="durationTimeClicked(f)">${f}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header d-flex align-items-center pr-1" style="height: 44px;">
+          Surgery
+          <button class="btn btn-sm btn-outline-primary ml-auto mr-2" type="button" aria-expanded="false" click.delegate="newSurgeryRow()">
+            <!-- <i class="fa fa-plus" aria-hidden="true"></i> -->New
+          </button>
+        </div>
+        <div class="card-body py-2">
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <small class="form-text text-muted">Facility</small>
+              <select value.bind="OD_Surg_Schedule.SurgLocation" matcher.bind="locationMatcher" class="form-control" aria-describedby="languageHelp">
+                <option model.bind="null">Choose...</option>
+                <option repeat.for="s of locationsList" model.bind="s" >${s.LocationName}</option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <small  class="form-text text-muted">Admission</small>
+              <select value.bind="OD_Surg_Schedule.Admission" class="form-control" aria-describedby="languageHelp">
+                <option model.bind="null">Choose...</option>
+                <option repeat.for="s of admissionList" model.bind="s" >${s}</option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <small  class="form-text text-muted">Anesthesia</small>
+              <select value.bind="OD_Surg_Schedule.SurgAnesthesia" matcher.bind="anesthesiaMatcher" class="form-control" aria-describedby="languageHelp">
+                <option model.bind="null">Choose...</option>
+                <option repeat.for="s of anesthesiaList" model.bind="s" >${s.Description1}</option>
+              </select>
+            </div>
+          </div>
+
+    
+
+          <div class="list-group list-group-flush" style="overflow-y: auto;">
+            <div repeat.for="s of surgeries" class="list-group-item px-0 d-flex">
+
+              <div class="d-flex flex-column justify-content-center col-sm-2 p-0">
+                <button class="btn p-0" type="button" aria-expanded="false" click.delegate="openBodysidePicker(s)">
+                  <span class="text-black-50 m-0 text-uppercase">${s.bodyside}</span>
+                </button>
+                <button class="btn p-0" type="button" aria-expanded="false" click.delegate="openBodypartPicker(s)">
+                  <strong class="h6 m-0 text-uppercase">${s.bodypart}</strong>
+                </button>
+              </div>
+
+              <div class="d-flex flex-column justify-content-center col-sm-10 p-0">
+
+                <div repeat.for="px of s.procedures" class="d-flex py-2" style="border-bottom: 1px solid lightgray;">
+                  <div class="col-sm-2 col-md-2 pr-0">
+                    <strong class="mr-3 text-primary text-uppercase">${px.code}</strong>
+                  </div>
+                  <div class="col-sm-10 col-md-10 d-flex pr-0">
+                    <span class="text-black-50">${px.description}</span>
+                    <button class="btn btn-sm btn-outline-secondary text-uppercase ml-auto mr-2" 
+                      type="button" aria-expanded="false" click.delegate="openModPicker(px)">
+                      ${px.modifier ? px.modifier : '+ MOD'}
+                    </button>
+                    <button class="btn btn-sm btn-danger" style="max-height: 31px;" type="button" aria-expanded="false" click.delegate="deleteProcedure($index, s.procedures, $parent.$index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+
+                    <button if.bind="$first" class="btn btn-sm btn-outline-primary ml-2" style="max-height: 31px;" type="button" aria-expanded="false" click.delegate="openPxPicker(s)">
+                      <i class="fa fa-plus" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <div if.bind="s.procedures.length == 0" class="d-flex align-items-center justify-content-center mb-2 border rounded p-2 btn-outline-primary" style="border-color: lightgray;">
+                  <div class="text-uppercase h5 m-0" click.delegate="openPxPicker(s)">ADD PROCEDURE
+                    <i class="fa fa-plus" aria-hidden="true"></i></div>
+                </div>
+
+
+                <div repeat.for="dx of s.diagnosis" class="d-flex py-2" style="border-bottom: 1px solid lightgray;">
+
+                  <div class="col-sm-2 col-md-2 pr-0">
+                    <strong class="mr-3 text-primary text-uppercase">${dx.code}</strong>
+                  </div>
+                  <div class="col-sm-10 col-md-10 d-flex pr-0">
+                    <span class="text-black-50">${dx.description}</span>
+                    <button class="btn btn-sm btn-danger ml-auto" style="max-height: 31px;" type="button" aria-expanded="false" click.delegate="deleteDiagnosis($index, s.diagnosis, $parent.$index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+
+                    <button if.bind="$first" class="btn btn-sm btn-outline-primary ml-2" style="max-height: 31px;" type="button" aria-expanded="false" click.delegate="openDxPicker(s)">
+                      <i class="fa fa-plus" aria-hidden="true"></i>
+                    </button>
+
+                  </div>
+
+                </div>
+                <div if.bind="s.diagnosis.length == 0" class="d-flex align-items-center justify-content-center py-2 border rounded p-2 btn-outline-primary" style="border-color: lightgray;">
+                  <div class="text-uppercase h5 m-0" click.delegate="openDxPicker(s)">ADD DIAGNOSIS
+                    <i class="fa fa-plus" aria-hidden="true"></i></div>
+                </div>
+
+              </div>
+
+
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+
+
+      <div class="form-row">
+        <div class="form-group col-md-12 my-2">
+          <strong class="text-muted">Misc</strong>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="form-text text-muted">Authorization #</small>
+          <input class="form-control" value.bind="OD_Surg_Schedule.AuthorizeNumber" style="width: 100%;">
+        </div>
+        <div class="form-group col-md-6">
+          <small class="form-text text-muted">Position of Patient</small>
+          <select value.bind="OD_Surg_Schedule.Equip_PositionPatient" class="form-control" aria-describedby="languageHelp">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="s of positionList" model.bind="s" >${s}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small class="form-text text-muted">Procedure Details</small>
+          <textarea class="form-control" value.bind="OD_Surg_Schedule.LO_txt" rows="4" style="width: 100%;"></textarea>
+        </div>
+        <div class="form-group col-md-6">
+          <small class="form-text text-muted">Instructions</small>
+          <textarea class="form-control" value.bind="OD_Surg_Schedule.Comments" rows="4" style="width: 100%;"></textarea>
+        </div>
+      </div>
+
+
+    </div>
+
+
+
+    <!-- </div> -->
+
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="save()">Save</button>
+    </div>
+  </div>
+</template>

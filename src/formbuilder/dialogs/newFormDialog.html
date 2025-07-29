@@ -1,0 +1,36 @@
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+
+  <ux-dialog ref="genpicklist" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">New Form</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+      <div class="row justify-content-center">
+        <div class="col">
+          <label for="nameInput">Name</label>
+          <input id="nameInput" type="text" value.bind="formName" class="form-control">
+        </div>
+        <div class="col-auto">
+          <label for="typePicker">Type</label>
+          <select value.bind="selectedType" class="custom-select ${!selectedType ? 'is-invalid': ''}" id="typePicker">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="t of typeList" model.bind="t" >${t}</option>
+          </select>
+          <div id="validationServer04Feedback" class="invalid-feedback">
+            Please select a form type.
+          </div>
+        </div>
+      </div>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button disabled.bind="incomplete" click.delegate="ok()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

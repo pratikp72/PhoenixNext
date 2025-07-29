@@ -1,0 +1,25 @@
+<template>
+
+
+
+  <div ref="camerapop" class="row border border-bottom-0 rounded-top bg-white">
+    <div class="col-md-12" style="padding-top: 15px;">
+      <video ref="video" width="320" height="240" autoplay class="border rounded" css="display: ${showVideo ? 'block' : 'none'}">
+      </video>
+
+      <i if.bind="displaySpinner" class="fa fa-spinner fa-pulse fa-3x fa-fw" style="position: absolute; left: 50%; top: 50%;"></i>
+
+      <div css="display: ${showVideo ? 'none' : 'block'}">
+        <canvas ref="canvas" width="320" height="240"></canvas>
+        <button class="btn btn-outline-danger" click.delegate="clear()" style="position:absolute; right: 20px; bottom: 12px;">Clear</button>
+      </div>
+
+    </div>
+  </div>
+  <div class="row justify-content-around pt-2 border border-top-0 rounded-bottom bg-white" style="padding-bottom: 15px;">
+    <button class="btn btn-outline-primary" click.delegate="take()"><i class="fa fa-camera" aria-hidden="true"></i></button>
+    <button class="btn btn-outline-secondary" click.delegate="flip()"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+    <button class="btn btn-primary" click.delegate="save()" disabled.bind="showVideo">Save</button>
+    <button class="btn btn-secondary" click.delegate="cancel()">Cancel</button>
+  </div>
+</template>

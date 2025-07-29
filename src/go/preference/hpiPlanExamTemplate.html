@@ -1,0 +1,44 @@
+<template>
+
+  <div id.bind="templateId" class="d-flex align-items-center border-bottom pl-4 pr-2 py-0"
+        style="background-color: rgba(0, 0, 0, 0.03); min-height: 48px;">
+
+    <h5 class="m-0 pr-2" style="display: inline-block;">${section.name}</h5>
+
+
+    <div class="input-group ml-auto" style="width: unset; align-items: unset;">
+      <select class="form-item form-control mr-0"
+        value.bind="selectedMacro" 
+        style="width: 100px; display: inline-block;">
+        <option model.bind="null">Macros...</option>
+        <option repeat.for="m of macroList"
+                model.bind="m">
+          ${m}
+        </option>
+      </select>
+      <div class="input-group-append">
+        <i class="fa fa-plus fa-2x px-2 input-group-text" aria-hidden="true" click.delegate="addMacro()"></i>
+      </div>
+    </div>
+
+    <a class="btn btn-danger ml-2" 
+      href="#" 
+      click.delegate="removeSection()">
+      <i class="fa fa-trash-o fa-lg"></i>
+    </a>
+
+  </div>
+
+  <div repeat.for="i of section.items">
+    <div class="form-group mb-0" style="height: 150px;">
+      <textarea ref="selectedTextarea" class="form-control" rows="3" placeholder="Add preference here..." 
+        value.bind="i.details" 
+        click.delegate="textareaFocus('hpi', $event)" 
+        style="height: 100%; resize: none;"></textarea>
+    </div>
+  </div>
+
+  </div>
+
+
+</template>

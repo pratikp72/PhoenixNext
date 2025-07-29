@@ -1,0 +1,154 @@
+<template>
+
+  <style>
+    .card-radius{
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border: 1px solid #dee2e6;
+    }
+    .table th, .table td {
+      padding: 0.75rem;
+      vertical-align: top;
+      border-top: none;
+    }
+  </style>
+
+  <div ref="filewatchercard" class="card border-top-0 card-radius" css="height: ${bodyHeight}px;" >
+
+    <div class="card-body" style="display: flex; flex-flow: column; justify-content: space-around;">
+
+
+
+        <form if.bind="!selectedFilewatcher">
+          <div class="form-group">
+
+            <label>Type</label>
+            <div class="input-group">
+              <select class="form-control"
+                  value.bind="selectedFilewatcherType" required>
+                <option model.bind="null">Select...</option>
+                <option repeat.for="v of filewatcherTypeList"
+                        model.bind="v">
+                  ${v}
+                </option>
+              </select>
+              <!-- <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" click.delegate="newWatcher()">
+                  <i class="fa fa-plus mr-2 text-primary"></i>New</button>
+              </div> -->
+            </div>
+          </div>
+          <!-- <div class="form-group">
+            <label for="formGroupExampleInput">Description</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Description" value.bind="createDescription">
+          </div> -->
+          <div class="form-group">
+
+            <label for="formGroupExampleInput">Directory Path</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="path\to\watched\files" value.bind="createInboundPath">
+            <small id="inboundHelp" class="form-text text-muted">Path must exist and have proper permissions.</small>
+          </div>
+          <!-- <div class="form-group">
+            <label for="formGroupExampleInput2">Process Path</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="path\to\processed\files" value.bind="createProcessedPath">
+          </div> -->
+          <button type="button" class="btn btn-primary" disabled.bind="createDisabled" click.delegate="createClick()">Create</button>
+        </form>
+
+        <div if.bind="selectedFilewatcher">
+
+
+          <label>Filewatcher</label>
+          <div class="input-group">
+            <select class="form-control"
+                    value.bind="selectedFilewatcher">
+              <option model.bind="null">Select...</option>
+              <option repeat.for="v of filewatchers"
+                      model.bind="v">
+                ${v.description}
+              </option>
+            </select>
+            <div class="input-group-append">
+              <button class="btn btn-outline-primary" type="button" click.delegate="newWatcher()">
+                <i class="fa fa-plus mr-2 text-primary"></i>New</button>
+            </div>
+          </div>
+
+
+
+
+          <!-- <div class="form-group">
+
+            <select class="form-control"
+                    value.bind="selectedFilewatcher">
+              <option model.bind="null">Select...</option>
+              <option repeat.for="v of filewatchers"
+                      model.bind="v">
+                ${v.description}
+              </option>
+            </select>
+          </div> -->
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Description</th>
+                <th scope="col">Inbound</th>
+                <th scope="col">Processed</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="${rowColor}">
+                <td scope="row"><button type="button" class="btn btn-light" click.delegate="statusButtonClick()">${filewatcherStatusButton}</button></td>
+                <td>${selectedFilewatcher.description}</td>
+                <td>${selectedFilewatcher.inboundPath}</td>
+                <td>${selectedFilewatcher.processedPath}</td>
+                <td>${filewatcherStatus}</td>
+                <td scope="row"><button type="button" class="btn btn-danger" click.delegate="deleteButtonClick()">Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <strong class="mr-2">Log date</strong>
+            <abp-datetime-picker class="pr-2" style="width: 120px; display: inline-block;" icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" value.bind="filterDate" options.bind="{ format: 'MM-DD-YYYY' }"></abp-datetime-picker>
+            <strong class="mr-2">Logs per page</strong>
+            <select value.bind="logPageSize" class="form-control mr-2" style="display: inline-block; width: auto;">
+              <option repeat.for="size of logPageSizes" value.bind="size">${size}</option>
+            </select>
+            <nav aria-label="Page navigation example" class="d-inline-block">
+              <ul class="pagination">
+                <li repeat.for="page of totalLogPages" class="page-item ${logPageNumber == (page + 1) ? 'active' : ''}"><a class="page-link" href="#" click.delegate="pageClicked(page)">${page + 1}</a></li>
+              </ul>
+            </nav>
+            <button type="button" class="btn btn-danger mr-2 float-right" click.delegate="clearLog()">Clear Log</button>
+          </div>
+        </div>
+
+
+
+      <div style="overflow-y: auto; height: 100%;">
+        <template repeat.for="l of logItems">
+          <div class="d-flex align-items-center border-bottom">
+            <div class="mr-2 p-2">
+              <!-- <button type="button" class="btn btn-light mr-2" click.delegate="l.view()">Log</button> -->
+              <i class="fa fa-file-code-o" aria-hidden="true" click.delegate="l.view()"></i>
+            </div>
+            <div class="mr-2  p-2">${l.name}</div>
+            <div class="ml-auto mr-2 p-2 text-muted">${l.message}</div>
+            <div class="${l.textColor} mr-2  p-2"><strong>${l.confidence}</strong></div>
+          </div>
+          <pre if.bind="l.displayLog" class="mb-2" style="background-color: #f7f7f9;" css="max-width: ${maxCardWidth}px;">${l.log}</pre>
+        </template>
+      </div>
+
+    
+
+    </div>
+  </div>
+</template>

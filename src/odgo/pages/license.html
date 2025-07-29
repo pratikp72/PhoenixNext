@@ -1,0 +1,69 @@
+<template>
+
+  <style>
+    .card-radius{
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border: 1px solid #dee2e6;
+    }
+  </style>
+
+  <div class="card border-top-0 card-radius" css="height: ${bodyHeight}px;" style="overflow-y: auto;">
+    <div class="card-body pt-0">
+
+      <div class="d-flex align-items-center py-2">
+        <i class="fa fa-plus fa-2x ml-auto text-primary" aria-hidden="true" click.delegate="addLicenseClick()"></i>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Type</th>
+            <th scope="col">License</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <template repeat.for="l of licenses">
+            <tr>
+              <th scope="row">
+                <button if.bind="l.data.License != null" type="button" class="btn btn-outline-primary" click.delegate="showKey(l)">Details <i class="fa fa-key" aria-hidden="true"></i></button>
+              </th>
+              <td>${l.data.LicenseType}</td>
+              <td>${l.licenseDisplay}</td>
+              <td>    
+                <button type="button" class="btn btn-danger" click.delegate="deleteClicked(l)">Delete <i class="fa fa-trash" aria-hidden="true"></i></button>      
+              </td>
+            </tr>
+            <tr if.bind="l.showClaims">
+              <td colspan="4">
+                <div class="card w-100 mb-2">
+                  <div class="card-body">
+                    <p class="card-text">${l.claims.FirstName} ${l.claims.LastName} </p>
+                    <p class="card-text">License Type : ${l.claims.LicenseType} </p>
+                    <p class="card-text">TenantId : ${l.claims.TenantId} </p>
+                    <p class="card-text">UserId : ${l.claims.UserID} </p>
+                    <p class="card-text">Audience : ${l.claims.aud} </p>
+                    <p class="card-text">Expiration : ${l.expireDateString} </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <!-- <div class="card w-100 mb-2" if.bind="l.showClaims">
+              <div class="card-body">
+                <p class="card-text">${l.claims.FirstName} ${l.claims.LastName} </p>
+                <p class="card-text">License Type : ${l.claims.LicenseType} </p>
+                <p class="card-text">TenantId : ${l.claims.TenantId} </p>
+                <p class="card-text">UserId : ${l.claims.UserID} </p>
+                <p class="card-text">Audience : ${l.claims.aud} </p>
+                <p class="card-text">Expiration : ${l.expireDateString} </p>
+              </div>
+            </div> -->
+          </template>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</template>

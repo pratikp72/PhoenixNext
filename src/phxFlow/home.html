@@ -1,0 +1,105 @@
+<template>
+
+  <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#" click.delegate="toggleSidebar()">
+      <i class="fa fa-align-justify"></i>
+      Flow</a>
+    <form class="form-inline">
+      <button class="btn btn-outline-success float-right" type="button" click.delegate="sortFlow()">Type</button>
+      <button class="btn btn-outline-info float-right" type="button" click.delegate="sortTime()">Time</button>
+    </form>
+  </nav>
+
+
+  <div class="row">
+
+    <div class="col-3" if.bind="sidebarVisible">
+      <ul class="list-group">
+        <li class="list-group-item">Item 1</li>
+        <li class="list-group-item">Item 2</li>
+        <li class="list-group-item">Item 3</li>
+        <li class="list-group-item">Item 4</li>
+        <li class="list-group-item">Item 5</li>
+        <li class="list-group-item">Item 6</li>
+      </ul>
+    </div>
+
+    <div class="${sidebarVisible ? 'col-9' : 'col-12'}">
+
+        <template repeat.for="b of blocks">
+
+          <div class="row" style="padding-bottom: 2px;">
+            <div class="col">
+              <div class="card">
+
+
+                <!--head-->
+                <div class.bind="b.headerCls" click.delegate="toggleBlock(b)">
+
+                  <span style="width: 80px; display: inline-block;">${b.getTime()}</span>
+
+                  <i class.bind="b.icon"></i>
+
+                  <span style="padding-right: 2px;"><b>${b.from}</b></span>
+                  <span class="d-inline-block text-truncate"
+                        style="padding-right: 2px;
+                              max-width: 75%;
+                              top: 6px;
+                              position: relative;
+                              font-weight: lighter; ">${b.description}</span>
+                  <span style="padding-right: 2px;"><b>${b.name}</b></span>
+
+                  <template repeat.for="s of b.steps">
+                    <i class="fa fa-circle float-right" css="padding-right:2px; color:${s.indicatorColor}"></i>
+                  </template>
+
+                  <span style="position: absolute;
+                                display: flex;
+                                right: 22px;
+                                top: 28px;
+                                font-size: small;">${b.workflowType}</span>
+
+                  <i if.bind="b.type == 'task'" class="fa fa-check-square fa-lg float-right" style="color: white; top: 7px; position: relative;" click.delegate="completeBlock($index)"></i>
+
+
+                </div>
+                <!--end head-->
+
+
+
+                <div class="card-body" style="overflow-y: auto; max-height: 300px;" if.bind="b.collapsed">
+
+                  <template repeat.for="s of b.steps">
+                    <button class.bind="s.cls" type="button" click.delegate="launchItem(s)" style="margin-right: 2px;">${s.type}</button>
+                  </template>
+
+                  <template repeat.for="d of b.data">
+                    <h5 class="card-title">${d.name}</h5>
+                    <p class="card-text" style="font-size: small;">${d.detail}</p>
+
+                    <div if.bind="b.type == 'message'" class="form-group">
+                      <label for="exampleFormControlTextarea1">Response</label>
+                      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    </div>
+
+                  </template>
+
+                  <i class="fa fa-times fa-lg float-right" style="color: dimgrey" click.delegate="completeBlock($index)"></i>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </template>
+
+
+
+
+
+
+
+    </div>
+
+  </div>
+</template>

@@ -1,0 +1,27 @@
+<template>
+
+  <!-- <require from="../webSpeechCustomElement"></require> -->
+  <require from="../hpiRowCustomAttribute"></require>
+
+  <div class="card-header d-flex align-items-center" style="height: 44px;">
+    <h6 class="mb-0 mr-2">${title}</h6>
+
+    <div class="dropdown" style="position: inherit;">
+      <button class="btn btn-outline-primary dropdown-toggle" style="padding: 4px 12px 4px 12px;" disabled.bind="locked" type="button" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-plus mr-1" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item px-3" href="#" click.delegate="openHpiIntake()"><i class="fa fa-pencil-square-o fa-fw pr-2" aria-hidden="true"></i>Intake</a>
+        <a class="dropdown-item px-3" href="#" click.delegate="previousClick()"><i class="fa fa-arrow-circle-left fa-fw pr-2" aria-hidden="true"></i>Previous HPI</a>
+      </div>
+    </div>
+
+  </div>
+  <div ref="cardbody" class="card-body p-1 overflow-hidden">
+    <textarea hpirow 
+      readonly.bind="locked" rows="10" 
+      style="width: 100%; height: 100%; border: none; resize: none; overflow-y: scroll;" 
+      value.bind="hpiText" blur.trigger="trySave()"
+      css="background-color:${backgroundColor}"></textarea>
+  </div>
+</template>

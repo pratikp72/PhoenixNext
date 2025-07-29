@@ -1,0 +1,187 @@
+<template>
+
+  <require from="./customElements/myCheckbox"></require>
+
+  <style>
+    .returnToDate input{
+      width: 120px;
+    }
+    .form-control{
+      width: unset;
+    }
+  </style>
+
+
+  <div class="card" style="height: inherit;">
+
+    <!--HEADER-->
+    <div class="card-header">
+      <h4 class="mr-2 mb-0" style="display: inline-block; vertical-align: middle;"><i class="fa fa-sticky-note-o mr-2"></i>Therapy Order</h4>
+      <div class="dropdown d-inline-block" style="vertical-align: middle;">
+        <button class="btn btn-sm btn-primary" type="button"  data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-user-plus mr-1" aria-hidden="true"></i>Pref
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a repeat.for="p of preferences" class="dropdown-item" click.delegate="prefSelected(p)">${p.Description}</a>
+        </div>
+      </div>
+      <div class="dropdown d-inline-block" style="vertical-align: middle;">
+        <button class="btn btn-sm" type="button"  data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-ellipsis-h fa-2x mr-1" aria-hidden="true"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" click.delegate="createPref()"><i class="fa fa-user mr-1 text-danger" aria-hidden="true"></i>New Preference</a>
+          <a class="dropdown-item" click.delegate="updatePref()"><i class="fa fa-user mr-1 text-success" aria-hidden="true"></i>Update Preference</a>
+        </div>
+      </div>
+      <i class="fa fa-close fa-2x float-right" style="vertical-align: middle;" click.delegate="cancel()"></i></a>
+    </div>
+
+    <!--BODY-->
+    <div class="card-body" style="overflow-y: scroll;">
+
+      <!--ORDER-->
+      <h4>Order</h4>
+      <div class="row row-cols-4">
+        <div class="col">
+          <my-checkbox selected.bind="ptCheckbox.checked"
+                       value.bind="ptCheckbox.detail"
+                       editing.bind="ptCheckbox.editing"
+                       click.delegate="ptCheckbox.select()"></my-checkbox>
+        </div>
+        <div class="col">
+          <my-checkbox selected.bind="otCheckbox.checked"
+                       value.bind="otCheckbox.detail"
+                       editing.bind="otCheckbox.editing"
+                       click.delegate="otCheckbox.select()"></my-checkbox>
+        </div>
+        <div class="col">
+          <my-checkbox selected.bind="workHardenCheckbox.checked"
+                       value.bind="workHardenCheckbox.detail"
+                       editing.bind="workHardenCheckbox.editing"
+                       click.delegate="workHardenCheckbox.select()"></my-checkbox>
+        </div>
+        <div class="col">
+          <my-checkbox selected.bind="evalTreatCheckbox.checked"
+                       value.bind="evalTreatCheckbox.detail"
+                       editing.bind="evalTreatCheckbox.editing"
+                       click.delegate="evalTreatCheckbox.select()"></my-checkbox>
+        </div>
+      </div>
+
+      <strong>Push</strong>
+      <div class="row row-cols-3">
+        <div repeat.for="p of pushes"
+             class="col">
+          <my-checkbox selected.bind="p.checked"
+                       value.bind="p.detail"
+                       editing.bind="p.editing"
+                       click.delegate="p.select()"></my-checkbox>
+        </div>
+      </div>
+
+
+<!--      <div class="card">-->
+<!--        <div class="card-body">-->
+<!--          <h5 class="card-title">Order</h5>-->
+<!--          <div class="row row-cols-3">-->
+<!--            <div class="col">-->
+<!--              <my-checkbox selected.bind="ptCheckbox.checked"-->
+<!--                           value.bind="ptCheckbox.detail"-->
+<!--                           editing.bind="ptCheckbox.editing"-->
+<!--                           click.delegate="ptCheckbox.select()"></my-checkbox>-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--              <my-checkbox selected.bind="otCheckbox.checked"-->
+<!--                           value.bind="otCheckbox.detail"-->
+<!--                           editing.bind="otCheckbox.editing"-->
+<!--                           click.delegate="otCheckbox.select()"></my-checkbox>-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--              <my-checkbox selected.bind="workHardenCheckbox.checked"-->
+<!--                           value.bind="workHardenCheckbox.detail"-->
+<!--                           editing.bind="workHardenCheckbox.editing"-->
+<!--                           click.delegate="workHardenCheckbox.select()"></my-checkbox>-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--              <my-checkbox selected.bind="evalTreatCheckbox.checked"-->
+<!--                           value.bind="evalTreatCheckbox.detail"-->
+<!--                           editing.bind="evalTreatCheckbox.editing"-->
+<!--                           click.delegate="evalTreatCheckbox.select()"></my-checkbox>-->
+<!--            </div>-->
+<!--          </div>-->
+
+<!--          <h6 class="card-subtitle text-muted">Push</h6>-->
+<!--          <div class="row row-cols-3">-->
+<!--            <div repeat.for="p of pushes"-->
+<!--                 class="col">-->
+<!--              <my-checkbox selected.bind="p.checked"-->
+<!--                           value.bind="p.detail"-->
+<!--                           editing.bind="p.editing"-->
+<!--                           click.delegate="p.select()"></my-checkbox>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+
+      <hr>
+      <h5>Modalities</h5>
+      <div class="row row-cols-3">
+        <div repeat.for="m of modalities"
+             class="col">
+          <my-checkbox selected.bind="m.checked"
+                       value.bind="m.detail"
+                       editing.bind="m.editing"
+                       click.delegate="m.select()"></my-checkbox>
+        </div>
+      </div>
+
+
+      <hr>
+      <h5>Exercise</h5>
+      <div class="row row-cols-3">
+        <div repeat.for="e of exercises"
+             class="col">
+          <my-checkbox selected.bind="e.checked"
+                       value.bind="e.detail"
+                       editing.bind="e.editing"
+                       click.delegate="e.select()"></my-checkbox>
+        </div>
+      </div>
+
+      <hr>
+      <h5>ROM</h5>
+      <div class="row row-cols-3">
+        <div repeat.for="r of roms"
+             class="col">
+          <my-checkbox selected.bind="r.checked"
+                       value.bind="r.detail"
+                       editing.bind="r.editing"
+                       click.delegate="r.select()"></my-checkbox>
+        </div>
+      </div>
+
+      <strong>Traction</strong>
+      <div class="row row-cols-3">
+        <div repeat.for="t of tractions"
+             class="col">
+          <my-checkbox selected.bind="t.checked"
+                       value.bind="t.detail"
+                       editing.bind="t.editing"
+                       click.delegate="t.select()"></my-checkbox>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label for="exampleFormControlTextarea1">Comments</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" value.bind="comments" rows="8" style="width: 100%;"></textarea>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="save()">Save</button>
+    </div>
+  </div>
+</template>

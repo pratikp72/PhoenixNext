@@ -1,0 +1,129 @@
+<template>
+  <div style="position: absolute; top:0; bottom: 0; width: 100%;">
+
+    <!--sidebar-->
+    <div class="d-flex flex-column flex-shrink-0 bg-light" style="width: 4.5rem; height: 100%;">
+      <div class="dropdown border-top">
+        <a href="#" class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none" data-toggle="dropdown" id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="https://github.com/mdo.png" alt="mdo" width="50" height="50" class="rounded">
+        </a>
+        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+          <li><a class="dropdown-item" href="#">New project...</a></li>
+          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><a class="dropdown-item" href="#">Profile</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#">Sign out</a></li>
+        </ul>
+      </div>
+
+      <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+        <li class="nav-item" style="height: 65px;">
+
+
+          <div class="dropdown border-top">
+            <a href="#" class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none border-bottom" data-toggle="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-clipboard fa-2x"></i>
+            </a>
+            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+              <li><a repeat.for="b of boards" class="dropdown-item" href="#" click.delegate="loadBoard(b)">${b.description}</a></li>
+            </ul>
+          </div>
+
+
+          <i if.bind="examVisible" class="fa fa-caret-left fa-2x" style="position: relative; top: -45px; left: 42px;"></i>
+        </li>
+        <li style="height: 65px;">
+          <a href="#" click.delegate="sidebarClick('meds')"  class="nav-link py-3 border-bottom" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Dashboard">
+            <i class="fa fa-stethoscope fa-2x"></i>
+          </a>
+          <i if.bind="medVisible" class="fa fa-caret-left fa-2x" style="position: relative; top: -45px; left: 42px;"></i>
+        </li>
+        <li style="height: 65px;">
+          <a href="#" click.delegate="sidebarClick('surgery')"  class="nav-link py-3 border-bottom" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders">
+            <i class="fa fa-medkit fa-2x"></i>
+          </a>
+          <i if.bind="surgeryVisible" class="fa fa-caret-left fa-2x" style="position: relative; top: -45px; left: 42px;"></i>
+        </li>
+        <li style="height: 65px;">
+          <a href="#" click.delegate="sidebarClick('dx')"  class="nav-link py-3 border-bottom" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Products">
+            <i class="fa fa-heartbeat fa-2x"></i>
+          </a>
+          <i if.bind="dxVisible" class="fa fa-caret-left fa-2x" style="position: relative; top: -45px; left: 42px;"></i>
+        </li>
+        <li style="height: 65px;">
+          <a href="#" click.delegate="sidebarClick('edit')"  class="nav-link py-3 border-bottom" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Products">
+            <i class="fa fa-cog fa-2x text-secondary"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="background-color: #dedede;
+              height: 100%;
+              position: absolute;
+              top: 0;
+              left: 80px;
+              /*width: 100%;*/
+              right: 0; border-left: 1px solid black;">
+
+      <div class="container-fluid d-flex flex-column h-100 pb-2 pr-4 overflow-auto">
+
+        <div class="row flex-fill" repeat.for="r of currentBoard.rows">
+
+          <!--COMPOSE THE BLOCKS-->
+          <compose repeat.for="b of r.blocks" view-model="./block" model.bind="b" containerless></compose>
+
+          <!--EDITING-->
+
+
+          <div class="row position-relative" style="z-index: 1000; bottom: 35px; left: 5px; height:0;" if.bind="editing">
+            <div class="col">
+              <div class="btn-toolbar" role="toolbar">
+                <!--add block-->
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle ml-2 mt-2 btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Block
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" repeat.for="t of data.blockTypes" href="#" click.delegate="addBlock(r, t)">${t}</a>
+                  </div>
+                </div>
+                <!--delete row-->
+                <button type="button" class="btn btn-danger float-right ml-2 mt-2 btn-sm" click.delegate="deleteRow(currentBoard, $index)">
+                  <i class="fa fa-trash" aria-hidden="true"></i> Row
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+
+
+        </div>
+
+        <!--add NEW ROW-->
+        <div if.bind="editing" class="row pt-2">
+          <div class="col">
+            <button type="button" class="btn btn-outline-primary float-right" click.delegate="addRow(currentBoard)">
+              <i class="fa fa-plus" aria-hidden="true"></i> Row
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+</div>
+</template>

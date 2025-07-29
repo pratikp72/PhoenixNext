@@ -1,0 +1,19 @@
+
+<template>
+  <ux-dialog>
+    <ux-dialog-header>
+        <i class.bind="iconClass" aria-hidden="true"
+           css="color: ${color};"
+           style="padding: 5px 5px 5px 0px;
+           vertical-align: baseline;"></i>
+        <h4 style="display: inline-block; margin-bottom: 0px;">${alertTitle}</h4>
+    </ux-dialog-header>
+    <ux-dialog-body>
+      <h7>${alertText}</h7>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button if.bind="showOk" click.delegate="close()">OK</button>
+      <button if.bind="showCancel" click.delegate="cancel()">Cancel</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

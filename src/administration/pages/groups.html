@@ -1,0 +1,61 @@
+<template>
+  <div class="row">
+    <div class="col-md-3 pr-0" css="height: ${height}px;" style="overflow-y:auto;">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="d-inline-block m-0 pt-1">Groups</h4>
+          <i class="fa fa-plus text-primary fa-2x float-right" aria-hidden="true" click.delegate="newGroupClick()"></i>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li repeat.for="g of groups" class="list-group-item ${g.selected ? 'active' : ''} " click.delegate="groupClick(g)">${g.name}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="card" css="height: ${height}px;">
+        <h5 class="card-header py-0 px-2">
+          <div class="d-flex align-items-center">
+            <div class="p-2 flex-grow-1"> ${selectedGroup.name}</div>
+          </div>
+        </h5>
+        <div class="card-body" style="overflow-y:auto;">
+
+          <div if.bind="!enableEdit" style="position: absolute;
+          background-color: #ffffffd4;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          top: 0;
+          z-index: 5000;"></div>
+
+          <div class="form-group">
+            <label for="exampleInputEmail1">Location</label>
+            <select value.bind="selectedGroup.location" class="form-control" id="exampleInputEmail1" matcher.bind="locationMatcher" change.delegate="locationSelected()">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="l of locations" model.bind="l" >${l.name}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="userid">Users</label>
+            <div id="userid" class="d-flex flex-row flex-wrap align-items-center" style="border: 1px solid #ced4da;border-radius: 0.25rem;">
+              <div repeat.for="u of selectedGroup.users"
+                   class="p-2 text-primary"
+                   click.delegate="deleteUser(u)">
+                <span class="p-1 bg-light">
+                  ${u.FirstName} ${u.LastName}
+                  <i class="fa fa-times float-right" aria-hidden="true"></i>
+                </span>
+              </div>
+              <i class="fa fa-plus text-primary p-2 mr-2 ml-auto" aria-hidden="true" click.delegate="addUser()"></i>
+            </div>
+            <small id="emailHelp" class="form-text text-muted">Add users to group...</small>
+          </div>
+
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-primary float-right" click.delegate="update()">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

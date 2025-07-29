@@ -1,0 +1,45 @@
+<template>
+  <!-- Overlay Backdrop -->
+  <div class="chatbot-overlay" show.bind="isOpen" click.delegate="handleBackdropClick($event)">
+    <div class="chatbot-modal">
+      <!-- Close Button -->
+      <button class="chatbot-close-btn" click.delegate="closeOverlay()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Main Container -->
+      <div class="container" show.bind="showMainView">
+        <!-- Header with Back Button -->
+        <div class="header-with-back" if.bind="chatMessages && chatMessages.length > 0">
+          <button class="back-button" click.delegate="goBack()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+          </button>
+          <h2>Chat</h2>
+        </div>
+
+        <!-- Regular Header when no chat -->
+        <assistance-header show.bind="!chatMessages || chatMessages.length === 0"></assistance-header>
+        
+        <!-- Chat Messages Area -->
+        <div class="chat-messages" if.bind="chatMessages && chatMessages.length > 0">
+          <div class="chat-message" repeat.for="message of chatMessages" class.bind="message.type">
+            <span>${message.content}</span>
+          </div>
+        </div>
+        
+        <!-- Action Buttons (show only when no chat messages) -->
+        <action-buttons show.bind="!showDetailView && (!chatMessages || chatMessages.length === 0)"></action-buttons>
+        
+        <!-- Detail View for other actions -->
+        <detail-view if.bind="showDetailView" detail-type.bind="currentDetail"></detail-view>
+        
+        <chat-input></chat-input>
+      </div>
+    </div>
+  </div>
+</template>

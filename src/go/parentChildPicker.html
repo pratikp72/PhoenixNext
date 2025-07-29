@@ -1,0 +1,24 @@
+<template>
+
+  <div class="form-group mb-0">
+    <select value.bind="currentItem" class="form-control" id="exampleFormControlSelect1">
+      <option model.bind="null">Choose...</option>
+      <option repeat.for="p of parentChildItems" model.bind="p" >${p.description}</option>
+    </select>
+  </div>
+
+  <div with.bind="currentItem" class="card">
+    <div class="d-flex card-header align-items-center" click.delegate="backClick()">
+      <i if.bind="hasParent" class="fa fa-angle-left fa-2x mr-2 text-primary" aria-hidden="true"></i> <strong class="text-capitalize">${description}</strong>
+    </div>
+    <ul class="list-group list-group-flush" css="max-height:${listHeight}px;" style="overflow-y: scroll;">
+      <li repeat.for="i of items" class="d-flex list-group-item align-items-center ${i.selected ? 'list-group-item-primary' : ''}" click.delegate="itemClick(i)">
+        <div class="text-capitalize">${i.description}</div>
+        <i if.bind="i.items.length > 0" class="fa fa-angle-right fa-2x ml-auto text-primary" aria-hidden="true"></i>
+        <button if.bind="i.items.length == 0" type="button" class="btn btn-primary ml-auto" click.delegate="itemSelected(i)">Select</button>
+        <i if.bind="i.data.Mapped" class="fa fa-map-marker text-danger fa-2x ml-1" aria-hidden="true"></i>
+      </li>
+    </ul>
+  </div>
+</template>
+

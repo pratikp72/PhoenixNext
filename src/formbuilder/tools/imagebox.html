@@ -1,0 +1,33 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+  <require from="./listbox-toolbar"></require> 
+
+  <style>
+    .table-style{
+      display: inline-block;
+      width: auto;
+    }
+  </style>
+
+  <div
+    ref="dndElement"
+    class="${item.addBoxClass ? 'box' : 'table-style'}"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)">
+
+    <div class="card w-100 h-100 border-0 bg-transparent mb-1">
+      <div ref="cardbody" class="card-body p-2">
+        <img ref="myimage" id.bind="item.elementId" width.bind="item.width" style="height: auto;" src.bind="item.dataColumn.image"> <!--height.bind="item.height"-->
+      </div>
+    </div>
+
+    <resize-corner
+      if.bind="item.addBoxClass"
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

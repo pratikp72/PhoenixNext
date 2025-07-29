@@ -1,0 +1,112 @@
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+    .result-header{
+      background-color: lightgray;
+    }
+    .result-row{
+      border-bottom: 1px solid lightgray;
+      height: 50px;
+    }
+
+    .edit-table {
+      display: flex;
+      flex-flow: column nowrap;
+      border: 1px solid lightgray;
+      border-bottom: none !important;
+      border-right: none !important;
+    }
+
+    .edit-row {
+      display: flex;
+      border-bottom: 1px solid lightgray;
+    }
+
+    .edit-heading {
+      font-weight: bold;
+    }
+
+    .edit-cell {
+      display: flex;
+      flex: 1;
+      /* justify-content: center; */
+      align-items: center;
+      border-right: 1px solid;
+    }
+
+  </style>
+
+  <ux-dialog ref="cSearchDialog" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">Search</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+
+      <!--SEARCH-->
+      <div class="row mx-0">
+        <div class="input-group">
+          <input type="text" class="form-control" value.bind="searchTerm" placeholder.bind="searchPlaceholderDescription" aria-describedby="button-addon4">
+          <div class="input-group-append" id="button-addon4">
+            <button class="btn btn-outline-secondary" type="button" click.delegate="search()"><i class="fa fa-search" aria-hidden="true"></i></button>
+            <button if.bind="editMode" class="btn btn-outline-secondary" type="button" click.delegate="openSqlSelector()"><i class="fa fa-cog" aria-hidden="true"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!--SEARCH RESULTS-->
+      <div class="card-body p-0 overflow-auto" css="max-height: ${maxScrollHeight}px;">
+        <div class="tableFixHeadLight" style="height: auto;">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th repeat.for="h of tableHeaders" scope="col">${h.value}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr repeat.for="r of searchResults">
+                <td repeat.for="c of r.cells">${c.value}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!--EDIT GRID-->
+        <div class="d-flex flex-column">
+
+          <h5 class="text-secondary">Table format...</h5>
+          <small>Search result selections will be added to current table with the following format. Set table columns to the search result columns you wish to populate. </small>
+
+          <div if.bind="editMode" class="edit-table">
+            <div class="edit-row edit-heading">
+              <div repeat.for="i of editTableObject.items" class="edit-cell pl-2">${i.item.name}
+              </div>
+            </div>
+            <div class="edit-row">
+              <div repeat.for="i of editTableObject.items" class="edit-cell">
+                <select value.bind="i.cell.value" class="form-control" aria-describedby="languageHelp">
+                  <option model.bind="null">Column...</option>
+                  <option repeat.for="c of tableHeaders" model.bind="c" >${c.value}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+
+
+
+    </ux-dialog-body>
+    <ux-dialog-footer style="position: absolute;
+        bottom: 0;
+        width: 99%;">
+      <button disabled.bind="incomplete" click.delegate="ok()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

@@ -1,0 +1,52 @@
+
+<template>
+  <ux-dialog ref="userdialog" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">User</h4>
+      <i class="fa fa-times fa-lg" style="cursor: pointer; float: right;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+
+    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">
+
+      <div>
+        <span style="position: absolute;
+                      margin-left: 8px;
+                      height: 38px;
+                      display: flex;
+                      align-items: center;
+                      color: grey;">
+            <i class="fa fa-search" aria-hidden="true"></i>
+        </span>
+        <input type="text" class="form-control"
+               placeholder="search user..."
+               aria-label="search user..."
+               aria-describedby="searchIcon"
+               value.bind="searchString"
+               input.delegate="filter($this)"
+               style="padding-left: 25px;">
+      </div>
+
+      <div class="tableFixHeadLight" css="height: ${popupHeight - 198}px;">
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th scope="col">Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="s of searchResults">
+            <tr click.delegate="rowClicked(s)" class.bind="s.selected ? 'table-primary' : 'table-light'">
+              <td>${s.name}</td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+
+    </ux-dialog-body>
+    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">
+      <button click.delegate="close()">Select</button>
+<!--      <button click.delegate="cancel()">Cancel</button>-->
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

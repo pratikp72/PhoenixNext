@@ -1,0 +1,27 @@
+<template>
+<div id="myDataGrid">
+  <table class="table table-sm table-hover table-bordered">
+    <thead class="thead-light" style="font-weight: bold; background-color: #f1f1f1;">
+      <tr>
+        <template repeat.for="c of datagridHelper.columns">
+          <td if.bind="c.visible" >${c.header}</td>
+        </template>
+      </tr>
+    </thead>
+    <tbody>
+    <tr repeat.for="r of datagridHelper.rows" style.bind="r.selected ? r.selectedStyleString : r.styleString">
+      <template repeat.for="c of datagridHelper.columns">
+        <td if.bind="c.visible"
+            click.delegate="rowClicked(r.cells[$index], r, $index, $parent.$index)"
+            dblclick.delegate="rowDoubleClicked(r.cells[$index], $parent.$index)"
+            contextmenu.delegate="rowRightClick(r.cells[$index], $parent.$index)"
+            innerhtml="${r.cells[$index]}">
+        </td>
+      </template>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+
+</template>

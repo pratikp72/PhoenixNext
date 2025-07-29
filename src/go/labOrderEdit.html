@@ -1,0 +1,114 @@
+<template>
+  <div ref="laborderedit" class="card">
+    <!-- <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a class="nav-link ${tabUserSelected ? 'active' : ''}" href="#" click.delegate="tabClicked('user')">User</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link ${tabToolbarSelected ? 'active' : ''}" href="#" click.delegate="tabClicked('toolbar')">Toolbar</a>
+        </li>
+      </ul>
+    </div> -->
+    <div class="card-body">
+      <form>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Date Ordered</label>
+            <div class="form-control">${px.data.DateCollect}</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Status</label>
+            <select value.bind="px.data.OrderStatus" class="form-control">
+              <option>ACTIVE</option>
+              <option>DISCONTINUED</option>
+              <option>COMPLETE</option>
+              <option>PATIENT_DECLINED</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Lab</label>
+            <input type="text" class="form-control" 
+              value.bind="px.data.TestOrdered" aria-describedby="usernameError" placeholder="some lab">
+          </div>
+          <div class="form-group col-md-6">
+            <label>Loinc ID</label>
+            <input type="text" class="form-control" 
+              value.bind="px.data.Code" aria-describedby="usernameError" placeholder="loinc id">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label>Location</label>
+            <select value.bind="selectedLocation" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="l of locations" model.bind="l" >${l.LocationName}</option>
+            </select>
+
+            <label>Address</label>
+            <div class="form-control" innerhtml.bind="selectedLocation.Address1"></div>
+          </div>
+          <!-- <div class="form-group col-md-6">
+            <label>Address</label>
+            <div class="form-control" 
+              value.bind="selectedLocation.Address1" aria-describedby="usernameError" placeholder="lab address"></div>
+          </div> -->
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label>Result</label>
+            <input type="text" class="form-control" 
+              value.bind="px.data.OrdResult" aria-describedby="usernameError" placeholder="lab result">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Range</label>
+            <input type="text" class="form-control" 
+              value.bind="px.data.RefRange" aria-describedby="usernameError" placeholder="lab range">
+          </div>
+          <div class="form-group col-md-4">
+            <label>Instructions</label>
+            <select value.bind="px.data.OrderInstructions" class="form-control">
+              <option>Fasting</option>
+              <option>In AM</option>
+              <option>Routine</option>
+              <option>STAT</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Normal/Abnormal</label>
+            <input type="text" class="form-control" 
+              value.bind="px.data.NormalAbnormal" aria-describedby="usernameError" placeholder="normal/abnormal">
+            <!-- <select value.bind="px.data.NormalAbnormal" class="form-control">
+              <option>Fasting</option>
+              <option>In AM</option>
+            </select> -->
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label>Comments</label>
+            <input type="text" class="form-control" 
+              value.bind="px.data.OrderComment" aria-describedby="usernameError" placeholder="lab comments">
+          </div>
+        </div>
+
+
+       
+      </form>
+
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="add()">Update</button>
+    </div>
+  </div>
+</template>

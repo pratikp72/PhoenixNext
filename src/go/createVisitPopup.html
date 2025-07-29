@@ -1,0 +1,122 @@
+
+<template>
+  <ux-dialog style="z-index: 2000; width:600px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">Create Visit</h4>
+      <i class="fa fa-times fa-lg" style="cursor: pointer; float: right;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+
+    <ux-dialog-body class="pb-0">
+
+      <form>
+        <div class="form-row">
+          <div class="form-group col-md-5">
+            <label for="visittype">Visit Type</label>
+            <select id="visittype" class="form-control"
+                    value.bind="selectedVisitType" required>
+              <option model.bind="null">Select...</option>
+              <option repeat.for="v of visitTypes"
+                      model.bind="v">
+                ${v}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group col-auto">
+            <label for="bodypart">Body Part</label>
+            <div id="bodypart" class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                ${selectedBodypart}
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a repeat.for="b of bodyParts" class="dropdown-item" href="#" click.delegate="partClicked(b)">${b}</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group col-auto">
+            <label for="bodyside">Body Side</label>
+            <div id="bodyside" class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-expanded="false">
+                ${selectedBodyside}
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a repeat.for="s of bodySides" class="dropdown-item" href="#" click.delegate="sideClicked(s)">${s}</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group col-auto">
+            <button id="add" type="button" class="btn btn-primary" style="margin-top: 32px;" click.delegate="addBodypart()"><i class="fa fa-plus" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-5">
+              <label for="userboard">User Board</label>
+              <select id="userboard" class="form-control"
+                      value.bind="selectedBoard" required>
+                <option model.bind="null">Select...</option>
+                <option repeat.for="b of userBoards"
+                        model.bind="b">
+                  ${b.description}
+                </option>
+              </select>
+          </div>
+          <div class="form-group col-md-7">
+            <div class="${selectedBodyparts.length == 0 ? 'create-visit-error-border' : ''}">
+              <template repeat.for="t of selectedBodyparts">
+                <span click.delegate="bodypartClick(t)" class="p-1 text-primary d-inline-block">${t.side}&nbsp;${t.part}
+                  <i class="fa fa-times float-right" aria-hidden="true"></i>
+                </span>
+              </template>
+            </div>
+            <div if.bind="selectedBodyparts.length == 0" class="create-visit-error-bodypart">
+              Bodypart missing
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-12 m-0">
+            <button id="add" type="button" data-toggle="collapse" data-target=".extra" aria-expanded="false" class="btn float-right collapsed" click.delegate="extraToggle()">
+              <i class="fa ${ extraVisible ? 'fa-ellipsis-h' : 'fa-ellipsis-h'} fa-2x text-secondary" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="form-group col-auto extra collapse">
+            <label for="visitdate">Visit Date</label>
+            <input type="date" class="form-control" id="visitdate" value.bind="createVisitDate">
+          </div>
+          <div class="form-group col-auto extra collapse">
+            <label for="visitprovider">Visit Provider</label>
+            <select id="visitprovider" class="form-control"
+                    value.bind="selectedVisitProvider">
+              <option model.bind="null">Select...</option>
+              <option repeat.for="p of providers"
+                      model.bind="p">
+                ${p.ProviderEntity}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-auto extra collapse">
+            <label for="billingprovider">Billing Provider</label>
+            <select id="billingprovider" class="form-control"
+                    value.bind="selectedBillingProvider">
+              <option model.bind="null">Select...</option>
+              <option repeat.for="p of providers"
+                      model.bind="p">
+                ${p.ProviderEntity}
+              </option>
+            </select>
+          </div>
+        </div>
+
+
+      </form>
+
+
+    </ux-dialog-body>
+    <ux-dialog-footer>
+        <button click.delegate="close()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

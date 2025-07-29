@@ -1,0 +1,342 @@
+<template>
+
+  <require from="../customElements/myCheckbox"></require>
+
+
+    <div ref="tabs" class="row mb-1">
+      <!--TABS-->
+      <div class="col-md-12">
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link ${displayPatHx ? 'active' : ''}" href="#" click.delegate="toggleTab('PATIENTHX')">Patient</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${displayFamHx ? 'active' : ''}" href="#" click.delegate="toggleTab('FAMILYHX')">Family</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${displaySocHx ? 'active' : ''}" href="#" click.delegate="toggleTab('SOCIALHX')">Social</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${displayMeds ? 'active' : ''}" href="#" click.delegate="toggleTab('MEDS')">Allergies/Meds</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${displayRos ? 'active' : ''}" href="#" click.delegate="toggleTab('ROS')">Health Review</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${displayVitals ? 'active' : ''}" href="#" click.delegate="toggleTab('VITALS')">Vitals</a>
+          </li>
+          <li class="nav-item">
+            <i class="fa fa-pencil-square-o fa-2x ml-2 float-right"
+               aria-hidden="true" click.delegate="toggleEdit()" css="color: ${ edit ? '#0d6efd' : '#9e9e9e'}"></i>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="patHxForm" style="overflow-y: scroll;" css="height:${windowHeight}px;">
+
+      <div if.bind="displayPatHx" class="card mb-2">
+        <div class="card-header py-0">
+
+          <div class="d-inline-block align-middle py-2 h4 m-1">Medical History</div>
+
+          <my-checkbox with.bind="history.pathx.noMedHistory"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right text-primary"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noMedicalHistoryChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+
+        </div>
+        <div class="card-body">
+          <div class="row row-cols-2">
+
+            <div repeat.for="h of history.pathx.hx"
+                 if.bind="h.visible"
+                 class="col">
+              <my-checkbox selected.bind="h.selected"
+                           value.bind="h.name"
+                           editing.bind="h.editing"
+                           click.delegate="h.select()"></my-checkbox>
+
+            </div>
+          </div>
+          <!--OTHER DISEASE-->
+          <div class="row my-2" if.bind="history.pathx.otherDiseaseHx.length > 0 || edit"
+               style="background-color: #f7f7f7;
+               margin-left: -20px; margin-right: -20px;
+               border-left: none;
+               border-right:none;
+               border-top: 1px solid #d8d8d8;
+               border-bottom: 1px solid #d8d8d8;">
+            <label class="col-md-12 col-form-label">Other Disease</label>
+          </div>
+          <div class="row" if.bind="edit">
+            <div class="col-md-12">
+              <div>
+                <select value.bind="otherDiseaseList.selectedOption" class="form-control">
+                  <option model.bind="null">Choose...</option>
+                  <option repeat.for="o of otherDiseaseList.options" model.bind="o" >${o.Description1}</option>
+                </select>
+              </div>
+              <div class="p-1">- or -</div>
+              <input value.bind="otherDiseaseInput" type="text" class="form-control d-inline" placeholder="Enter Disease">
+              <div class="mt-1">
+                <button type="button" class="btn btn-outline-secondary" click.delegate="otherDiseaseAddClick()">Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="row" repeat.for="d of history.pathx.otherDiseaseHx">
+            <div class="col-md-12">
+              <label class="col-form-label">${d}</label>
+              <button if.bind="edit" type="button" class="btn m-1 btn-danger float-right" click.delegate="otherDiseaseDeleteClick(d)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div if.bind="displayPatHx" class="card mb-2">
+        <div class="card-header py-0">
+          <div class="d-inline-block align-middle py-2 h4 m-1">Ortho History</div>
+          <my-checkbox with.bind="history.pathx.noSurgHistory"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noSurgicalHistoryChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+        </div>
+        <div class="card-body">
+          <div class="row row-cols-2">
+              <div repeat.for="h of history.pathx.surgs"
+                   if.bind="h.visible"
+                   class="col">
+                <my-checkbox selected.bind="h.selected"
+                             value.bind="h.name"
+                             editing.bind="h.editing"
+                             click.delegate="h.select()"></my-checkbox>
+
+              </div>
+          </div>
+          <!--OTHER ORTHO-->
+          <div class="row my-2" if.bind="history.pathx.otherOrthoSurg.length > 0 || edit"
+               style="background-color: #f7f7f7;
+               margin-left: -20px; margin-right: -20px;
+               border-left: none;
+               border-right:none;
+               border-top: 1px solid #d8d8d8;
+               border-bottom: 1px solid #d8d8d8;">
+            <label class="col-md-12 col-form-label">Other Surgery</label>
+          </div>
+          <div class="row" if.bind="edit">
+            <div class="col-md-12">
+              <div>
+                <select value.bind="otherOrthoList.selectedOption" class="form-control">
+                  <option model.bind="null">Choose...</option>
+                  <option repeat.for="o of otherOrthoList.options" model.bind="o" >${o.Description1}</option>
+                </select>
+              </div>
+              <div class="p-1">- or -</div>
+              <input value.bind="otherOrthoInput" type="text" class="form-control d-inline" placeholder="Enter Disease">
+              <div class="mt-1">
+                <button type="button" class="btn btn-outline-secondary" click.delegate="otherOrthoAddClick()">Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="row" repeat.for="d of history.pathx.otherOrthoSurg">
+            <div class="col-md-12">
+              <label class="col-form-label">${d}</label>
+              <button if.bind="edit" type="button" class="btn m-1 btn-danger float-right" click.delegate="otherOrthoDeleteClick(d)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div if.bind="displayFamHx" class="card mb-2">
+        <div class="card-header py-0">
+          <div class="d-inline-block align-middle py-2 h4 m-1">Father</div>
+          <my-checkbox with.bind="history.famhx.fatherNoHx"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noFatherHistoryChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+        </div>
+        <div class="card-body">
+            <div class="row row-cols-2">
+              <div repeat.for="h of history.famhx.fatherHx"
+                   if.bind="h.visible"
+                   class="col">
+                <my-checkbox selected.bind="h.selected"
+                             value.bind="h.name"
+                             editing.bind="h.editing"
+                             click.delegate="h.select()"></my-checkbox>
+              </div>
+            </div>
+
+
+
+
+
+
+          <!--FATHER OTHER-->
+          <div class="row my-2" if.bind="history.famhx.fatherHx.other.length > 0 || edit"
+               style="background-color: #f7f7f7;
+               margin-left: -20px; margin-right: -20px;
+               border-left: none;
+               border-right:none;
+               border-top: 1px solid #d8d8d8;
+               border-bottom: 1px solid #d8d8d8;">
+            <label class="col-md-12 col-form-label">Other</label>
+          </div>
+          <div class="row" if.bind="edit">
+            <div class="col-md-12">
+              <input value.bind="otherFatherInput" type="text" class="form-control d-inline" placeholder="Enter Disease">
+              <div class="mt-1">
+                <button type="button" class="btn btn-outline-secondary" click.delegate="familyOtherAddClick('father')">Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="row" repeat.for="d of history.famhx.fatherHx.other">
+            <div class="col-md-12">
+              <label class="col-form-label">${d}</label>
+              <button type="button" class="btn m-1 btn-danger float-right" click.delegate="otherFamilyDeleteClick('father',d)">Delete</button>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div if.bind="displayFamHx" class="card mb-2">
+        <div class="card-header py-0">
+          <div class="d-inline-block align-middle py-2 h4 m-1">Mother</div>
+          <my-checkbox with.bind="history.famhx.motherNoHx"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noMotherHistoryChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+        </div>
+        <div class="card-body">
+          <div class="row row-cols-2">
+            <div repeat.for="h of history.famhx.motherHx"
+                 if.bind="h.visible"
+                 class="col">
+              <my-checkbox selected.bind="h.selected"
+                           value.bind="h.name"
+                           editing.bind="h.editing"
+                           click.delegate="h.select()"></my-checkbox>
+            </div>
+          </div>
+
+
+          <!--MOTHER OTHER-->
+          <div class="row my-2" if.bind="history.famhx.motherHx.other.length > 0 || edit"
+               style="background-color: #f7f7f7;
+               margin-left: -20px; margin-right: -20px;
+               border-left: none;
+               border-right:none;
+               border-top: 1px solid #d8d8d8;
+               border-bottom: 1px solid #d8d8d8;">
+            <label class="col-md-12 col-form-label">Other</label>
+          </div>
+          <div class="row" if.bind="edit">
+            <div class="col-md-12">
+              <input value.bind="otherMotherInput" type="text" class="form-control d-inline" placeholder="Enter Disease">
+              <div class="mt-1">
+                <button type="button" class="btn btn-outline-secondary" click.delegate="familyOtherAddClick('mother')">Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="row" repeat.for="d of history.famhx.motherHx.other">
+            <div class="col-md-12">
+              <label class="col-form-label">${d}</label>
+              <button type="button" class="btn m-1 btn-danger float-right" click.delegate="otherFamilyDeleteClick('mother',d)">Delete</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div if.bind="displayFamHx" class="card mb-2">
+        <div class="card-header py-0">
+          <div class="d-inline-block align-middle py-2 h4 m-1">Sibling</div>
+          <my-checkbox with.bind="history.famhx.siblingNoHx"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noSiblingHistoryChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+        </div>
+        <div class="card-body">
+          <div class="row row-cols-2">
+            <div repeat.for="h of history.famhx.siblingHx"
+                 if.bind="h.visible"
+                 class="col">
+              <my-checkbox selected.bind="h.selected"
+                           value.bind="h.name"
+                           editing.bind="h.editing"
+                           click.delegate="h.select()"></my-checkbox>
+            </div>
+          </div>
+
+          <!--SIBLING OTHER-->
+          <div class="row my-2" if.bind="history.famhx.siblingHx.other.length > 0 || edit"
+               style="background-color: #f7f7f7;
+               margin-left: -20px; margin-right: -20px;
+               border-left: none;
+               border-right:none;
+               border-top: 1px solid #d8d8d8;
+               border-bottom: 1px solid #d8d8d8;">
+            <label class="col-md-12 col-form-label">Other</label>
+          </div>
+          <div class="row" if.bind="edit">
+            <div class="col-md-12">
+              <input value.bind="otherSiblingInput" type="text" class="form-control d-inline" placeholder="Enter Disease">
+              <div class="mt-1">
+                <button type="button" class="btn btn-outline-secondary" click.delegate="familyOtherAddClick('sibling')">Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="row" repeat.for="d of history.famhx.siblingHx.other">
+            <div class="col-md-12">
+              <label class="col-form-label">${d}</label>
+              <button type="button" class="btn m-1 btn-danger float-right" click.delegate="otherFamilyDeleteClick('sibling',d)">Delete</button>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div if.bind="displaySocHx" class="row">
+        <!--SOCIAL HISTORY-->
+        <compose view-model="./socialHistory" model.bind="$this" containerless></compose>
+      </div>
+
+
+      <!--Allergies / Meds-->
+      <compose if.bind="displayMeds" view-model="./allergiesMeds" model.bind="$this" containerless></compose>
+
+
+      <div if.bind="displayRos" class="row">
+        <!--ROS-->
+        <compose view-model="./healthReview" model.bind="$this" containerless></compose>
+      </div>
+
+      <div if.bind="displayVitals" class="row">
+        <!--VITAL SIGNS-->
+        <compose view-model="./vitalSigns" model.bind="$this" containerless></compose>
+      </div>
+
+    </div>
+</template>

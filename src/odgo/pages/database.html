@@ -1,0 +1,49 @@
+<template>
+
+  <style>
+    .card-radius{
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border: 1px solid #dee2e6;
+    }
+  </style>
+
+  <div class="card border-top-0 card-radius">
+    <div class="card-body">
+
+      <form>
+        <fieldset disabled.bind="home.selectedPage.disabled">
+          <h4 class="mb-2">${home.selectedTenant.data.TenantId}<i if.bind="!home.selectedPage.disabled" class="fa fa-pencil-square-o ml-2 text-muted" aria-hidden="true" click.delegate="editTenantClick()"></i></h4>
+          <div if.bind="displayTenantIdEdit" class="form-group border rounded p-2 bg-warning">
+            <label for="formGroupExampleInput">Make sure you know what you're doing!</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="TenantId" value.bind="home.selectedTenant.data.TenantId">
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput">Database Name</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Database Name" value.bind="home.selectedTenant.data.DatabaseName">
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Portal Domain</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Portal Domain url..." value.bind="home.selectedTenant.data.PortalDomain">
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Root Path</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Root folder path..." value.bind="home.selectedTenant.data.RootPath">
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value.bind="home.selectedTenant.data.SelfHosted" id="defaultCheck1">
+            <label class="form-check-label" for="defaultCheck1">
+              Self Hosted
+            </label>
+          </div>
+        </fieldset>
+      </form>
+
+
+    </div>
+    <div class="card-footer">
+      <button type="button" disabled.bind="home.selectedPage.disabled" class="btn btn-danger" click.delegate="delete()">Delete <i class="fa fa-trash" aria-hidden="true"></i></button>
+      <button type="button" disabled.bind="home.selectedPage.disabled" class="btn btn-primary float-right" click.delegate="save()">Save</button>
+    </div>
+  </div>
+</template>

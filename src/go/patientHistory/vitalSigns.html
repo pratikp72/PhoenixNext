@@ -1,0 +1,129 @@
+<template>
+  <div class="col-md-12">
+    <div class="card mb-2">
+      <div class="card-header py-0">
+        <div class="d-inline-block align-middle py-2 h4 m-1">Vital Signs</div>
+      </div>
+      <div class="card-body">
+
+        <div if.bind="parent.edit">
+          <h4>Blood Pressure</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Systolic</span>
+                </div>
+                <input type="number" value.bind="systole" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="basic-addon1">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon2">Diastolic</span>
+                </div>
+                <input type="number" value.bind="diastole" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="basic-addon2">
+              </div>
+            </div>
+          </div>
+
+          <h4>Pulse - Resp - Temp</h4>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="pulseAddon">Pulse</span>
+                </div>
+                <input type="number" value.bind="pulse" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="pulseAddon">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="respAddon">Resp</span>
+                </div>
+                <input type="number" value.bind="resp" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="respAddon">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="tempAddon">Temp</span>
+                </div>
+                <input type="number" value.bind="temp" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="tempAddon">
+              </div>
+            </div>
+          </div>
+
+          <h4>Height - Weight</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="heightaddon1">Height</span>
+                </div>
+                <input type="number" value.bind="height" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="heightaddon1">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="weightAddon">Weight</span>
+                </div>
+                <input type="number" value.bind="weight" class="form-control" placeholder="value..." aria-label="Username" aria-describedby="weightAddon">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 pb-2">
+              <button type="button" class="btn btn-primary float-right" click.delegate="addClick()">Add</button>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!--VITAL HISTORY-->
+        <div class="row">
+          <div class="col-md-12">
+<!--            <label class="col-form-label">History</label>-->
+            <div class="tableFixHeadLight" css="height: 100px;" style="overflow-y: scroll; overflow-x: hidden;">
+              <table class="table table-condensed table-striped w-auto">
+                <thead style="font-size: small; color: grey;">
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Ht</th>
+                    <th scope="col">Wt</th>
+                    <th scope="col">BMI</th>
+                    <th scope="col">BMI%</th>
+                    <th scope="col">HL%</th>
+                    <th scope="col">B/P</th>
+                    <th scope="col">P</th>
+                    <th scope="col">R</th>
+                    <th scope="col" style="width: 100%;">Temp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="v of rows">
+                      <td>${v.date}</td>
+                      <td>${v.time}</td>
+                      <td>${v.height}</td>
+                      <td>${v.weight}</td>
+                      <td>${v.bmi}</td>
+                      <td>${v.bmiPercent}</td>
+                      <td>${v.heightLengthPercent}</td>
+                      <td>${v.bloodpressure}</td>
+                      <td>${v.pulse}</td>
+                      <td>${v.resp}</td>
+                      <td>${v.temp}</td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

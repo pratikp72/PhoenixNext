@@ -1,0 +1,165 @@
+<template>
+  <style type="text/css">
+      .section-list-item {
+          color: white;
+          line-height: 30px;
+          padding: 5px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 16px;
+      }
+  </style>
+  <div class="row">
+      <div class="col">
+          <nav class="navbar navbar-light bg-light d-flex ">
+
+              <div class="p-2">
+                  <h5 class="p-2" style="display: inline;">
+                      Portal Preferences
+                  </h5>
+                  <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Configure Portal"></i>
+              </div>
+
+              <div class="p-2 ml-auto text-right" >
+                  <button disabled.bind="changesSaved" class="btn btn-primary">Save Layout</button>
+                  <!-- <div class="text-danger">Changes not saved!</div> -->
+              </div>
+
+          </nav>
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-4 p-5">
+
+          <div class="row">
+            <div class="col">
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa fa-list-alt" aria-hidden="true"></i> Go Forms</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li repeat.for="form of availableGoForms" class="list-group-item">
+                              <h5>
+                                ${form.Description}
+                              </h5>
+                              <div>
+                                <span class="btn btn-success pointer-event" click.delegate="addClicked(form, 'goform')">Add</span>
+                              </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+
+
+      </div>
+      <div class="col-8 p-5">
+
+          <!-- <div class="row">
+              <div class="col p-2">
+                  <span class="p-2">
+                      <h5 class="p-2" style="display: inline;">
+                      Page order for the "${currentProviderName}" "${currentConfiguration.Name}" layout
+                      </h5>
+                      <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Page Order"></i>
+                  </span>
+              </div>
+          </div> -->
+
+          <div class="row">
+              <div class="col">
+
+                  <form>
+
+                      <div class="form-group">
+
+                          <template if.bind="currentConfiguration && currentConfiguration.JsonData">
+                              <ul class="list-group">
+                                  <li class="list-group-item ${item.type === 'pdf' ? 'list-group-item-info' : ''} ${item.type === 'child-page' ? 'list-group-item-secondary' : ''}" style="cursor: pointer;" reorderable-repeat.for="item of currentConfiguration.JsonData" reorderable-after-reordering="orderChanged">
+
+                              <span class="d-flex">
+
+                                  <span class="mr-auto" style="${item.type === 'child-page' ? 'margin-left: 20px' : ''}">
+                                      <template if.bind="item.type === 'child-page'">
+
+                                          <h6>
+                                              ${item.name}
+                                          </h6>
+
+                                          <span class="text-muted" >
+                                              child of: ${item.parent}
+                                          </span>
+
+                                      </template>
+                                      <template if.bind="item.type !== 'child-page'">
+
+                                      <span>
+                                          <i style="padding: 0 5px 0 0;" class="fa fa-${item.icon} fa-2x"></i>
+                                      </span>
+
+                                          <h4 style="display: inline;">
+                                              ${item.name}
+                                          </h4>
+
+                                      </template>
+                                      <!-- <template if.bind="item.type === 'pdf'">
+
+                                          <template if.bind="item.pdfTemplate.OD_PDF_Template_Rules && item.pdfTemplate.OD_PDF_Template_Rules.length > 0">
+
+                                              <div class="row">
+                                                  <div class="col font-weight-bold">
+                                                      PDF Rules:
+                                                  </div>
+                                              </div>
+
+                                              <div class="row">
+
+                                                  <template repeat.for="rule of item.pdfTemplate.OD_PDF_Template_Rules">
+                                                      <div class="col border-right border-dark">
+                                                          <div>${rule.Name}</div>
+                                                          <small innerHtml.bind="parseRuleValue(rule)"></small>
+                                                      </div>
+                                                  </template>
+
+                                              </div>
+
+                                          </template>
+
+                                          <div>
+
+                                              <button class="mt-1 btn btn-primary pointer-event" click.delegate="openRulesDialog(item.pdfTemplate)">Edit Rules</button>
+
+                                          </div>
+
+                                      </template> -->
+                                  </span>
+                                  <span >
+                                      <span if.bind="item.name != 'End' && item.name != 'Pay'" class="btn btn-danger pointer-event" click.delegate="removeClicked(item, $index)">Remove</span>
+                                  </span>
+
+                              </span>
+
+                                  </li>
+                              </ul>
+
+                          </template>
+
+                      </div>
+
+                  </form>
+
+              </div>
+          </div>
+
+
+      </div>
+  </div>
+</template>

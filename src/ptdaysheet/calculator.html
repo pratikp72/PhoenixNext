@@ -1,0 +1,102 @@
+
+<template>
+  <ux-dialog>
+    <ux-dialog-header>
+      <div class="row">
+        <div class="col-sm-12 d-flex">
+          <h4>Calculator</h4>
+
+          <i class="fa fa-times ml-auto" click.delegate="close()"></i>
+        </div>
+      </div>
+    </ux-dialog-header>
+    <ux-dialog-body>
+
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="row">
+            <div class="col-sm-12">
+              <input class="form-control form-control-sm" type="text" value.bind="value" css="background-color:${backgroundColor}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary flex-fill my-1" value="1" click.delegate="numberClick($event)">1</button>
+              <button type="button" class="btn btn-secondary flex-fill m-1" value="2" click.delegate="numberClick($event)">2</button>
+              <button type="button" class="btn btn-secondary flex-fill my-1" value="3" click.delegate="numberClick($event)">3</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary flex-fill my-1" value="4" click.delegate="numberClick($event)">4</button>
+              <button type="button" class="btn btn-secondary flex-fill m-1" value="5" click.delegate="numberClick($event)">5</button>
+              <button type="button" class="btn btn-secondary flex-fill my-1" value="6" click.delegate="numberClick($event)">6</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 d-flex justify-content-between">
+              <button type="button" class="btn btn-secondary flex-fill my-1" value="7" click.delegate="numberClick($event)">7</button>
+              <button type="button" class="btn btn-secondary flex-fill m-1" value="8" click.delegate="numberClick($event)">8</button>
+              <button type="button" class="btn btn-secondary flex-fill my-1" value="9" click.delegate="numberClick($event)">9</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 d-flex justify-content-around">
+              <button type="button" class="btn btn-success flex-fill my-1" click.delegate="close()"><i class="fa fa-check"></i></button>
+              <button type="button" class="btn btn-secondary flex-fill m-1" value="0" click.delegate="numberClick($event)">0</button>
+              <button type="button" class="btn btn-danger flex-fill my-1" click.delegate="clear()">CE</button>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-4 d-flex flex-column">
+          <div class="dropdown">
+            <button class="btn btn-primary btn-sm btn-block dropdown-toggle mb-1" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              A-P
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#" click.delegate="actPassClick('ACT')">ACT</a>
+              <a class="dropdown-item" href="#" click.delegate="actPassClick('PASS')">PASS</a>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-sm  mb-1" value="to" click.delegate="valueClick($event)">TO</button>
+
+          <button type="button" class="btn btn-primary btn-sm  mb-1" value="reps" click.delegate="valueClick($event)">Rep</button>
+
+          <div class="dropdown">
+            <button class="btn btn-primary btn-sm btn-block dropdown-toggle mb-1" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dist
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Feet</a>
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Step(s)</a>
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Mile(s)</a>
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Block(s)</a>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-sm mb-1" value="lbs" click.delegate="valueClick($event)">LBS</button>
+
+          <div class="dropdown">
+            <button class="btn btn-primary btn-sm btn-block dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Time
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Second(s)</a>
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Minute(s)</a>
+              <a class="dropdown-item" href="#" click.delegate="linkClick($event)">Hour(s)</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </ux-dialog-body>
+    <!--<ux-dialog-footer>-->
+      <!--<button click.delegate="close()">Login</button>-->
+    <!--</ux-dialog-footer>-->
+
+  </ux-dialog>
+</template>

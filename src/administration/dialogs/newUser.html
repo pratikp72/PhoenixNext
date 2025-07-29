@@ -1,0 +1,147 @@
+<template>
+  <div ref="newuser" class="card">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a class="nav-link ${tabUserSelected ? 'active' : ''}" href="#" click.delegate="tabClicked('user')">User</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link ${tabMiscSelected ? 'active' : ''}" href="#" click.delegate="tabClicked('misc')">Misc</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link ${tabToolbarSelected ? 'active' : ''}" href="#" click.delegate="tabClicked('toolbar')">Toolbar</a>
+        </li>
+        <!--<li class="nav-item">
+          <a class="nav-link disabled">Other</a>
+        </li> -->
+      </ul>
+    </div>
+    <div class="card-body">
+
+      <div if.bind="tabToolbarSelected">
+        <compose view-model="../pages/toolbar" model.bind="user" containerless></compose>
+      </div>
+
+      <div if.bind="tabMiscSelected">
+        <compose view-model="../pages/userMisc" model.bind="user" containerless></compose>
+      </div>
+
+      <form if.bind="tabUserSelected">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Username</label>
+            <input type="email" class="form-control ${user.UserName.length==0 || user.UserName == null ? 'is-invalid' : ''}" 
+              value.bind="user.UserName" aria-describedby="usernameError" placeholder="some@email.com">
+            <div id="usernameError" class="invalid-feedback">
+              Username is required and must be a valid email address
+            </div>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Role</label>
+            <select value.bind="selectedRole" class="form-control ${selectedRole==null ? 'is-invalid' : ''}">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="r of roleTypes" model.bind="r" >${r.RoleName}</option>
+            </select>
+            <div class="invalid-feedback">
+              Role is required
+            </div>
+          </div>
+        </div>
+
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Email</label>
+            <input type="email" class="form-control ${user.email.length==0 || user.email == null ? 'is-invalid' : ''}" value.bind="user.email" aria-describedby="emailError">
+            <div id="emailError" class="invalid-feedback">
+              Email required
+            </div>
+          </div>
+        </div>
+
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>First Name</label>
+            <input type="text" class="form-control ${user.FirstName.length==0 || user.FirstName == null ? 'is-invalid' : ''}" value.bind="user.FirstName" aria-describedby="firstNameError">
+            <div id="firstNameError" class="invalid-feedback">
+              First name required
+            </div>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Last Name</label>
+            <input type="text" class="form-control ${user.LastName.length==0 || user.LastName == null ? 'is-invalid' : ''}" value.bind="user.LastName" aria-describedby="lastNameError">
+            <div id="lastNameError" class="invalid-feedback">
+              Last name required
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Location</label>
+            <select class="form-control" value.bind="user.Location">
+              <option selected>Choose...</option>
+              <option repeat.for="l of locations">${l.LocationName}</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Status</label>
+            <select value.bind="userStatus" class="form-control">
+              <!-- <option>Enabled</option>
+              <option>Disabled</option> -->
+              <option repeat.for="s of userStatusList">${s}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>User Password</label>
+            <input type="password" class="form-control ${invalidPassword ? 'is-invalid' : ''}" value.bind="typePassword" aria-describedby="passwordError">
+            <div id="passwordError" class="invalid-feedback">
+              ${passwordErrorTxt}
+            </div>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Retype Password</label>
+            <input type="password" class="form-control ${invalidRetypePassord ? 'is-invalid' : ''}" value.bind="retypePassword" aria-describedby="passwordRetypeError">
+            <div id="passwordRetypeError" class="invalid-feedback">
+              ${retypePasswordErrorTxt}
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>License</label>
+            <select class="form-control ${user.LicenseType==null ? 'is-invalid' : ''}" value.bind="user.LicenseType">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="r of licenseTypes" model.bind="r" >${r}</option>
+            </select>
+            <div class="invalid-feedback">
+              License type is required
+            </div>
+          </div>
+          <div class="form-group col-md-6" if.bind="hideKeyPicker">
+            <label>License Key <i class="fa fa-key text-secondary" aria-hidden="true"></i></label>
+            <div if.bind="availableLicense && !user.License" class="input-group mb-3">
+              <input type="text" class="form-control" value.bind="user.License" readonly placeholder="License Key..." aria-label="license key" aria-describedby="button-addon2">
+              <div class="input-group-append">
+                <button class="btn btn-success" type="button" id="button-addon2" click.delegate="claimKey()">Claim</button>
+              </div>
+            </div>
+            <div if.bind="!availableLicense && !user.License" class="input-group mb-3">
+              <input type="text" class="form-control ${user.License==null ? 'is-invalid' : ''}" value.bind="user.License" readonly placeholder="License Key Required..." aria-label="license key" aria-describedby="button-add">
+              <div class="input-group-append">
+                <button class="btn btn-primary" disabled.bind="!canCreateLicense" type="button" id="button-add" click.delegate="addKey()">Add</button>
+              </div>
+            </div>
+            <input if.bind="user.License" readonly type="text" class="form-control is-valid" value.bind="user.License">
+          </div>
+        </div>
+      </form>
+
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" disabled.bind="!canSave" click.delegate="add()">${buttonText}</button>
+    </div>
+  </div>
+</template>

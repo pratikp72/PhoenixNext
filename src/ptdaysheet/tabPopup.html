@@ -1,0 +1,34 @@
+
+<template>
+  <ux-dialog ref="tabpop">
+    <ux-dialog-header>
+      <div class="row">
+        <div class="col-sm-12 d-flex">
+          <h4>Add Tab</h4>
+          <i class="fa fa-times ml-auto" click.delegate="close()"></i>
+        </div>
+      </div>
+    </ux-dialog-header>
+    <ux-dialog-body>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <form>
+            <div class="form-group">
+              <select class="form-control" multiple value.bind="selectedTabs">
+                <option repeat.for="t of tabOptions"
+                        model.bind="t">
+                  ${t.Description2}
+                </option>
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+    <button click.delegate="close()">Done</button>
+    </ux-dialog-footer>
+
+  </ux-dialog>
+</template>

@@ -1,0 +1,58 @@
+<template>
+  <ux-dialog>
+    <ux-dialog-body>
+      <h2>DI Lookup</h2>
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" value.bind="deviceValue" placeholder="Implant DI#" aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" click.delegate="lookupDeviceWithDi()">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <table class="table table-hover" if.bind="devices">
+        <thead>
+        <tr>
+          <th scope="col">GMDN Part Name</th>
+          <th scope="col">Device ID</th>
+          <th scope="col">Description</th>
+          <th scope="col">Brand Name</th>
+          <th scope="col">Version or Model</th>
+          <th scope="col">Company Name</th>
+          <th scope="col">MRI Safety Info</th>
+          <th scope="col">Label Rubber</th>
+          <th scope="col">Lot or Batch</th>
+          <th scope="col">Serial Number</th>
+          <th scope="col">Expiration Date</th>
+          <th scope="col">Mfg. Date</th>
+        </tr>
+        </thead>
+        <tbody repeat.for="d of devices">
+          <tr>
+            <td>${d.Json.gmdnTerms.gmdn.gmdnPTName}</td>
+            <td>${d.Json.identifiers.identifier.deviceId}</td>
+            <td>${d.Json.deviceDescription}</td>
+            <td>${d.Json.brandName}</td>
+            <td>${d.Json.versionModelNumber}</td>
+            <td>${d.Json.companyName}</td>
+            <td>${d.Json.MRISafetyStatus}</td>
+            <td>${d.Json.labeledContainsNRL}</td>
+            <td>${d.Json.lotBatch}</td>
+            <td>${d.Json.serialNumber}</td>
+            <td>${d.Json.expirationDate}</td>
+            <td>${d.Json.manufacturingDate}</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+    </ux-dialog-body>
+
+    <ux-dialog-footer>
+      <button click.trigger="controller.cancel()">Cancel</button>
+      <button click.trigger="controller.ok(devices)">Ok</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

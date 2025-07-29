@@ -1,0 +1,124 @@
+
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+    .fax-number-input{
+      display: inline-block;
+      width: auto;
+      border: none;
+      height: auto;
+      padding: 0;
+      width: 100%;
+    }
+
+    .no-left-border-radius{
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    .no-right-border-radius{
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  </style>
+
+
+
+  <ux-dialog ref="dxpop" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">Diagnosis</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body style="height: 75%;">
+
+
+
+    <i if.bind="displaySpinner" class="fa fa-spinner fa-pulse fa-3x fa-fw" style="position: absolute;" css="left:${spinnerLeft}px; top:${spinnerTop}px;"></i>
+
+
+    <!-- <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <select value.bind="bodypart" class="form-control" style="border-top-right-radius: 0;border-bottom-right-radius: 0;">
+          <option repeat.for="bp of bodyparts" value.bind="bp" >${bp}</option>
+        </select>
+      </div>
+      <input type="text" class="form-control"
+              placeholder="search code or description..."
+              aria-label="search code or description..."
+              aria-describedby="button-addon2" value.bind="searchString">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary"
+                type="button" id="button-addon2" click.delegate="searchClicked()">Search</button>
+      </div>
+    </div> -->
+
+
+    <div class="d-flex align-items-center mb-3">
+
+      <div class="btn-group">
+        <button type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-plus fa-2x text-primary" aria-hidden="true"></i>
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#" repeat.for="bp of bodyparts" click.delegate="addSearchFilter(bp)">${bp}</a>
+        </div>
+      </div>
+
+      <div class="border-right-0 form-control no-right-border-radius d-flex align-items-center">
+        <template repeat.for="r of searchFilters">
+          <span click.delegate="removeSearchFilter($index)" 
+            class="p-1 text-primary d-inline-block" style="position: relative; margin-right: 20px;">${r}
+          <i class="fa fa-times float-right" style="position: absolute; top:5px; right: -10px;" aria-hidden="true"></i>
+          </span>
+        </template>
+        <input type="text" class="form-control fax-number-input flex-fill" placeholder="search code or description..." value.bind="searchString"></input>
+      </div>
+
+      <button class="btn btn-outline-secondary ml-auto no-left-border-radius"
+        type="button" id="button-addon2" click.delegate="searchClicked()">          
+        <i class="fa fa-search" aria-hidden="true"></i>
+      </button>
+
+    </div>
+
+
+
+    <div id="selectedDiagnosis" class="d-flex flex-wrap">
+      <span repeat.for="t of selectedDiagnosis" click.delegate="removeDiagnosisClick(t)" class="p-1 text-primary d-inline-block">
+        ${t.code}&nbsp;${t.description}&nbsp;${t.side}
+        <i class="fa fa-times float-right" aria-hidden="true"></i>
+      </span>
+    </div>
+
+    <div class="tableFixHeadLight" css="height: ${searchResultsHeight}px;">
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Code</th>
+            <th scope="col">Desc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template repeat.for="s of searchResults">
+            <tr class.bind="s.selected ? 'table-primary' : 'table-light'">
+              <td click.delegate="addClicked(s)"><i class="fa fa-plus-square fa-2x text-primary"></i></td>
+              <td>${s.code}</td>
+              <td>${s.description}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+
+
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button click.delegate="close()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

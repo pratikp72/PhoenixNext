@@ -1,0 +1,262 @@
+<template>
+
+  <require from="../customElements/myCheckbox"></require>
+
+  <div class="col-md-12">
+    <div class="card mb-2">
+      <div class="card-header py-0">
+        <div class="d-inline-block align-middle py-2 h4 m-1">Social History</div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-5">
+            <label class="col-form-label">Hand Dominance</label>
+          </div>
+          <div class="col-md-auto">
+            <my-checkbox with.bind="history.sochx.hand_dom_R"
+                         if.bind="visible"
+                         selected.bind="selected"
+                         value.bind="name"
+                         editing.bind="editing"
+                         click.delegate="select()"></my-checkbox>
+
+
+            <my-checkbox with.bind="history.sochx.hand_dom_L"
+                         if.bind="visible"
+                         selected.bind="selected"
+                         value.bind="name"
+                         editing.bind="editing"
+                         click.delegate="select()"></my-checkbox>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-auto">
+            <!--PREGNANT??-->
+            <my-checkbox with.bind="history.sochx.pregnant"
+                         if.bind="isFemale"
+                         selected.bind="selected"
+                         value.bind="name"
+                         editing.bind="editing"
+                         click.delegate="select()"></my-checkbox>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-2">
+      <div class="card-header py-0">
+
+        <div class="d-inline-block align-middle py-2 m-1">Substances</div>
+
+        <my-checkbox with.bind="history.sochx.All_Sub_Neg"
+          if.bind="visible"
+          class="float-right text-primary"
+          selected.bind="selected"
+          value.bind="name"
+          editing.bind="editing"
+          click.delegate="select()"></my-checkbox>
+
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+
+            <div if.bind="parent.edit" class="row mb-2">
+              <div class="col-md-12">
+                <div class="dropdown d-inline-block">
+                  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                    ${selectedSubstance}
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a repeat.for="s of substanceList" class="dropdown-item" href="#" click.delegate="selectSubstance(s)" >${s}</a>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary d-inline-block ml-2" click.delegate="addSubstance()">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="row mb-2" repeat.for="s of history.sochx.substances">
+              <div if.bind="!parent.edit" style="display: contents;">
+                <label class="col-md-5 col-form-label font-weight-bold">${s.selectedValue}</label>
+                <div class="col-auto">
+                  <div class="d-inline-block">
+                    <label class="col-form-label">${s.selectedUsageOption}</label>
+                  </div>
+                </div>
+              </div>
+              <div if.bind="parent.edit" class="col-md-8">
+                <div style="display: inline-block; padding-right: 10px; width: 50%;">
+                  <select value.bind="s.selectedValue" class="form-control d-inline-block">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="o of s.typeOptions" model.bind="o" >${o}</option>
+                  </select>
+                </div>
+                <div class="d-inline-block" style="width: 50%;">
+                  <select value.bind="s.selectedUsageOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="o of s.usageOptions" model.bind="o" >${o}</option>
+                  </select>
+                </div>
+              </div>
+              <div if.bind="parent.edit" class="col-md-auto pl-0">
+                <button type="button" class="btn btn-danger d-inline-block" click.delegate="removeSubstance(s)">
+                   Delete
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-2">
+      <div class="card-header">
+        Lifestyle | Appearance | Orientation
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+
+            <div if.bind="history.sochx.Appearance.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.Appearance.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.Appearance.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.Appearance.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.Appearance.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.activity_level.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.activity_level.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.activity_level.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.activity_level.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.activity_level.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.exercise_freq.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.exercise_freq.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.exercise_freq.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.exercise_freq.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.exercise_freq.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.exercise_val.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.exercise_val.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.exercise_val.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.exercise_val.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.exercise_val.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.hobbies.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.hobbies.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.hobbies.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.hobbies.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.hobbies.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.dietHx.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.dietHx.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.dietHx.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.dietHx.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.dietHx.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="card mb-2">
+      <div class="card-header">
+        Demographics
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+
+            <div if.bind="history.sochx.occupation.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.occupation.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.occupation.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.occupation.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.occupation.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.Employer.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">Employer</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.Employer.selectedOption}</label>
+                  <input if.bind="parent.edit" type="text" class="form-control" placeholder="Employer..." value.bind="history.sochx.Employer.selectedOption">
+                </div>
+              </div>
+            </div>
+
+            <div if.bind="history.sochx.education.visible" class="row mb-2">
+              <label class="col-md-5 col-form-label font-weight-bold">${history.sochx.education.name}</label>
+              <div class="col-auto">
+                <div class="d-inline-block">
+                  <label if.bind="!parent.edit" class="col-form-label">${history.sochx.education.selectedOption}</label>
+                  <select if.bind="parent.edit" value.bind="history.sochx.education.selectedOption" class="form-control">
+                    <option model.bind="null">Choose...</option>
+                    <option repeat.for="s of history.sochx.education.options" model.bind="s" >${s}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+</template>

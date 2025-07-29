@@ -1,0 +1,100 @@
+<template>
+  <div class="card-header d-flex align-items-center" style="height: 44px;">
+    <h6 class="mb-0 mr-2">ORDERS <small class="text-muted">${orders.length}</small></h6>
+
+    <div class="dropdown mr-2" style="position: inherit;">
+      <button class="btn btn-outline-primary dropdown-toggle" 
+        disabled.bind="locked" style="padding: 4px 12px 4px 12px;" 
+        type="button" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-plus pr-1"></i>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item px-3" repeat.for="t of prefTypes" 
+          href="#" click.delegate="openPreferencePicker(t)">
+            <i class="fa fa-user-plus fa-fw pr-2" aria-hidden="true"></i>${t}</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" 
+        style="padding: 4px 12px 4px 12px;" 
+        disabled.bind="locked" type="button" data-toggle="dropdown" aria-expanded="false">
+        X-RAY
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="#" click.delegate="displayPxSearch('X-RAY')"><i class="fa fa-plus mr-1" aria-hidden="true"></i>Add</a>
+        <a if.bind="xrays.length > 0" class="dropdown-item" href="#" click.delegate="openXrayHistory()">X Priors</a>
+      </div>
+    </div>
+
+    <a class="btn btn-default ml-auto ${locked ? 'disabled' : ''}" href="#" style="padding: 0 34px 0 0;">
+      <i class="fa fa-search fa-2x text-primary"  click.delegate="displayPxSearch(null)"></i>
+    </a>
+
+  </div>
+  <div class="card-body p-0 overflow-hidden">
+    <div class="tableFixHeadLight">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Desc</th>
+            <th scope="col" if.bind="displayDeleteHeader" class="au-animate animate-swipe-row-right"></th>
+          </tr>
+        </thead>
+        <tbody>
+        <template repeat.for="s of orders">
+          <tr if.bind="globals.isTouchDevice" hammer-swipe.call="rowSwipe($event, s)"
+              css="background-color: ${s.isEven() ? '#f2f2f2' : '' & signal: 'refresh-row'}"><!--class="${s.selected ? 'table-success' : 'table-light'}"-->
+            <td style="vertical-align: middle;">${s.code}</td>
+            <td class="d-flex align-items-center">
+              ${s.description}
+              <span class="text-black-50 mr-1 ml-auto text-uppercase"><strong>${s.side}</strong></span><!--if.bind="s.side != null" -->
+              <button if.bind="s.type == 'LAB'" 
+                type="button" class="btn btn-outline-secondary float-right mr-2" 
+                click.delegate="openLabEditPopup(s)"><i class="fa fa-flask mr-1"></i>Edit</i></button>
+              <!--outside image-->
+              <button if.bind="s.type == 'X-RAY'" 
+                type="button" class="btn ${s.outside == true ? 'btn-warning' : 'btn-outline-secondary'} float-right mr-2" 
+                click.delegate="toggleOutsideImage(s)">
+                  Outside <i class="fa fa-external-link-square"></i></button>
+            </td>
+
+            <td if.bind="displayDeleteHeader && !s.displayDelete"></td>
+            <td if.bind="s.displayDelete"
+                style="background-color: #dd3444;vertical-align: middle;"
+                class="au-animate animate-swipe-row-left animate-swipe-row-right">
+              <button type="button" class="btn btn-danger" style="display: block; margin: auto;"
+                      click.delegate="deleteOrderClick($index)"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+          <!--FOR NON-TOUCH DEVICES-->
+          <tr if.bind="!globals.isTouchDevice" css="background-color: ${s.isEven() ? '#f2f2f2' : '' & signal: 'refresh-row'}">
+            <td style="vertical-align: middle;">${s.code}</td>
+            <td class="d-flex align-items-center">
+              ${s.description}
+              <span class="text-black-50 mr-1 ml-auto text-uppercase"><strong>${s.side}</strong></span>
+              <button if.bind="s.type == 'LAB'" 
+                type="button" class="btn btn-outline-secondary float-right mr-2" 
+                click.delegate="openLabEditPopup(s)"><i class="fa fa-flask mr-1"></i>Edit</i></button>
+              <!--outside image-->
+              <button if.bind="s.type == 'X-RAY'" 
+                type="button" class="btn ${s.outside == true ? 'btn-warning' : 'btn-outline-secondary'} float-right mr-2" 
+                click.delegate="toggleOutsideImage(s)">
+                  Outside <i class="fa fa-external-link-square"></i></button>
+            </td>
+
+            <!-- <td></td> -->
+            <td style="vertical-align: middle;">
+              <button if.bind="s.canDelete" type="button" class="btn" style="display: block; margin: auto;"
+                      click.delegate="deleteOrderClick($index)"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+        </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,55 @@
+<template>
+  <div class="chat-input-container">
+    <div class="chat-input-top">
+      <label class="chat-placeholder" show.bind="!chatText && !isRecording">Ask POGO AI...</label>
+
+      <!-- Voice Recording Indicator -->
+      <div class="voice-input" class.bind="isRecording ? 'show' : ''">
+        <div class="recording-indicator">
+          <span class="recording-dot"></span>
+          <span class="recording-text">Listening...</span>
+        </div>
+        <div class="waveform">
+          <div class="wave-bar" repeat.for="i of 10"></div>
+        </div>
+      </div>
+
+      <textarea 
+        value.bind="chatText" 
+        class="chat-textarea" 
+        keydown.delegate="handleKeyPress($event)"
+        placeholder=""
+        style.bind="isRecording ? 'display: none' : 'display: block'">
+      </textarea>
+    </div>
+
+    <div class="chat-divider"></div>
+
+    <div class="chat-input-bottom">
+      <button class="transcribe-label-btn" click.delegate="onTranscribeClick()">
+        <svg class="clip-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16.5 6.5L7 16c-1.1 1.1-1.1 2.9 0 4s2.9 1.1 4 0l9.5-9.5c1.6-1.6 1.6-4.2 0-5.8s-4.2-1.6-5.8 0L6.5 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Transcribe
+      </button>
+      <div class="input-controls">
+        <button 
+          class="transcribe-btn" 
+          class.bind="isRecording ? 'recording' : ''" 
+          click.delegate="toggleRecording()"
+          title="${isRecording ? 'Stop recording' : 'Start voice recording'}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" fill="currentColor" />
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button class="send-btn" click.delegate="sendMessage()" title="Send message">
+          <svg class="send-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

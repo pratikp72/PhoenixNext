@@ -1,0 +1,34 @@
+<template>
+  <div class="office-visits-detail">
+    <div class="detail-header">
+      <h3>Office Visits</h3>
+      <button class="close-btn" click.delegate="closeDetail()">×</button>
+    </div>
+
+    <p class="detail-subtitle">Sandra McCune has the following open office visits:</p>
+
+    <div class="visits-table">
+      <div class="table-header">
+        <span>Date</span>
+        <span>Time</span>
+        <span>Status</span>
+      </div>
+
+      <div class="table-row" repeat.for="visit of visits">
+        <span>${visit.date}</span>
+        <span>${visit.time}</span>
+        <span class="status" class.bind="visit.status.toLowerCase()">${visit.status}</span>
+      </div>
+    </div>
+
+    <p class="detail-footer">
+      Please let me know if you'd like to make changes to any of these appointments or
+      <a href="#" click.delegate="showMoreDetails($event)">click here</a> for more details.
+    </p>
+
+    <div class="action-buttons">
+      <button class="primary-button" click.delegate="openVisit()">Open</button>
+      <button class="secondary-button" click.delegate="addToDashboard()">Add to Dashboard</button>
+    </div>
+  </div>
+</template>

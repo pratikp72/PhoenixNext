@@ -1,0 +1,87 @@
+
+<template>
+    <ux-dialog style="width: 650px;">
+        <style type="text/css">
+            .form-item {
+                margin: 10px;
+            }
+            .inline {
+                display: inline;
+            }
+            .error-message {
+                color: red;
+                font-size: small;
+            }
+        </style>
+        <ux-dialog-header>
+            <h3>Preference Builder</h3>
+            <div>
+
+                <form class="form-inline needs-validation" ref="optionsForm" style="display: inline-block;" novalidate>
+                    <div class="form-group" style="align-items: normal;">
+
+                        <div class="form-item inline">
+                            <input id="preferenceName" value.bind="preferenceName" class="form-control" type="text" placeholder="Preference Name" required />
+                            <div if.bind="showNameError" class="error-message">
+                                Provide a name.
+                            </div>
+                        </div>
+
+                        <div class="form-item inline">
+                            <select id="bodyPart" class="form-control"
+                                    value.bind="selectedBodyPart" required>
+                                <option model.bind="null">Bodypart...</option>
+                                <option repeat.for="b of bodyparts"
+                                        model.bind="b">
+                                    ${b}
+                                </option>
+                            </select>
+                            <div if.bind="showBodyPartError" class="error-message">
+                                Select a body part.
+                            </div>
+                        </div>
+
+                        <div class="btn-group form-item inline">
+                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span >macros</span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <template repeat.for="m of macros">
+                                    <a class="dropdown-item" href="#" click.delegate="macroClicked(m)">${m}</a>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="form-item inline">
+                            <button class="btn btn-success" click.delegate="close()">Save</button>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </ux-dialog-header>
+        <ux-dialog-body>
+            <div class="card-body" style="overflow-y: scroll;">
+                <form>
+
+                    <div class="form-group">
+                        <label for="hpi">History</label>
+                        <textarea class="form-control" id="hpi" rows="3" value.bind="hpiText" click.delegate="setSelectedTextarea($event)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exam">Exam</label>
+                        <textarea class="form-control" id="exam" rows="3" value.bind="examText" click.delegate="setSelectedTextarea($event)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plan">Plan</label>
+                        <textarea class="form-control" id="plan" rows="3" value.bind="planText" click.delegate="setSelectedTextarea($event)"></textarea>
+                    </div>
+
+                </form>
+            </div>
+        </ux-dialog-body>
+    </ux-dialog>
+</template>

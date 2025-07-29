@@ -1,0 +1,78 @@
+
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+
+  <ux-dialog ref="patientpop" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header style="padding: 10px;">
+      <h4 style="display: inline-block; margin-bottom: 0px;">
+        <i class="fa fa-user"></i>
+        Patient Search
+      </h4>
+
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+
+    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control"
+               placeholder="Search LastName, FirstName, PatientID..."
+               aria-label="search patient..."
+               aria-describedby="button-addon2" 
+               value.bind="searchString"
+               keydown.trigger="inputKeydown($event)">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary"
+                  type="button" id="button-addon2" click.delegate="searchClicked()"><i class="fa fa-search mr-1" aria-hidden="true"></i>Search</button>
+        </div>
+      </div>
+
+      <div if.bind="!showCreatePatient" class="tableFixHeadLight" css="height: ${popupHeight - 198}px;">
+        <table class="table table-sm table-striped w-auto">
+          <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Name</th>
+            <th scope="col">DOB</th>
+            <th scope="col">Address</th>
+            <th scope="col">Phone</th>
+            <th scope="col" style="width: 100%">PatientID</th>
+          </tr>
+          </thead>
+          <tbody>
+            <template repeat.for="s of searchResults">
+              <tr click.delegate="selectAndClose(s)">
+                <td><button type="button" class="btn btn-primary" click.delegate="selectAndClose(s)"><i class="fa fa-folder-open-o" aria-hidden="true"></i></button></td>
+                <td class="text-nowrap">${s.name}</td>
+                <td class="text-nowrap">${s.data.DOB}</td>
+                <td class="text-nowrap">${s.data.Address1}</td>
+                <td class="text-nowrap">${s.data.PhoneHome}</td>
+                <td class="text-nowrap">${s.data.PatientID}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" if.bind="showCreatePatient">
+        <div class="card-body p-0">
+          <!--NO PATIENT-->
+          <div class="jumbotron m-0">
+            <h1 class="display-4">No Patient Found</h1>
+            <!-- <p class="lead">Create</p> -->
+            <a class="btn btn-primary btn-lg" href="#" role="button" click.delegate="createPatientClick()">Create New</a>
+          </div>
+        </div>
+      </div>
+
+    </ux-dialog-body>
+<!--    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">-->
+<!--      <button click.delegate="close()">OK</button>-->
+<!--    </ux-dialog-footer>-->
+  </ux-dialog>
+</template>

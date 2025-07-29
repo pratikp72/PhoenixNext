@@ -1,0 +1,146 @@
+<template>
+  <div ref="mainrow" class="row">
+    <div class="col-md-4">
+      <div class="card" css="height: ${height}px;">
+        <div class="card-header">
+          <h4 class="d-inline-block m-0 pt-1">Miscellaneous</h4>
+        </div>
+
+        <div class="card-body" style="overflow-y:auto;">
+          <div class="form-row">
+            <div class="form-group"><!-- col-md-3">-->
+              <label for="docLockDays">Date / Document Lock Days</label>
+              <input type="number" class="form-control" id="docLockDays" aria-describedby="docLockDaysHelp" value.bind="data.DockLockDays">
+              <small id="docLockDaysHelp" class="form-text text-muted">Number of days before automatically locking a visit or document.</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group"><!-- col-md-3">-->
+              <label for="appLogOffTime">Auto Log-off</label>
+              <input type="number" class="form-control" id="appLogOffTime" aria-describedby="appLogOffTimeHelp" value.bind="autoLogoffMinutes">
+              <small id="appLogOffTimeHelp" class="form-text text-muted">Minutes before automatically logging out of application.</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group"><!-- col-md-3">-->
+              <label for="otherApps">Other Settings</label>
+              <button type="button" class="form-control btn btn-outline-primary mb-1" aria-describedby="otherAppsHelp" click.delegate="openPopup('docBuilder')">Document Builder</button>
+              <button type="button" class="form-control btn btn-outline-primary mb-1" aria-describedby="otherAppsHelp" click.delegate="openPopup('email')">Email Notification Manager</button>
+              <button type="button" class="form-control btn btn-outline-primary mb-1" aria-describedby="otherAppsHelp" click.delegate="openPopup('kiosk')">Portal / Kiosk Preferences</button>
+              <button type="button" id="otherApps" class="form-control btn btn-outline-primary mb-1" aria-describedby="otherAppsHelp" click.delegate="openPopup('mapper')">Procedure Mapper</button>
+              <button type="button" id="otherApps" class="form-control btn btn-outline-primary mb-1" aria-describedby="otherAppsHelp" click.delegate="openPopup('formBuilder')">Form Builder</button>
+              <button type="button" class="form-control btn btn-outline-primary" aria-describedby="otherAppsHelp" click.delegate="openPopup('reportBuilder')">Report Builder</button>
+              <small id="otherAppsHelp" class="form-text text-muted">Additional settings...</small>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8 pl-0">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card mb-3">
+            <div class="card-header">
+              <h4 class="d-inline-block m-0 pt-1">External Apps</h4>
+              <i class="fa fa-plus fa-2x float-right text-primary" click.delegate="addExternalApp()"></i>
+            </div>
+    
+            <div class="card-body" style="overflow-y:auto;" css="height:${halfHeight}px;">
+              <template repeat.for="r of externalapps">
+                <div class="${r.altRow ? 'alert-secondary':''}">
+                  <div class="d-flex flex-wrap p-2 border-bottom">
+                    <div class="pr-2"><i class="fa ${r.Enabled ? 'fa-check-square-o' : 'fa-square-o'} fa-2x" click.delegate="toggleExternalApp(r)"></i></div>
+                    <div class="pr-2"><input type="text" placeholder="name" class="form-control" value.bind="r.ExternalAppName" blur.trigger="saveExternalApp(r)"></div>
+                    <div class="pr-2 flex-fill"><input type="text" placeholder="path" class="form-control" value.bind="r.ExternalAppPathOrUrl" blur.trigger="saveExternalApp(r)"></div>
+                    <div><button type="button" class="form-control btn btn-danger" click.delegate="deleteApp(r, $index)">Delete</button></div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="d-inline-block m-0 pt-1">ODGO</h4>
+              <button class="btn btn-sm btn-primary float-right" type="button" click.delegate="openPopup('odgo')">Open</button>
+            </div>
+            <div class="card-body" style="overflow-y:auto;" css="height:${halfHeight}px;">
+              <form>
+                <div if.bind="odgoUsers.length == 0" class="form-row align-items-center">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="username" aria-label="username" aria-describedby="basic-addon2" value.bind="odgoUsername">
+                    <input type="password" class="form-control" placeholder="password" aria-label="password" aria-describedby="basic-addon2" value.bind="odgoPassword">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-primary" type="button" click.delegate="addODGOUser()">Add</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+  
+              <ul class="list-group list-group-flush">
+                <li repeat.for="u of odgoUsers" class="list-group-item d-flex justify-content-between align-items-center pl-1">
+                  ${u.Username}
+                  <i class="fa fa-trash-o fa-2x text-danger" click.delegate="deleteODGOUser(u.Id)"></i>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-md-8 pl-0">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="d-inline-block m-0 pt-1">ERx</h4>
+            </div>
+            <div class="card-body" style="overflow-y:auto;" css="height:${halfHeight}px;">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="erxvendorname">Vendor Name</label>
+                  <input type="text" class="form-control" aria-describedby="erxvendorname" value.bind="data.ERxVendorName">
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="erxvendorpass">Vendor Password</label>
+                  <input type="text" class="form-control" aria-describedby="erxvendorpass" value.bind="data.ERxVendorPassword">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="erxpracticename">Practice Name</label>
+                  <input type="text" class="form-control" aria-describedby="erxpracticename" value.bind="data.ERxPracticeName">
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="erxpracticeuser">Practice Username</label>
+                  <input type="text" class="form-control" aria-describedby="erxpracticeuser" value.bind="data.ERxPracticeUserName">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="erxsystemname">System Name</label>
+                  <input type="text" class="form-control" aria-describedby="erxsystemname" value.bind="data.ERxSystemName">
+                </div>
+              </div>
+    
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</template>
+
+
+
+

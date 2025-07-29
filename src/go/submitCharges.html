@@ -1,0 +1,129 @@
+<template>
+  <div class="card h-100" style="box-shadow: 2px 5px .25rem rgba(0,0,0, 0.3);">
+
+    <div class="card-header pl-3 pr-2">
+
+      <div class="d-flex align-items-center">
+        <h4 class="pr-2" style="display: inline-block; margin-bottom: 0px;"><i class="fa fa-usd mr-2"></i>Submit Charges</h4>
+
+
+        <div class="form-group mb-0 pr-1">
+          <select ref="providerpicker" value.bind="selectedProvider" class="form-control" id="exampleFormControlSelect1" change.delegate="providerSelected()">
+            <option model.bind="null">provider...</option>
+            <option scheduleprovider repeat.for="p of providers" model.bind="p" >${p.ProviderEntity}</option>
+          </select>
+        </div>
+
+
+        <button type="button" class="btn btn-outline-primary btn-sm" click.delegate="toggleFilters()">
+          <i class="fa fa-filter pr-1"></i>Filter</button>
+
+        <i class="fa fa-close fa-2x ml-auto pr-2"  click.delegate="cancel()"></i>
+      </div>
+
+
+      <div if.bind="displayFilters" class="d-flex align-items-center pt-2">
+
+        <small class="pr-2 font-weight-bold">Filter visits between:</small>
+        <abp-datetime-picker class="mr-1" style="width: 110px;" icon-base="font-awesome" with-date-icon="false" element.bind="startdatepicker" value.bind="startdate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+        <small class="pr-1 font-weight-bold">and</small>
+        <abp-datetime-picker class="mr-4" style="width: 110px;" icon-base="font-awesome" with-date-icon="false" element.bind="enddatepicker" value.bind="enddate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+
+
+        <small class="pr-2 font-weight-bold">Status:</small>
+        <div class="dropdown">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+            ${selectedStatusFilter}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a repeat.for="t of filterTypes" class="dropdown-item" href="#" click.delegate="filterTypeSelected(t)">${t}</a>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="dropdown-toggle" style="border: none; background-color: transparent;" type="button" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-filter text-primary fa-2x"></i>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <h6 class="dropdown-header">Filter By...</h6>
+            <a class="dropdown-item" href="#" click.delegate="filter('date')">Date Range</a>
+            <a class="dropdown-item" href="#" click.delegate="filter('status')">Status</a>
+            <a class="dropdown-item" href="#" click.delegate="filter('all')">Both</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <small class="d-block px-2 pt-2 text-muted">Check each row you wish to submit. Only encounters with a selected visit code will display here!</small>
+
+    <div class="card-body p-0" style="overflow-y: scroll;">
+      <div repeat.for="r of rows" class="card mx-2 mt-2 mb-0">
+        <div class="card-body mb-0 p-0">
+
+          <div class="d-flex align-items-center ${r.data.Status=='Pending' ? 'alert-warning' : 'alert-success'} px-2 py-1">
+            <i class="fa ${r.selected ? 'fa-check-square-o' : 'fa-square-o'} fa-2x pr-2" aria-hidden="true" click.delegate="r.select()"></i>
+            <div class="pr-4 font-weight-bold" click.delegate="showDetails(r)"><i class="fa fa-calendar-o pr-1" aria-hidden="true"></i>${r.date}</div>
+            <div class="pr-4" click.delegate="showDetails(r)"><strong>${r.data.PatientName}</strong></div>
+            <div class="pr-2 flex-grow-1 text-muted" click.delegate="showDetails(r)">${r.data.ProviderName}</div>
+            <div class="pr-2 text-uppercase" click.delegate="showDetails(r)">${r.data.Status}</div>
+            <i class="fa ${r.displayDetails ? 'fa-angle-down' : 'fa-angle-up'} fa-2x pr-2" aria-hidden="true" click.delegate="showDetails(r)"></i>
+          </div>
+
+          <div if.bind="r.displayDetails" class="container">
+            <div repeat.for="deet of r.details" class="row py-1"><!--${deet.Type == 'procedure' ? 'border-top' : ''} -->
+
+              <div class="col-md-12">
+
+              <template repeat.for="i of deet.Items">
+                <template if.bind="$index == 0">
+                  <div class="row" style="background-color: #f2f2f2;">
+                    <div class="col-md-2 font-weight-bold alert-secondary h4 my-0 py-1"><i class="fa fa-usd pr-2 text-success" aria-hidden="true"></i>${i.Code}</div>
+                    <div class="col-md-10 alert-secondary h4 my-0 py-1">${i.Description}</div>
+                    <template if.bind="i.Modifier || i.Units">
+                      <div class="col-md-2 h6 my-0 py-1"></div>
+                      <div class="col-md-2 h6 my-0 py-1">
+                        <div class="d-inline-block pr-2" if.bind="i.Modifier"> Modifier: ${i.Modifier}</div>
+                      </div>
+                      <div class="col-md-8 h6 my-0 py-1">
+                        <div class="d-inline-block" if.bind="i.Units"> Units: ${i.Units}</div>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+                <template if.bind="$index != 0">
+                  <div class="row">
+                    <div class="col-md-2 h6"></div>
+                    <div class="col-md-2 font-weight-bold h6">${i.Code}</div>
+                    <div class="col-md-8 h6">${i.Description}</div>
+                  </div>
+                </template>
+              </template>
+
+
+            </div>
+
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+      <!--NO ROWS FOUND??-->
+      <div if.bind="rows.length == 0" class="card mx-2 mt-2 mb-0">
+        <div class="card-body h5 mb-0 p-2">
+          <div class="d-flex align-items-center justify-content-center">
+            <div class="text-secondary">No Charges Found.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="card-footer">
+      <button type="button" class="btn btn-outline-primary" click.delegate="selectAll()">
+        <i class="fa ${allSelected ? 'fa-square-o': 'fa-check-square-o'} pr-1" aria-hidden="true"></i>${selectAllString} All</button>
+      <button type="button" class="btn btn-primary float-right" click.delegate="submitChargesClick()">Submit</button>
+    </div>
+
+  </div>
+</template>

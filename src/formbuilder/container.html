@@ -1,0 +1,71 @@
+<template>
+  <require from="./styles/container.css"></require>
+  <require from="./box"></require>
+  <require from="./tools/static-text"></require>
+  <require from="./tools/checkbox"></require>
+  <require from="./tools/textbox"></require>
+  <require from="./tools/listbox"></require>
+  <require from="./tools/signature"></require>
+  <require from="./tools/imagebox"></require>
+  <require from="./tools/mytable"></require>
+  <require from="./charts/chart-bar"></require>
+
+  <style>
+    .show-grid { box-sizing:border-box; margin:0; height:100%; width:100%; background-size:10px 10px;
+       background-image: repeating-linear-gradient(0deg, transparent, transparent 9px, #e0e0e0 9px, #e0e0e0 10px), 
+       repeating-linear-gradient(-90deg, transparent, transparent 9px, #e0e0e0 9px, #e0e0e0 10px); 
+     }
+  </style>
+
+  <div ref="dndElement" class="container ${showGrid ? 'show-grid' : ''} w-100 h-100 p-0 m-0 ${showResizeArea ? 'show-resize-area' : ''}" 
+    style="max-width: none;" 
+    css="overflow: ${edit ? 'hidden' : 'visible'};"
+    pointerup.delegate="deselectAll($event)"><!-- click.delegate= touchend.delegate="deselectAll()" mouseup.delegate="deselectAll()">-->
+    <template repeat.for="item of patchedItems">
+      <template if.bind="item.toolType==='STATICTEXT'">
+        <static-text item.bind="item"></static-text>
+      </template>
+      <template if.bind="item.toolType==='HR'">
+        <static-text item.bind="item"></static-text>
+      </template>
+      <template if.bind="item.toolType=='CHECKBOX'">
+        <checkbox item.bind="item"></checkbox>
+      </template>
+      <template if.bind="item.toolType=='TEXTBOX'">
+        <textbox item.bind="item"></textbox>
+      </template>
+      <template if.bind="item.toolType=='LISTBOX'">
+        <listbox item.bind="item"></listbox>
+      </template>
+      <template if.bind="item.toolType=='SIGNATURE'">
+        <signature item.bind="item"></signature>
+      </template>
+      <template if.bind="item.toolType=='IMAGEBOX'">
+        <imagebox item.bind="item"></imagebox>
+      </template>      
+      <template if.bind="item.toolType=='MYTABLE'">
+        <mytable item.bind="item" fullwidth.bind="fullwidth"></mytable>
+      </template>   
+      <template if.bind="item.toolType=='CHARTBAR' || item.toolType=='CHARTLINE'">
+        <chart-bar item.bind="item"></chart-bar>
+      </template>   
+    </template>
+
+    <!--selection marquee-->
+    <div css="position: ${drawMarquee ? 'absolute' : 'unset'}">
+      <svg ref="dndElement" width="816" height="1056">
+        <rect
+          if.bind="drawMarquee"
+          x.bind="marqueeShape.x"
+          y.bind="marqueeShape.y"
+          width.bind="marqueeShape.width"
+          height.bind="marqueeShape.height"
+          stroke="blue"
+          stroke-width="1"
+          fill="transparent"
+        ></rect>
+      </svg>
+    </div>
+
+  </div>
+</template>

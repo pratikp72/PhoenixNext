@@ -1,0 +1,17 @@
+<template>
+  <div id="patHxForm" style="overflow-y: scroll;" css="height:${windowHeight}px;">
+    <div class="card mb-2">
+      <div class="card-header py-0">
+        <div class="d-inline-block align-middle py-2 h4 m-1">Patient Alert</div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <textarea value.bind="alertText" name="message" rows="10" cols="50"
+                      style="position: relative;width: 100%; height: 100%; resize: none;" placeholder="Patient Alert..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

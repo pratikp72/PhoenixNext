@@ -1,0 +1,50 @@
+<template>
+
+  <style>
+    .card-radius{
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border: 1px solid #dee2e6;
+    }
+  </style>
+
+  <div class="card border-top-0 card-radius">
+    <div class="card-body">
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" value.bind="searchTxt" placeholder="lastname, firstname" aria-label="Portal username" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" click.delegate="searchUser()">Search</button>
+        </div>
+      </div>
+
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">LastName</th>
+            <th scope="col">FirstName</th>
+            <th scope="col">PatientID</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template repeat.for="u of users">
+            <tr>
+              <th scope="row">
+                <button type="button" class="btn btn-outline-primary" click.delegate="openUserPop(u)">Edit</button>
+              </th>
+              <td>${u.NameLast}</td>
+              <td>${u.NameFirst}</td>
+              <td>${u.User.PatientID}</td>
+              <td>${u.User.Email}</td>
+              <td><i class="fa ${ u.User.Verified ? 'fa-check-circle' : 'fa-times-circle'} ${ u.User.Verified ? 'text-success' : 'text-danger'} fa-2x" aria-hidden="true"></i></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</template>

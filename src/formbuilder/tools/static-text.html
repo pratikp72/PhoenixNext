@@ -1,0 +1,51 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+  <require from="./text-toolbar"></require> 
+
+  <style>
+    [contenteditable]{
+      outline: 0px solid transparent;
+    }
+    .pin {
+      position: absolute;
+      cursor: pointer;
+      top: 50%;
+      left: 10px;
+      margin-top: -5px;
+      width: 10px;
+      height: 10px;
+      border: 1px solid gray;
+      cursor: pointer;
+    }
+
+    .table-style{
+      display: inline-block;
+      width: auto;
+    }
+
+  </style>
+
+  <div
+    ref="dndElement"
+    class="${item.addBoxClass ? 'box' : 'table-style'}"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)">
+
+    <div class="card w-100 h-100 mb-1 bg-transparent border-0">
+      <div ref="cardbody" class="card-body p-1">
+        <div id.bind="item.elementId" contenteditable.bind="item.editMode" 
+          innerhtml.two-way="item.html" style.bind="item.style">
+        </div>
+      </div>
+    </div>
+
+    <resize-corner
+      if.bind="item.addBoxClass"
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

@@ -1,0 +1,26 @@
+<template>
+    <div class="card-body p-0" style="overflow-y: auto;">
+      <ul class="list-group list-group-flush">
+        <li repeat.for="b of boards" class="list-group-item ${locked ? 'disabled' : ''}">
+
+          <div if.bind="!b.editing">
+            <span click.delegate="selectBoardAndClose($index)">${b.description}</span>
+            <i class="fa fa-cog text-secondary float-right" click.delegate="editBoardClick(false, $index)"></i>
+          </div>
+
+          <div if.bind="b.editing" class="input-group mb-3">
+            <input type="text" value.bind="b.description" class="form-control" placeholder="Board Description..." aria-label="Board Description" aria-describedby="button-addon2">
+            <div class="input-group-append">
+              <button class="btn btn-outline-primary" type="button" id="button-addon2" click.delegate="updateBoard()">Save</button>
+            </div>
+          </div>
+
+        </li>
+      </ul>
+    </div>
+    <div class="card-footer">
+
+      <i class="fa fa-plus fa-2x text-primary float-right" click.delegate="createNewBoard()"></i>
+
+    </div>
+</template>

@@ -1,0 +1,38 @@
+<template>
+  <div ref="targetdiv" class="row border-bottom py-2 pl-2 align-items-center">
+    <!--new conversation-->
+    <label class="my-1">To:</label>
+
+    <template repeat.for="t of messageForm.currentMessage.targetList">
+      <span click.delegate="targetListClicked(t)" class="p-1 text-primary d-inline-block">${t.firstName}&nbsp;${t.lastName}
+      <i class="fa fa-times float-right" aria-hidden="true"></i>
+      </span>
+    </template>
+    <input ref="targetinput" class="d-inline-block p-1"
+           style="width: 25%; border: none; outline: none;"
+           id="messageTarget" aria-describedby="messageTarget" value.bind="searchString" input.delegate="filter($this)">
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="tableFixHeadLight" css="height: ${detailHeight}px;">
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th scope="col" click.delegate="toggleSearchTarget()">
+              <i class="fa fa-search py-1 text-primary" style="cursor: pointer;"></i>
+              <span class="py-1 text-primary font-weight-light">${searchTarget}</span>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="s of searchResults">
+            <tr click.delegate="rowClicked(s)" class.bind="s.selected ? 'table-primary' : 'table-light'">
+              <td><span class="${s.matchedLast ? '' : 'font-weight-bold'}">${s.firstName}</span>&nbsp;<span class="${s.matchedLast ? 'font-weight-bold' : ''}">${s.lastName}</span></td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>

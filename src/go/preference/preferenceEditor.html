@@ -1,0 +1,235 @@
+<template>
+
+<style>
+  .preference-selected{
+    background-color: aliceblue;
+  }
+  .preference-selected-border{
+    -webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 4px 1px rgba(0,123,255,0.7);
+  }
+
+  .select-pref-alert{
+    border: 1px dashed lightgray;
+    border-radius: 5px;
+    padding: 10px;
+  }
+
+  @keyframes FadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes FadeOut {
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* .animate-fade-in.au-enter {
+    opacity: 0;
+  }
+  
+  .animate-fade-in.au-enter-active {
+    animation: FadeIn 1s;
+  }
+  
+  .animate-fade-out.au-leave-active {
+    animation: FadeOut 1s;
+  }
+  
+  .animate-fade-out.au-left {
+    opacity: 0;
+  } */
+
+</style>
+
+  <div class="card" style="height: inherit;">
+    <div class="card-header d-flex">
+      <h4 class="mr-2 mb-0 align-self-center"><i class="fa fa-user mr-2"></i>Preference Editor</h4>
+
+      <div class="align-self-center pr-1">
+        <select value.bind="currentProvider" class="form-control" id="exampleFormControlSelect1"
+                change.delegate="providerSelected()">
+          <option model.bind="null">Provider...</option>
+          <option repeat.for="p of providers" model.bind="p" >${p.ProviderEntity}</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn btn-outline-secondary" click.delegate="openDaysheetEditor()">
+        <i class="fa fa-pencil-square-o fa-lg pr-1"></i>Daysheet Editor
+      </button>
+
+      <i class="fa fa-close fa-2x align-self-center ml-auto" click.delegate="cancel()"></i></a>
+    </div>
+
+    <div class="card-body pt-2" style="overflow-y: scroll;">
+
+      <!--filter menu-->
+      <div class="d-flex align-items-center mb-2">
+
+        <i class="fa fa-filter fa-lg mr-2 text-muted"></i>
+
+        <div class="pr-1">
+          <select class="form-item form-control"
+                  value.bind="selectedPrefType"
+                  change.delegate="filterPreference()">
+            <option model.bind="null">Type...</option>
+            <option repeat.for="t of prefTypes"
+                    model.bind="t">
+              ${t}
+            </option>
+          </select>
+        </div>
+
+        <div class="pr-1">
+          <select class="form-item form-control"
+                  value.bind="selectedBodyPart"
+                  change.delegate="filterPreference()">
+            <option model.bind="null">Bodypart...</option>
+            <option repeat.for="b of bodyparts"
+                    model.bind="b">
+              ${b}
+            </option>
+          </select>
+        </div>
+
+
+
+        <div class="dropdown ml-auto">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-plus pr-1" aria-hidden="true"></i>New
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" click.delegate="newPreference()">New</a>
+            <a class="dropdown-item" href="#" click.delegate="newPreferenceFromExisting()">From legacy preference</a>
+          </div>
+        </div>
+
+
+
+      </div>
+
+      <div class="accordion" id="prefAccordian">
+
+        <!--NO PREFENRECES-->
+        <div if.bind="preferences.length==0" class="jumbotron">
+          <h1 class="display-4">No Preferences Found</h1>
+          <p class="lead">No preferences were found with the current filter selections</p>
+          <hr class="my-4">
+          <p>Provider: ${currentProvider.ProviderEntity}, Type: ${selectedPrefType}, Bodypart: ${selectedBodyPart}</p>
+        </div>
+
+
+        <div repeat.for="p of preferences" class="card ${p.selected ? 'preference-selected-border' : ''}">
+
+          <div class="card-header ${p.selected ? 'preference-selected' : ''} py-1 pl-4 pr-2" id="heading${$index}">
+            <div class="mb-0 d-flex align-items-center">
+
+              <button if.bind="!p.editingName" click.delegate="selectPreference(p)"
+                class="btn btn-link text-left font-weight-bold pl-0 pr-2" 
+                style="font-size: 1.25rem !important;"
+                type="button" data-toggle="collapse" 
+                data-target="#collapse${$index}" 
+                aria-expanded="true" aria-controls="collapse${$index}">
+                ${p.description}
+              </button>
+
+              <button type="button" if.bind="!p.editingName" disabled.bind="!p.selected" class="btn" click.delegate="p.toggleNameEdit()">
+                <i class="fa fa-pencil-square-o fa-lg text-muted"></i>
+              </button>
+
+              <input if.bind="p.editingName" type="text" value.bind="p.description" class="form-control mr-1" style="width: 200px;">
+
+              <i if.bind="p.editingName" class="fa fa-check-circle fa-2x text-success" click.delegate="p.toggleNameEdit()"></i>
+
+              <div class="input-group ml-auto mx-2" style="width: unset; align-items: unset;">
+                <select class="form-item form-control mr-0"
+                  value.bind="p.selectedProtocol" 
+                  disabled.bind="!p.selected"
+                  style="width: 125px; 
+                  display: inline-block;">
+                  <option model.bind="null">Protocol...</option>
+                  <option repeat.for="m of protocolList"
+                          model.bind="m">
+                    ${m.description}
+                  </option>
+                </select>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" disabled.bind="!p.selected" type="button" id="button-addon2" click.delegate="p.addNewProtocol(p.selectedProtocol)">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- <button class="btn ${p.autotask ? 'btn-success' : 'btn-secondary'} mx-2" 
+                disabled.bind="!p.selected" 
+                href="#" click.delegate="openAutoTask(p)">
+                  <i class="fa fa-thumb-tack fa-lg"></i>
+              </button> -->
+
+
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary pr-0" disabled.bind="!p.selected" click.delegate="p.save()">
+                  <i class="fa fa-floppy-o fa-lg"></i></button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" 
+                      disabled.bind="!p.selected" 
+                      data-toggle="dropdown" aria-expanded="false">
+                  <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu">
+                  <a if.bind="p.prefId != 0" class="dropdown-item" href="#" click.delegate="p.saveAs()" >Save As...</a>
+                </div>
+              </div>
+
+
+              <!-- <button class="btn btn-primary" type="button" disabled.bind="!p.selected" click.delegate="p.save()">
+                <i class="fa fa-floppy-o fa-lg"></i>
+              </button> -->
+
+            </div>
+          </div>
+      
+          <div id="collapse${$index}" class="collapse ${p.selected ? 'show' : ''}" aria-labelledby="heading${$index}" data-parent="#prefAccordian">
+            <div class="card-body p-0">
+
+              <div repeat.for="s of p.sections">
+                <compose view-model.bind="s.template" model.bind="s" containerless></compose>
+              </div>
+
+              <!--NO SECTIONS-->
+              <div if.bind="p.sections.length==0" class="jumbotron m-0">
+                <h1 class="display-4">No Protocols</h1>
+                <p class="lead">Select a protocol with the dropdown above,<br> then use the <i class="fa fa-plus text-muted" aria-hidden="true"></i> button to add it to the preference</p>
+              </div>
+
+            </div>
+          </div>
+        </div>    
+      </div>
+
+    </div>
+
+
+
+
+
+
+
+    <!-- <div class="card-footer">
+
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-plus pr-1" aria-hidden="true"></i>New
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#" click.delegate="newPreference()">New</a>
+          <a class="dropdown-item" href="#" click.delegate="newPreferenceFromExisting()">From legacy preference</a>
+        </div>
+      </div>
+
+
+    </div> -->
+  </div>
+</template>

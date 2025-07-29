@@ -1,0 +1,50 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+  <require from="./listbox-toolbar"></require> 
+
+  <style>
+    .sig-canvas{
+      width: 100% !important;
+    }
+
+    .table-style{
+      display: inline-block;
+      width: auto;
+    }
+
+  </style>
+
+  <div
+    ref="dndElement"
+    class="${item.addBoxClass ? 'box' : 'table-style'}"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)"><!--click-->
+
+    <div class="card w-100 h-100 bg-transparent mb-1 ${isRequired ? 'border-danger border-1': 'border-0'}"><!--border-0-->
+      <div ref="cardbody" class="card-body p-2" pointerup.delegate="sign()">
+        <div class="border-bottom border-dark" style="height: 100%; background-color: #dbe4ff;">
+          <span style="position: absolute; bottom: 15px;">X</span>
+          <canvas ref="sigcanvas" class="sig-canvas" style="width: 100% !important; height: 100% !important;">
+                   <!--height.bind="item.height">-->
+            Get a better browser, bro.
+          </canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- <listbox-toolbar target-element-id.bind="item.elementId" 
+                      dnd-id.bind="item.id" 
+                      show.bind="item.showToolbar"
+                      hide-options.bind="true"
+                      item.bind="item"></listbox-toolbar> -->
+
+    <resize-corner
+      if.bind="item.addBoxClass"
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

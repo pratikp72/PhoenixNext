@@ -1,0 +1,210 @@
+<template>
+
+
+  <style>
+    .returnToDate input{
+      width: 120px;
+    }
+    .form-control{
+      width: unset;
+    }
+  </style>
+
+
+  <div class="card" style="height: inherit;">
+    <div class="card-header d-flex align-items-center">
+      <h4 class="mr-2 mb-0" style="display: inline-block;"><i class="fa fa-sticky-note-o mr-2"></i>Return To...</h4>
+
+      <fieldset disabled.bind="!formTypeSchool">
+        <div class="input-group" style="width: auto;">
+          <select value.bind="selectedPref" class="custom-select" style="width: 120px;" aria-label="Example select with button addon">
+            <option selected>Choose...</option>
+            <option repeat.for="p of preferences" model.bind="p">${p.Description}</option>
+          </select>
+          <div class="input-group-append">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-user mr-1" aria-hidden="true"></i>Pref</button></button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" click.delegate="createPref()"><i class="fa fa-user mr-1 text-danger" aria-hidden="true"></i>New Preference</a>
+              <a class="dropdown-item" click.delegate="updatePref()"><i class="fa fa-user mr-1 text-success" aria-hidden="true"></i>Update Preference</a>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <i class="fa fa-close fa-2x ml-auto" click.delegate="cancel()"></i></a>
+    </div>
+
+    <div class="card-body" style="overflow-y: scroll;">
+
+      <!-- <h4>Absence Excuse</h4> -->
+      <div class="btn-group mb-3" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-lg btn-outline-primary ${formTypeSchool ? 'active' : ''}" click.delegate="toggleFormType()">School</button>
+        <button type="button" class="btn btn-lg btn-outline-primary ${!formTypeSchool ? 'active' : ''}" click.delegate="toggleFormType()">Work</button>
+      </div>
+
+
+      <div if.bind="formTypeSchool">
+        <!--RETURN TO SCHOOL-->
+
+        <!--EXCUSE-->
+        <div class="mb-2">
+          <i class="fa ${excuseCheck.checked ? 'fa-check-square-o': 'fa-square-o'} fa-2x" style="vertical-align: middle; color: #c3c3c3;" click.delegate="excuseCheck.select()"></i>
+          <span class="mr-1" style="vertical-align: middle;">${excuseCheck.detail}</span>
+        </div>
+
+        <!--EXCUSE DATE RANGE-->
+        <div class="mb-3">
+          <i class="fa ${excuseDateRangeCheck.checked ? 'fa-check-square-o': 'fa-square-o'} fa-2x" style="vertical-align: middle; color: #c3c3c3;" click.delegate="excuseDateRangeCheck.select()"></i>
+          <span class="mr-1" style="vertical-align: middle;">${excuseDateRangeCheck.detail}</span>
+          <div if.bind="excuseDateRangeCheck.checked">
+            <span class="ml-5 mr-1">From</span>
+            <abp-datetime-picker id="toDate" class="mr-1 returnToDate d-inline-block" icon-base="font-awesome"
+                                with-date-icon="false" element.bind="excuseFromDatePicker"
+                                value.bind="excuseFromDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+            <span class="mr-1">to</span>
+            <abp-datetime-picker id="toDate" class="returnToDate d-inline-block" icon-base="font-awesome"
+                                with-date-icon="false" element.bind="excuseToDatePicker"
+                                value.bind="excuseToDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+          </div>
+        </div>
+
+        <hr>
+
+        <!--RETURN TO SCHOOL-->
+        <div class="mb-3">
+          <i class="fa ${returnToSchoolCheck.checked ? 'fa-check-square-o': 'fa-square-o'} fa-2x" style="vertical-align: middle; color: #c3c3c3;" click.delegate="returnToSchoolCheck.select()"></i>
+          <span class="mr-1" style="vertical-align: middle;">Return to School</span>
+          <div if.bind="returnToSchoolCheck.checked" style="display: inline-block; vertical-align: middle;">
+            <span class="pl-4 pr-2 font-weight-bold">${returnToSchoolCheck.detail}</span>
+            <abp-datetime-picker id="toDate" class="mr-1 returnToDate d-inline-block" style="width: 80px;" icon-base="font-awesome"
+                                with-date-icon="false" element.bind="returnToSchoolDatePicker"
+                                value.bind="returnToSchoolDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+          </div>
+        </div>
+
+        <!--RESTRICTIONS-->
+        <div class="mb-3">
+          <i class="fa ${restrictionsCheck.checked ? 'fa-check-square-o': 'fa-square-o'} fa-2x" style="vertical-align: middle; color: #c3c3c3;" click.delegate="restrictionsCheck.select()"></i>
+          <span class="mr-2" style="vertical-align: middle;">Restrictions</span>
+          <div if.bind="restrictionsCheck.checked" class="form-group d-inline-block mb-0">
+            <select value.bind="modifiedActivity" class="form-control" change.delegate="restrictionsSelected()">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="a of modifiedActiviesList" model.bind="a" >${a}</option>
+            </select>
+          </div>
+        </div>
+
+        <!--SPORTS-->
+        <div class="form-group">
+          <select value.bind="sportStatus" class="form-control"  change.delegate="sportStatusSelected()">
+            <option model.bind="null">Sports...</option>
+            <option repeat.for="a of sportStatusList" model.bind="a" >${a}</option>
+          </select>
+        </div>
+
+        <!--RETURN TO SPORTS-->
+        <div class="mb-3" if.bind="showReturnToSports">
+          <span class="pr-2">Return to sports on:</span>
+          <abp-datetime-picker id="toDate" class="mr-1 returnToDate d-inline-block" style="width: 80px;" icon-base="font-awesome"
+                              with-date-icon="false" element.bind="returnToSportsDatePicker"
+                              value.bind="returnToSportsDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+        </div>
+
+        <!--MODIFIED SPORTS-->
+        <div if.bind="showModifiedSports">
+          <div class="mb-1 font-weight-bold">The athelete is able to perform:</div>
+          <div class="form-group">
+            <select value.bind="ambulation" class="form-control" change.delegate="ambulationSelected()">
+              <option model.bind="null">Ambulation...</option>
+              <option repeat.for="a of ambulationList" model.bind="a" >${a}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <select value.bind="throwing" class="form-control" change.delegate="throwingSelected()">
+              <option model.bind="null">Throwing...</option>
+              <option repeat.for="a of throwingList" model.bind="a" >${a}</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div if.bind="!formTypeSchool">
+        <!--WORK RELEASE-->
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Work Related</label>
+            <select value.bind="workRelated" class="form-control w-100" matcher.bind="surgeonMatcher" aria-describedby="languageHelp">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="s of workRelatedList" model.bind="s" >${s}</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label>Work Status</label>
+            <select value.bind="workStatus" class="form-control w-100" matcher.bind="assistantMatcher" aria-describedby="languageHelp">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="s of workStatusList" model.bind="s" >${s}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label>The patient is capable of performing the following degree of work:</label>
+            <select value.bind="workCapabilities" class="form-control w-100" matcher.bind="surgeonMatcher" aria-describedby="languageHelp">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="s of workCapabilitiesList" model.bind="s" >${s}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label class="d-block">Next appointment</label>
+
+            <div class="btn-group mb-2 mr-2" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-outline-secondary ${workNextApptIsDays ? 'active' : ''}" click.delegate="toggleWorkNextAppt()">Days</button>
+              <button type="button" class="btn btn-outline-secondary ${!workNextApptIsDays ? 'active' : ''}" click.delegate="toggleWorkNextAppt()">Date</button>
+            </div>
+
+            <div if.bind="workNextApptIsDays" class="btn-group mb-2 d-inline-block">
+              <input type="number" value.bind="nextApptDaysWeeksValue" class="form-control d-inline-block" style="width: 80px;" id="exampleFormControlInput1">
+              <select value.bind="nextApptDaysWeeks" class="form-control d-inline-block" aria-describedby="languageHelp">
+                <option model.bind="null">Choose...</option>
+                <option>days</option>
+                <option>weeks</option>
+              </select>
+            </div>
+            <div if.bind="!workNextApptIsDays" class="btn-group mb-2 d-inline-block">
+              <div class="input-group">
+                <abp-datetime-picker icon-base="font-awesome" with-date-icon="false" element.bind="nextApptDate" value.bind="nextApptDateValue" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" click.delegate="openNextApptDate()"> <i class="fa fa-calendar"></i></button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+      </div>
+
+      
+
+      <div class="form-group">
+        <label for="exampleFormControlTextarea1">Comments</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" value.bind="comments" rows="8" style="width: 100%;"></textarea>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="save()">Save</button>
+    </div>
+  </div>
+</template>

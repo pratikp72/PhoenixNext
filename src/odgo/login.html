@@ -1,0 +1,28 @@
+
+<template>
+    <ux-dialog ref="gologin">
+        <ux-dialog-header>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4>Login</h4>
+                </div>
+            </div>
+        </ux-dialog-header>
+        <ux-dialog-body>
+            <form>
+                <div class="form-group">
+                    <label>UserName:</label>
+                    <input value.bind="userName" type="text" class="form-control" placeholder="Enter UserName">
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input value.bind="password" type="password" class="form-control" placeholder="Password">
+                </div>
+            </form>
+        </ux-dialog-body>
+        <ux-dialog-footer>
+            <button click.delegate="loginClicked()">Login</button>
+        </ux-dialog-footer>
+
+    </ux-dialog>
+</template>

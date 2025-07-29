@@ -1,0 +1,51 @@
+<template>
+
+
+  <img style="    position: absolute;
+    height: 400px;
+    width: auto;
+    max-height: 100%;
+    max-width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;" src="${helper.goFileUrl}images/phxMeteorGray.svg"/>
+
+  <!-- repeat BLOCK -->
+  <compose repeat.for="b of board.blocks" view-model="./block" model.bind="b" containerless></compose>
+
+  <!-- ADD NEW BLOCK-->
+  <div if.bind="board.editing" class="fixed-bottom" style="background-color: rgba(0, 0, 0, 0.25); left: 80px;">
+
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups" style="z-index: 1000; position: absolute; bottom: 0;">
+      <div class="btn-group dropup mr-2" role="group" aria-label="First group">
+        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+        <div class="dropdown-menu">
+          <a click.delegate="board.addBlock(i.component)" repeat.for="i of data.getBlockTypes()" class="dropdown-item" href="#">${i.name}</a>
+        </div>
+      </div>
+      <div class="input-group mr-2">
+        <input type="text" value.bind="board.description" class="form-control" aria-describedby="button-addon2">
+      </div>
+      <div class="btn-group mr-2">
+        <button type="button" class="btn ${board.isDefault ? 'btn-primary' : 'btn-outline-primary'}" aria-haspopup="true" aria-expanded="false" click.delegate="togglePreference()">
+          <i class="fa fa-user" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div if.bind="!board.quickAdd" class="btn-group mr-2" role="group" aria-label="Update group">
+        <button type="button" class="btn btn-primary" click.delegate="updateClick()">Update Board</button>
+      </div>
+      <div class="btn-group mr-2" role="group" aria-label="Third group">
+        <button click.delegate="cancelClick()" type="button" class="btn btn-secondary">Cancel</button>
+      </div>
+      <!-- <div class="input-group float-right">
+        <input type="text" value.bind="board.description" class="form-control" aria-describedby="button-addon2">
+      </div> -->
+    </div>
+  </div>
+
+
+</template>

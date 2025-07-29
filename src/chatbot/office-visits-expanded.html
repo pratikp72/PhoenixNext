@@ -1,0 +1,41 @@
+<template>
+  <div class="expanded-container" class.bind="isVisible ? 'show' : ''">
+    <!-- Optional Close Button -->
+    <button class="expanded-close-btn" click.delegate="closeExpanded()">
+      ×
+    </button>
+    
+    <!-- Left Sidebar (10%) -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-circle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="white" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Chat Area (40%) -->
+    <div class="chat-section">
+      <div class="chat-history">
+        <div class="chat-message user">
+          Open office visits for Sandra McCune
+        </div>
+        <div class="chat-message assistant">
+          Sandra McCune has the following open office visits:
+        </div>
+        <div class="chat-message" repeat.for="message of chatMessages" class.bind="message.type">
+          ${message.content}
+        </div>
+      </div>
+
+      <chat-input></chat-input>
+    </div>
+
+    <!-- Right Detail Area (50%) -->
+    <div class="detail-section">
+      <office-visits-detail></office-visits-detail>
+    </div>
+  </div>
+</template>

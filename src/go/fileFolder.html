@@ -1,0 +1,125 @@
+<template>
+
+  <style>
+    .file-dragenter{
+      border: 1px dashed grey !important;
+    }
+  </style>
+
+  <div class="h-100 w-100" css="z-index:${zIndex}" style="background-color: white;"><!--container-fluid -->
+    <div ref="fileListDiv" class="row h-100" dragover.trigger="dragOver($event)" drop.trigger="fileDropped($event)">
+      <div class="col px-2 pb-2" style="overflow-y: auto;" css="height: ${listHeight}px;"><!--${listHeight}px-->
+
+        <div with.bind="currentFolder">
+          <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center" click.delegate="backClick()">
+              <i if.bind="hasParent" class="fa fa-angle-left fa-2x mr-2 text-primary" aria-hidden="true"></i>
+              <i class="fa fa-folder text-warning fa-2x pr-1" aria-hidden="true"></i>
+              <strong class="text-capitalize">${name}</strong>
+            </div>
+
+            <div class="dropdown ml-auto">
+              <button class="btn" type="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-plus fa-2x" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" click.delegate="newFolder()"><i class="fa fa-folder-o mr-2" aria-hidden="true"></i>New Folder</a>
+                <a class="dropdown-item" click.delegate="openCamera()"><i class="fa fa-camera mr-2" aria-hidden="true"></i>Take Photo</a>
+                <a class="dropdown-item">
+                  <i class="fa fa-file-o mr-2" aria-hidden="true"></i>
+                  <label for="fileFolderPicker">
+                    Add from file
+                  </label>
+                </a>
+              </div>
+            </div>
+
+            <div if.bind="currentFolder.index > -1" class="dropdown">
+              <button class="btn" type="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-ellipsis-h fa-2x" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" click.delegate="renameFolder()"><i class="fa fa-pencil-square-o mr-2" aria-hidden="true"></i>Rename</a>
+                <a if.bind="!currentFolder.hasChildren" class="dropdown-item" click.delegate="deleteFolder()"><i class="fa fa-trash-o mr-2" aria-hidden="true"></i>Delete</a>
+              </div>
+            </div>
+
+          </div>
+
+
+          <ul class="list-group list-group-flush">
+            <li repeat.for="f of folders" class="list-group-item" click.delegate="$this.folderClick(f)">
+              <div class="d-flex align-items-center">
+                <i class="fa fa-folder text-warning fa-2x pr-1" aria-hidden="true"></i>
+                <div class="text-capitalize">${f.name}</div>
+                <span if.bind="f.images.length > 0" class="mx-1 badge rounded-pill bg-danger text-light"><!--top-0 start-100 translate-middle -->
+                  ${f.images.length}
+                </span>
+                <i if.bind="f.folders.length > 0 || f.images.length > 0" class="fa fa-angle-right fa-2x ml-auto text-primary" aria-hidden="true"></i>
+              </div>
+            </li>
+
+
+            <template repeat.for="i of images">
+              <li if.bind="globals.isTouchDevice" repeat.for="i of images" class="list-group-item"
+                  hammer-swipe.call="rowSwipe($event, i)">
+                  <div class="d-flex align-items-center au-animate animate-swipe-row-left animate-swipe-row-right" ><!-- ml-4-->
+                    <span click.delegate="imageClick(i)">
+                      <i class="fa ${i.icon} fa-2x pr-2" aria-hidden="true"></i>
+                      <div class="text-capitalize text-truncate" style="display: inline-block; max-width: 250px;">${i.name}</div>
+                    </span>
+
+                    <i if.bind="faxEnabled" class="fa fa-fax ml-auto text-muted" aria-hidden="true" click.delegate="openFax(i, $event)"></i><!---->
+
+                    <button if.bind="i.displayDelete" type="button" class="ml-auto btn btn-outline-danger mr-2" click.delegate="deleteImage(i)"><i class="fa fa-trash"></i></button>
+                    <button if.bind="i.displayDelete" type="button" class="btn btn-outline-dark" click.delegate="moveImage(i)"><i class="fa fa-folder-o"></i></button>
+                  </div>
+              </li>
+              <li if.bind="!globals.isTouchDevice" repeat.for="i of images" class="list-group-item">
+                  <div class="d-flex align-items-center" ><!-- ml-4-->
+                    <span click.delegate="imageClick(i)">
+                      <i class="fa ${i.icon} fa-2x pr-2" aria-hidden="true"></i>
+                      <div class="text-capitalize text-truncate" style="display: inline-block; max-width: 250px;">${i.name}</div>
+                    </span>
+
+                    <i if.bind="faxEnabled" class="fa fa-fax ml-auto text-muted" aria-hidden="true" click.delegate="openFax(i, $event)"></i><!---->
+
+                    <button type="button" class="ml-auto btn btn-outline-danger mr-2" click.delegate="deleteImage(i)"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="btn btn-outline-dark" click.delegate="moveImage(i)"><i class="fa fa-folder-o"></i></button>
+                  </div>
+              </li>
+            </template>
+
+
+
+            <!-- <li repeat.for="i of images" class="list-group-item"
+                hammer-swipe.call="rowSwipe($event, i)">
+                <div class="d-flex align-items-center au-animate animate-swipe-row-left animate-swipe-row-right" >
+                  <span click.delegate="imageClick(i)">
+                    <i class="fa ${i.icon} fa-2x pr-2" aria-hidden="true"></i>
+                    <div class="text-capitalize text-truncate" style="display: inline-block; max-width: 250px;">${i.name}</div>
+                  </span>
+
+                  <i if.bind="faxEnabled" class="fa fa-fax ml-auto text-muted" aria-hidden="true" click.delegate="openFax(i, $event)"></i>
+
+                  <button if.bind="i.displayDelete" type="button" class="ml-auto btn btn-outline-danger mr-2" click.delegate="deleteImage(i)"><i class="fa fa-trash"></i></button>
+                  <button if.bind="i.displayDelete" type="button" class="btn btn-outline-dark" click.delegate="moveImage(i)"><i class="fa fa-folder-o"></i></button>
+                </div>
+            </li> -->
+          </ul>
+
+
+        </div>
+
+
+      </div>
+    </div>
+
+
+
+
+    <input id="fileFolderPicker" type="file" multiple style="display:none"/>
+
+
+  </div>
+</template>

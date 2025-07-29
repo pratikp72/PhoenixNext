@@ -1,0 +1,136 @@
+<template>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+
+        <div class="row">
+          <h1 class="p-3">${mode}</h1>
+
+        </div>
+        <div class="row">
+
+          <div style="padding: 0 0 0 20px; margin: -20px 0 0 0;">
+            <a click.delegate="modeClicked()" style="cursor: pointer; color: #0B90C4; text-decoration: underline;">${otherMode}</a>
+          </div>
+
+        </div>
+
+      </div>
+      <div class="col" >
+        <div class="form-group" style="padding: 25px 0 0 0;">
+
+          <p show.bind="locationsLoaded === false">
+            ${loadingMessage}
+          </p>
+
+          <select show.bind="locationsLoaded === true" class="form-control" value.bind="selectedLocation" >
+            <option>-- Select a Location --</option>
+            <option repeat.for="location of locations" model.bind="location">
+              ${location.LocationName}
+            </option>
+          </select>
+
+          <div class="row g-3 align-items-center">
+            <div class="col-auto">
+              <div class="form-check">
+                <input checked.bind="showReconciled" class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                <label class="form-check-label" for="flexCheckChecked">
+                  Show reconciled
+                </label>
+              </div>
+            </div>
+            <div class="col-auto">
+              <button click.delegate="refreshCcdas()" type="submit" class="btn btn-primary">Refresh</button>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <div if.bind="mode === allCCDATitle" style="padding: 10px;">
+              <div style="display: flex; justify-content: center; font-weight: bold; font-size: 18px;">
+                Total CCDAs: ${totalCCDAs}
+              </div>
+              <div style="display: flex; justify-content: center;">
+                <div style="padding: 0 10px 0 10px;" repeat.for="page of pages">
+                  <div if.bind="page.type === 'link'">
+                    <div click.delegate="pageClicked(page.pageNumber)" if.bind="page.pageNumber !== pageNumber" style="cursor: pointer; text-decoration: underline; color: #1e88e5;">
+                      ${page.pageNumber}
+                    </div>
+                    <div if.bind="page.pageNumber === pageNumber">
+                      ${page.pageNumber}
+                    </div>
+                  </div>
+                  <div if.bind="page.type === 'ellipses'">...</div>
+                </div>
+
+              </div>
+            </div>
+            <table class="table table-bordered table-hover">
+              <thead class="thead-dark">
+              <tr>
+                <th>DocumentId</th>
+                <th>Received Time</th>
+                <th>Patient First Name</th>
+                <th>Patient Last Name</th>
+                <th>Patient DOB</th>
+                <th>Gender</th>
+                <th>Recipient</th>
+                <th>Sender</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr style="cursor: pointer;" repeat.for="ccda of ccdas" click.delegate="ccdaClicked(ccda)">
+                <td>
+                  <div>
+                    ${ccda.xmlDocument.EntryID}
+                  </div>
+                  <div if.bind="ccda.reconciled === true">
+                    <small style="color: green;">
+                      reconciled ${ccda.visit != null ? formatDate(ccda.visit.ExamDateTime) : ''}
+                    </small>
+                  </div>
+                </td>
+                <td>${formatDate(ccda.xmlDocument.ReceivedTime)}</td>
+
+                <td if.bind="ccda.phoenixPatients && ccda.phoenixPatients.length > 0">
+                  ${ccda.xmlDocument.tblPatientDemographic.NameFirst}
+                </td>
+                <td else>
+                                        <span style="color: red; font-weight: bold;">
+                                            ${ccda.xmlDocument.tblPatientDemographic.NameFirst}
+                                        </span>
+                </td>
+
+                <td if.bind="ccda.phoenixPatients && ccda.phoenixPatients.length > 0">
+                  ${ccda.xmlDocument.tblPatientDemographic.NameLast}
+                </td>
+                <td else>
+                                        <span style="color: red; font-weight: bold;">
+                                            ${ccda.xmlDocument.tblPatientDemographic.NameLast}
+                                        </span>
+                </td>
+
+                <td>${formatDate(ccda.xmlDocument.tblPatientDemographic.DateOfBirth)}</td>
+                <td>${ccda.xmlDocument.tblPatientDemographic.Gender}</td>
+                <td>${ccda.xmlDocument.DirectToName}</td>
+                <td>${ccda.xmlDocument.DirectFromName}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

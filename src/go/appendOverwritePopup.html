@@ -1,0 +1,22 @@
+<template>
+  <ux-dialog css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">${headerText}</h4>
+      <i class="fa fa-times fa-2x float-right" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+
+      <div class="row">
+        <div class="col-auto">
+          <h5>${bodyText}</h5>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-auto">
+          <button type="button" class="btn btn-outline-primary" click.delegate="append()">Append</button>
+          <button type="button" class="btn btn-outline-primary" click.delegate="overwrite()">Overwrite</button>
+        </div>
+      </div>
+    </ux-dialog-body>
+  </ux-dialog>
+</template>

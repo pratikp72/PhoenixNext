@@ -1,0 +1,26 @@
+<template>
+  <style>
+    .sig-canvas {
+      border: 2px dotted #CCCCCC;
+      border-radius: 15px;
+      cursor: crosshair;
+    }
+  </style>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <canvas ref="sigcanvas" class="sig-canvas"
+              width="620" height="160">
+        Get a better browser, bro.
+      </canvas>
+    </div>
+  </div>
+  <div class="row justify-content-around">
+    <button class="btn btn-primary" click.delegate="submit()">Submit</button>
+    <button class="btn btn-outline-secondary" click.delegate="clear()">Clear</button>
+    <button if.bind="displayCancelButton" class="btn btn-secondary" click.delegate="cancel()">Cancel</button>
+  </div>
+
+
+</template>

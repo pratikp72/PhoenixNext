@@ -1,0 +1,22 @@
+
+<template>
+  <ux-dialog style="background: none; border: none; box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <div>      <i class="fa fa-times fa-lg" style="cursor: pointer;
+    float: right;
+    position: relative;
+    z-index: 1000;
+    padding: 15px;" click.delegate="cancel()"></i></div>
+
+    <ux-dialog-body style="position: absolute;
+                      padding: 0;
+                      left: 0;
+                      top: 0;
+                      bottom: 0;
+                      right: 0;">
+
+      <compose view-model="../ptdaysheet/datagrid" model.bind="params" containerless></compose>
+
+<!--      <iframe ref="docframe" load.bind="onFrameLoad()" src.bind="url" title="Document" width="100%;" height="100%;" style="border: none; border-radius: 5px;"></iframe>-->
+    </ux-dialog-body>
+  </ux-dialog>
+</template>

@@ -1,0 +1,98 @@
+<template>
+
+  <require from="../customElements/myCheckbox"></require>
+
+  <style>
+    .group-selected {
+      background-color: #c6e1ff;
+    }
+    .group-unselected {
+      background-color: #fff;
+    }
+  </style>
+
+  <div class="p-2 mb-1" ref="hpiHeader">
+    <h4 style="display: inline-block; margin-bottom: 0px;">Tell us about the history of your illness</h4>
+    <i class="fa fa-times fa-2x float-right" style="cursor: pointer;" click.delegate="close()"></i>
+    <hr>
+  </div>
+
+  <div ref="intakebody" class="row" css="height:${bodyHeight}px;" style="overflow-y: auto;">
+    <div class="col-md-4 pr-0">
+      <ul class="list-group">
+        <template repeat.for="s of hpiObject.sections">
+          <li class="list-group-item ${s.selected ? 'active' : ''}" aria-current="true" click.delegate="sectionClick(s)">${s.description}</li>
+          <li repeat.for="g of s.groups" if.bind="g.displayInNavigation"
+              class="list-group-item ${g.selected ? 'group-selected' : ''}"
+              aria-current="true" click.delegate="groupClick(s, $index)">
+            <div style="padding-left: 20px;">${g.description}</div>
+          </li>
+        </template>
+      </ul>
+    </div>
+    <div class="col-md-8">
+
+      <div class="row">
+        <div class="col-md-12">
+            <textarea id="mta" ref="mytextarea" value.bind="hpitext" name="message" rows="5" cols="50"
+                      style="position: relative;width: 100%; resize: none; overflow-y: scroll;"></textarea>
+        </div>
+      </div>
+
+
+
+      <div class="card">
+        <div class="card-header">
+          <b>${currentSection.detail}</b>
+        </div>
+        <div class="card-body">
+
+          <div repeat.for="g of currentSection.groups"
+               class="row row-cols-${g.cols} pb-3"
+               if.bind="g.visible">
+
+            <div if.bind="g.detail.length > 0" class="col-12 px-4 pb-3">
+              ${g.detail}
+            </div>
+
+            <div repeat.for="i of g.items" class="col">
+              <!--CHECKBOX ITEMS-->
+              <my-checkbox if.bind="i.isCheckbox"
+                           selected.bind="i.object.selected"
+                           value.bind="i.object.name"
+                           editing.bind="i.object.editing"
+                           click.delegate="i.object.select(i.object, $parent.$parent, currentSection, g)"></my-checkbox>
+
+              <!--CALENDAR-->
+              <div if.bind="i.isCalendar" class="form-row">
+                <div class="input-group col-md-12">
+                  <label class="pt-1 pr-2">${i.detail}</label>
+                  <abp-datetime-picker icon-base="font-awesome" with-date-icon="false" element.bind="onsetdatepicker" value.bind="onsetdate" options.bind="{ format: 'MM/DD/YYYY' }" placeholder="MM/DD/YYYY"></abp-datetime-picker>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ref="footer" class="row">
+    <div class="col-md-12">
+      <nav class="navbar navbar-light bg-light" style="left: 0; right:0; bottom:0;">
+        <form class="form-inline" style="width: 100%; display: inline-block;">
+          <button class="btn btn-outline-secondary my-2 my-sm-0"
+                  click.delegate="previousSection()">Previous</button>
+          <button class="btn btn-success my-2 my-sm-0 float-right"
+                  click.delegate="nextSection()">${nextButtonDescription}</button>
+        </form>
+      </nav>
+    </div>
+  </div>
+
+
+
+</template>

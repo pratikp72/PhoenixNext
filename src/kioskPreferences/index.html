@@ -1,0 +1,332 @@
+<template>
+    <style type="text/css">
+        .section-list-item {
+            color: white;
+            line-height: 30px;
+            padding: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+    <div class="row">
+        <div class="col">
+            <nav class="navbar navbar-light bg-light d-flex ">
+
+                <!-- <div class="p-2">
+                    <h5 class="p-2" style="display: inline;">
+                        Kiosk Preferences
+                    </h5>
+                    <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Configure Kiosk" data-content="${data.pageInstructions}"></i>
+                </div> -->
+
+                <div class="dropdown">
+                  <button class="btn btn-link dropdown-toggle" 
+                      type="button" data-toggle="dropdown" aria-expanded="false">
+                      <h5 style="display: inline;">
+                        <span if.bind="isKioskPrefs">Kiosk Preferences </span>
+                        <span if.bind="!isKioskPrefs">Portal Preferences </span>
+                      </h5>
+                      <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Configure Kiosk" data-content="${data.pageInstructions}"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#" click.delegate="switchSettings('KIOSK')">Kiosk</a>
+                    <a class="dropdown-item" href="#" click.delegate="switchSettings('PORTAL')">Portal</a>
+                  </div>
+                </div>
+
+                <!--######  KIOSK NAVIGATION #########-->
+                <!-- <div if.bind="isKioskPrefs" class="d-inline-flex"> -->
+                  <div class="dropdown p-2">
+                      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="providerDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                          <a class="dropdown-item" click.delegate="providerSelected(null)">All Providers</a>
+                          <a class="dropdown-item" click.delegate="providerSelected(provider)" repeat.for="provider of allProviders">${provider.NameLast}, ${provider.NameFirst}</a>
+                      </div>
+                  </div>
+
+                  <div class="p-2">
+                      <h6 style="display: inline;">
+                          Current Provider:
+                      </h6>
+                      <i style="padding: 0 5px 0 5px; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Select a Provider" data-content="${data.providerDropdownInstructions}"></i>
+                      <!---->
+                      <div>${currentProviderName}</div>
+                  </div>
+
+                  <div class="dropdown p-2">
+                      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="typeDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      </a>
+
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                          <a class="dropdown-item" click.delegate="typeSelected(type)" repeat.for="type of allTypes">${type.Name}</a>
+                      </div>
+                  </div>
+
+                  <div class="p-2">
+                      <h6 style="display: inline;">
+                          Current Type:
+                      </h6>
+                      <i style="padding: 0 5px 0 5px; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Select a Layout Type" data-content="${data.typeDropdownInstructions}"></i>
+                      <div>${currentConfiguration ? currentConfiguration.Name : ''}</div>
+                  </div>
+
+                  <div if.bind="isKioskPrefs" class="p-2">
+                      <div>
+                          <span>Days Patient History Valid:</span>
+                          <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Days Patient History Valid" data-content="${data.patientHistoryValidInstructions}"></i>
+                      </div>
+                      <input type="text" value.bind="daysPatientHistoryValid" >
+                  </div>
+
+                  <div if.bind="isKioskPrefs" class="p-2">
+                      <button disabled.bind="settingsSaved" click.delegate="saveSettingsClicked()" class="btn btn-primary">Save Settings</button>
+                  </div>
+                <!-- </div> -->
+                <!--######  END KIOSK NAVIGATION #########-->
+
+                <div class="p-2 ml-auto text-right" >
+                    <button disabled.bind="changesSaved" class="btn btn-primary" click.delegate="saveClicked()">Save Layout</button>
+                    <div if.bind="!changesSaved" class="text-danger">Changes not saved!</div>
+                </div>
+
+            </nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4 p-5">
+
+            <div if.bind="isKioskPrefs" class="row pb-2">
+                <div class="col">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDFs</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item" repeat.for="pdf of availablePdfs">
+                                    <h5>
+                                        ${pdf.Name}
+                                    </h5>
+                                    <div>
+                                        <span class="btn btn-success pointer-event" click.delegate="addClicked(pdf, 'pdf')">Add</span>
+                                    </div>
+
+                                    <template if.bind="pdf.OD_PDF_Template_Rules && pdf.OD_PDF_Template_Rules.length > 0">
+
+                                        <div class="row">
+                                            <div class="col font-weight-bold">
+                                                PDF Rules:
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2">
+
+                                            <template repeat.for="rule of pdf.OD_PDF_Template_Rules">
+                                                <div class="col border-bottom border-dark ">
+                                                    <div>${rule.Name}:</div>
+                                                    <small innerHtml.bind="parseRuleValue(rule)"></small>
+                                                </div>
+                                            </template>
+
+                                        </div>
+
+                                    </template>
+
+                                    <div>
+
+                                        <button class="mt-1 btn btn-primary pointer-event" click.delegate="openRulesDialog(pdf)">Edit Rules</button>
+
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div if.bind="isKioskPrefs" class="row pb-2">
+                <div class="col">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa fa-file-o" aria-hidden="true"></i> Pages</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex ${page.type === 'child-page' ? 'list-group-item-secondary' : ''}" repeat.for="page of availablePages">
+
+                                    <span class="mr-auto" style="${page.type === 'child-page' ? 'margin-left: 20px' : ''}">
+                                        <template if.bind="page.type === 'child-page'">
+
+                                            <h6>
+                                                ${page.name}
+                                            </h6>
+
+                                            <span class="text-muted" >
+                                                child of: ${page.parent}
+                                            </span>
+
+                                        </template>
+                                        <template if.bind="page.type !== 'child-page'">
+
+                                        <span>
+                                            <i style="padding: 0 5px 0 0;" class="fa fa-${page.icon} fa-2x"></i>
+                                        </span>
+
+                                            <h4 style="display: inline;">
+                                                ${page.name}
+                                            </h4>
+
+                                        </template>
+                                    </span>
+
+                                    <div>
+                                        <span class="btn btn-success pointer-event" click.delegate="addClicked(page, 'page')">Add</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+
+            <div class="row">
+              <div class="col">
+
+                  <div class="card">
+                      <div class="card-header">
+                          <h3><i class="fa fa-list-alt" aria-hidden="true"></i> Forms</h3>
+                      </div>
+                      <div class="card-body">
+                          <ul class="list-group">
+                              <li repeat.for="form of availableGoForms" class="list-group-item d-flex align-items-center">
+                                <h5 class="d-inline-block">
+                                  ${form.Description}
+                                </h5>
+                                <span class="btn btn-success pointer-event ml-auto" click.delegate="addClicked(form, 'goform')">
+                                  <i class="fa fa-plus" aria-hidden="true"></i>
+                                </span>
+                                <!-- <div>
+                                  <span class="btn btn-success pointer-event" click.delegate="addClicked(form, 'goform')">Add</span>
+                                </div> -->
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-8 p-5">
+            <div class="row">
+                <div class="col p-2">
+
+                    <span class="p-2">
+                        <h5 class="p-2" style="display: inline;">
+                        Page order for the "${currentProviderName}" "${currentConfiguration.Name}" layout
+                        </h5>
+                        <i style="padding: 0 5px 0 0; cursor: pointer;" class="fa fa-question-circle text-primary" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Page Order" data-content="${data.layoutInstructions}"></i>
+                    </span>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <form>
+                        <div class="form-group">
+                            <template if.bind="currentConfiguration && currentConfiguration.JsonData">
+                                <ul class="list-group">
+                                    <li class="list-group-item ${item.type === 'pdf' ? 'list-group-item-info' : ''} ${item.type === 'child-page' ? 'list-group-item-secondary' : ''}" style="cursor: pointer;" reorderable-repeat.for="item of currentConfiguration.JsonData" reorderable-after-reordering="orderChanged">
+
+                                <span class="d-flex">
+
+                                    <span class="mr-auto" style="${item.type === 'child-page' ? 'margin-left: 20px' : ''}">
+                                        <template if.bind="item.type === 'child-page'">
+
+                                            <h6>
+                                                ${item.name}
+                                            </h6>
+
+                                            <span class="text-muted" >
+                                                child of: ${item.parent}
+                                            </span>
+
+                                        </template>
+                                        <template if.bind="item.type !== 'child-page'">
+
+                                        <span>
+                                            <i style="padding: 0 5px 0 0;" class="fa fa-${item.icon} fa-2x"></i>
+                                        </span>
+
+                                            <h4 style="display: inline;">
+                                                ${item.name}
+                                            </h4>
+
+                                        </template>
+                                        <template if.bind="item.type === 'pdf'">
+
+                                            <template if.bind="item.pdfTemplate.OD_PDF_Template_Rules && item.pdfTemplate.OD_PDF_Template_Rules.length > 0">
+
+                                                <div class="row">
+                                                    <div class="col font-weight-bold">
+                                                        PDF Rules:
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+
+                                                    <template repeat.for="rule of item.pdfTemplate.OD_PDF_Template_Rules">
+                                                        <div class="col border-right border-dark">
+                                                            <div>${rule.Name}</div>
+                                                            <small innerHtml.bind="parseRuleValue(rule)"></small>
+                                                        </div>
+                                                    </template>
+
+                                                </div>
+
+                                            </template>
+
+                                            <div>
+
+                                                <button class="mt-1 btn btn-primary pointer-event" click.delegate="openRulesDialog(item.pdfTemplate)">Edit Rules</button>
+
+                                            </div>
+
+                                        </template>
+                                    </span>
+                                    <span >
+                                        <span if.bind="item.name != 'End' && item.name != 'Pay'" class="btn btn-danger pointer-event" click.delegate="removeClicked(item, $index)">
+                                          <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </span>
+                                    </span>
+
+                                </span>
+
+                                    </li>
+                                </ul>
+
+                            </template>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</template>

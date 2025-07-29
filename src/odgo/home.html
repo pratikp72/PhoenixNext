@@ -1,0 +1,36 @@
+<template>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#"><i class="fa fa-cog mr-2" aria-hidden="true"></i>GO Manager</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- <div class="collapse navbar-collapse float-right" id="navbarNavAltMarkup">
+        <i class="fa fa-times mr-2 fa-2x" aria-hidden="true" click.delegate="close()"></i>
+      </div> -->
+    </nav>
+  
+    <div id="odgoContainer" class="row px-2 py-2" style="height: inherit;">
+      <div class="col-md-3">
+
+        <div class="d-flex align-items-center" style="height: 42px;">
+          <h4 class="ml-1">Tenants</h4><i class="fa fa-plus fa-2x ml-auto text-primary" aria-hidden="true" click.delegate="newTenantClick()"></i>
+        </div>
+
+        <div class="list-group" css="height:${tenantScrollHeight}px;" style="overflow-y: auto;">
+          <button repeat.for="t of tenants" type="button" 
+            class="list-group-item list-group-item-action ${t.selected ? 'active' : ''}" aria-current="true" click.delegate="tenantClicked(t)">
+            ${t.tenantId}
+          </button>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <ul class="nav nav-tabs">
+          <li repeat.for="p of pages" class="nav-item">
+            <a class="nav-link ${p.selected ? 'active' : ''} ${p.disabled ? 'disabled': ''}" href="#" click.delegate="pageClick(p)">${p.name}</a>
+          </li>
+        </ul>
+        <compose ref="adm" view-model.bind="selectedPage.path" model.bind="$this" containerless></compose>
+      </div>
+    </div>
+</template>

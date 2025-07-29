@@ -1,0 +1,412 @@
+<template>
+
+  <require from="./container"></require>
+  <require from="./tools/text-toolbar"></require>
+  <require from="./tools/maintoolbar"></require>
+  <require from="./dialogs/tableCellOptions"></require>
+
+  <require from="../go/customElements/myCheckbox"></require>
+
+  <!-- <require from="./customElements/datasetPicker"></require> -->
+
+  <style>
+    .page-selected {
+      border: 1px dashed #007bff;
+    }
+    .point-three-border{
+      border: 1px solid rgba(0, 0, 0, 0.3);
+    }
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active{
+        box-shadow:none !important;
+        outline:0px !important;
+    }
+    .btn-outline-primary:hover {
+      color: #fff;
+      background-color: #007bff !important;
+      border-color: #007bff;
+    }
+    .marquee-selected{
+      color: #fff;
+      background-color: #007bff !important;
+    }
+
+    .data-button{
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      padding-right: 0.3rem;
+    }
+    .data-button-dropdown{
+      padding-left: 0;
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+
+    .flex-fill{
+      flex: 1 1 auto;
+    }
+
+    .form-type{
+      color: grey;
+    }
+    .table-cell-options{
+      position: absolute;
+      border-radius: 4px;
+      border: 1px solid #007bff;
+      background-color: white;
+      box-shadow: #007bff 3px 3px 10px 0px;
+      z-index: 2000;
+    }
+    .container-class{
+      height: 1056px; 
+      width: 816px; 
+      /* width: 75%;  */
+      display: block;
+    }
+
+    textarea{
+      min-height:unset !important;
+    }
+  </style>
+
+  <div class="row">
+
+    <div id="formList" show.bind="sidebarExpanded" class="col-md-3 pr-0" style="overflow-y:auto; height: 90vh; position: fixed;">
+
+      <div class="d-flex align-items-center mb-1"><!---->
+        <button type="button" class="btn ${barForms ? 'btn-primary' : 'btn-outline-secondary'} mr-1" 
+          disabled.bind="barFormsDisabled"
+          click.delegate="tabClicked('forms')"><i class="fa fa-files-o" aria-hidden="true"></i> Forms</button>
+        <div class="dropdown">
+          <button type="button" class="btn dropdown-toggle ${barDatabase ? 'btn-primary' : 'btn-outline-secondary'}" 
+            disabled.bind="barDatabaseDisabled"
+            click.delegate="tabClicked('database')"
+            data-toggle="dropdown">
+              <i class="fa fa-database" aria-hidden="true"></i> ${selectedDataTypeBase ? 'Data' : 'Custom'} </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" click.delegate="toggleSelectedDataType()"><i class="fa fa-database text-muted" aria-hidden="true"></i> Data</a>
+                <a class="dropdown-item" href="#" click.delegate="toggleSelectedDataType()"><i class="fa fa-database text-muted" aria-hidden="true"></i> Custom</a>
+              </div>
+        </div>
+        <!-- <button type="button" class="btn ${barSelect ? 'btn-primary' : 'btn-outline-secondary'}"
+          disabled.bind="barSelectDisabled"
+          click.delegate="tabClicked('select')"><i class="fa fa-book" aria-hidden="true"></i> Pref Lib</button> -->
+      </div>
+
+      <div show.bind="barForms">
+        <div class="d-flex align-items-center mb-1">
+          <select value.bind="selectedProvider" class="form-control mr-1 flex-fill">
+            <option model.bind="null">Provider...</option>
+            <option repeat.for="p of providers" model.bind="p" >${p.ProviderEntity}</option>
+          </select>
+
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item ${!selectedProvider ? 'disabled' : ''}" href="#" click.delegate="newForm()">
+                <i class="fa fa-plus mr-1" aria-hidden="true"></i> New
+              </a>
+              <a class="dropdown-item ${!form ? 'disabled' : ''}" href="#" click.delegate="deleteForm()">
+                <i class="fa fa-trash-o mr-1" aria-hidden="true"></i>Delete
+              </a>
+            </div>
+          </div>
+
+        </div>
+        <ul class="list-group">
+          <li repeat.for="f of forms" class="list-group-item point-three-border ${f.selected ? 'active' : ''}" click.delegate="selectForm(f)">
+            <div class="d-flex align-items-center">
+              <i class="fa fa-file-o text-muted mr-2" aria-hidden="true"></i>
+              <span class="d-inline-block text-truncate">${f.name}</span>
+              <small class="ml-auto ${!f.selected ? 'form-type' : ''}">${f.type} </small>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+
+
+      <div show.bind="barDatabase" class="accordion" id="accordionExample">
+
+        <div class="d-flex align-items-center mb-1" if.bind="!selectedDataTypeBase">
+          <button type="button" class="btn btn-outline-primary ml-auto" click.delegate="openCustomValues()">
+            <i class="fa fa-cog" aria-hidden="true"></i></button>
+        </div>
+
+        <!-- <dataset-picker datacolumncallback.call="dataColumnClicked(dataColumn)"
+          categories.bind="categories"
+          formhelper.bind="formhelper"
+          data.bind="data"></dataset-picker> -->
+
+        <div repeat.for="c of categories" class="card point-three-border">
+          <div class="card-header">
+            <h2 class="mb-0">
+              <button class="btn btn-link btn-block text-left" type="button" 
+                style="font-size: 1.2rem;font-weight: 500;line-height: 1.2;"
+                data-toggle="collapse" data-target.bind="c.dataTarget" aria-expanded="true" 
+                click.delegate="categoryClicked(c)">
+                <i class="fa fa-database mr-1" aria-hidden="true"></i>${c.name}
+                <i class="fa ${c.expanded ? 'fa-angle-down' : 'fa-angle-up'} float-right" aria-hidden="true"></i>
+              </button>
+            </h2>
+          </div>
+      
+          <div id.bind="c.collapseId" class="collapse" data-parent="#accordionExample">
+            <ul class="list-group list-group-flush">
+              <li repeat.for="rc of c.items" 
+                  class="list-group-item ${rc.selected ? 'active' : ''} d-flex align-items-center" 
+                  click.delegate="dataColumnClicked(rc)">
+
+                <span class="fa-stack text-muted mr-1">
+                  <i class="fa fa-database fa-stack-1x" aria-hidden="true"></i> 
+                  <i if.bind="!rc.editable" class="fa fa-ban fa-stack-2x" aria-hidden="true"></i> 
+                </span>
+
+                <span class="mr-1">${rc.name}</span>
+
+                <span class="text-muted"><small>${rc.readableType}</small></span>
+
+                <i if.bind="rc.listId" class="fa fa-list-ul text-muted ml-auto" aria-hidden="true"></i> 
+
+                <!-- <i if.bind="selectedItem.incomplete" class="fa fa-link text-danger ml-auto" aria-hidden="true"></i>  -->
+
+              </li>
+            </ul>
+          </div>
+        </div>
+
+
+
+      </div>
+    </div>
+
+    <div id="formWindow" class="col-md-${sidebarExpanded ? '9' : '12'} ml-auto" 
+      style="overflow-y:auto; height: 90vh;" scrolltop.bind="pageTop">
+
+      <!--TOOLBARS-->
+      <div style="position: sticky; top: 0; z-index: 2000;">
+
+        <div class="d-flex align-items-center">
+          <div class="btn-group" style="background-color: white;" role="group">
+            <button type="button" class="btn btn-outline-primary" click.delegate="toggleSidebar()"><i class="fa ${sidebarExpanded ? 'fa-angle-left': 'fa-angle-right'}" aria-hidden="true"></i></button>     
+          </div>
+  
+          <div class="btn-group ml-auto" style="background-color: white;" role="group" aria-label="Toolbar">
+            <button type="button" class="btn btn-outline-primary" disabled.bind="!form" click.delegate="addTextElement('statictext')"><i class="fa fa-font" aria-hidden="true"></i>Text</button>
+
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary dropdown-toggle" disabled.bind="!form" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-list-alt" aria-hidden="true"></i> Input
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" click.delegate="addTextboxClicked()"><i class="fa fa-font" aria-hidden="true"></i> Textbox</a>
+                <a class="dropdown-item" href="#" click.delegate="addCheckboxClicked()"><i class="fa fa-check-square-o" aria-hidden="true"></i> Checkbox</a>
+                <a class="dropdown-item" href="#" click.delegate="addListboxClicked()"><i class="fa fa-list" aria-hidden="true"></i> Listbox</a>
+              </div>
+            </div>
+        
+            <!--IMAGE-->
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary dropdown-toggle" disabled.bind="!form" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-picture-o" aria-hidden="true">
+              </button>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" for="image-filepicker">
+                  <input accept=".jpg,.jpeg,.gif,.tiff,.tif,.bmp,.png,.webp" style="opacity: 0; position: absolute;" title="Upload an image" name="file" type="file" class="dropdown-item" id="image-filepicker">
+                  <i class="fa fa-plus" aria-hidden="true"></i> Add Image
+                </div>
+              </div>
+            </div>
+
+            <!--TABLE-->
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary" disabled.bind="!form" click.delegate="addTable()">
+                <i class="fa fa-table" aria-hidden="true">
+              </button>
+            </div>
+            
+
+            <!--SIGNATURE-->
+            <button type="button" class="btn btn-outline-primary" disabled.bind="!form" click.delegate="addSignature()"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Signature</button>
+
+            <!--CHARTS-->
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary dropdown-toggle" disabled.bind="!form" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-bar-chart" aria-hidden="true"></i> Chart
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" click.delegate="addChart('chartbar')"><i class="fa fa-bar-chart" aria-hidden="true"></i> Bar</a>
+              </div>
+            </div>
+
+
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary" style="border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem;"
+                      disabled.bind="!form" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" click.delegate="horizontalLineClicked()">
+                  <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 12L20 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+
+                  Horizontal Line
+                </a>
+                <!-- <a class="dropdown-item ${form.displayInNoteMenu ? 'active' : ''}" href="#" click.delegate="displayInNoteMenuClicked()"><i class="fa fa-sticky-note-o" aria-hidden="true"></i> Display in Note Menu</a>
+                <a class="dropdown-item ${form.displayInExamDropdown ? 'active' : ''}" href="#" click.delegate="displayInExamDropdownClicked()"><i class="fa fa-list-alt" aria-hidden="true"></i> Display in Document Dropdown</a> -->
+                <a class="dropdown-item ${form.fullWidth ? 'active' : ''}" href="#" click.delegate="fullWidthClicked()"><i class="fa fa-arrows-h" aria-hidden="true"></i> Full Width</a>
+                <!-- <a class="dropdown-item" href="#" click.delegate="maturityDaysClicked()"><i class="fa fa-calendar-plus-o" aria-hidden="true"></i> Maturity Days</a> -->
+                <a class="dropdown-item" href="#" click.delegate="toggleGrid()"><i class="fa fa-th" aria-hidden="true"></i> Toggle Grid</a>
+                <a class="dropdown-item" href="#" click.delegate="openPreferenceEditor()"><i class="fa fa-user" aria-hidden="true"></i> Go Form Preference Editor</a>
+              </div>
+            </div>
+          </div>
+  
+          <div class="btn-group ml-2 mr-auto" style="background-color: white;" role="group">
+            <button type="button" disabled.bind="!form" class="btn btn-outline-primary ${marqueeSelected ? 'marquee-selected' : ''}" click.delegate="marqee()"><i class="fa fa-object-group" aria-hidden="true"></i></button>
+          </div>
+  
+          <div class="btn-group" style="background-color: white;" role="group">
+            <button type="button" disabled.bind="!form" class="btn btn-primary" click.delegate="save()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+            <button type="button" disabled.bind="!form" class="btn btn-primary dropdown-toggle dropdown-toggle-split pl-0" data-toggle="dropdown" aria-expanded="false">
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="#" click.delegate="saveAs()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save As...</a>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="d-flex justify-content-center mt-2">
+          <maintoolbar ref="maintoolbar" item.bind="selectedItem"></maintoolbar>
+        </div>
+      </div>
+
+      <!--filename-->
+      <div class="d-flex pt-2 px-4 align-items-center">
+        <span class="h4 mb-0 mr-2" style="color: #007bff" contenteditable="true" innerhtml.bind="form.name"></span>
+        <i if.bind="form" class="fa fa-tag mr-1" style="color: #007bff;" aria-hidden="true" click.delegate="addTag()"></i>
+        <span class="font-weight-light" style="font-size: small; color: #007bff;">
+          ${form.tag}
+          <i if.bind="form.tag" class="fa fa-times" style="color: #007bff; font-size: small;" aria-hidden="true" click.delegate="deleteTag()"></i>
+        </span>
+        <i class="fa fa-cog ml-auto" style="color: #007bff;" aria-hidden="true" click.delegate="toggleFormSettings()"></i>
+      </div>
+
+
+
+      <!--form settings-->
+      <template if.bind="showFormSettings">
+        <div class="row align-items-start px-4">
+
+          <div class="col">
+            <my-checkbox selected.bind="form.displayInNoteMenu"
+                         value.bind="displayInNoteMenu"
+                         editing.bind="true"
+                         click.delegate="displayInNoteMenuClicked()"></my-checkbox>
+            <small class="form-text text-muted ml-2">Display in 
+              <i class="fa fa-sticky-note-o mx-1" aria-hidden="true"></i>note menu in main toolbar</small>
+          </div>
+  
+          <div class="col">
+            <my-checkbox selected.bind="form.displayInExamDropdown"
+                         value.bind="displayInDocumentDropdown"
+                         editing.bind="true"
+                         click.delegate="displayInExamDropdownClicked()"></my-checkbox>
+            <small class="form-text text-muted ml-2">Display in 
+              <i class="fa fa-list-alt mx-1" aria-hidden="true"></i>document tray dropdown on home screen</small>
+          </div>
+        </div>
+        <div class="row align-items-start px-4">
+          <div class="col">
+            <my-checkbox selected.bind="form.displayInPortalKioskPreferences"
+                         value.bind="displayInPortalKiosk"
+                         editing.bind="true"
+                         click.delegate="displayInPortalKioskClicked()"></my-checkbox>
+            <small class="form-text text-muted ml-2">Make form available to use in kiosk / portal</small>
+          </div>
+  
+          <div class="col">
+            <div class="input-group m-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Maturity Days</span>
+              </div>
+              <input type="text" class="form-control" value.bind="form.maturityDays" placeholder="Maturity days..." aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <small class="form-text text-muted ml-2">Days before form must be refilled</small>
+          </div>
+        </div>
+        <div class="row align-items-start px-4">
+          <div class="col">
+            <div class="input-group m-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Primary Exam</span>
+              </div>
+              <!-- <input type="text" class="form-control" value.bind="form.maturityDays" placeholder="Maturity days..." aria-label="Username" aria-describedby="basic-addon1"> -->
+              <select value.bind="form.primaryExam" class="form-control">
+                <option model.bind="null">None...</option>
+                <option repeat.for="b of bodyparts" model.bind="b.part" >${b.part}</option>
+              </select>
+            </div>
+            <small class="form-text text-muted ml-2">This form will be used to display selected exam data</small>
+          </div>
+        </div>
+
+
+      </template>
+      
+
+
+ 
+      <!--prepend page-->
+      <div class="d-flex pt-2 px-4 pb-4"><!--p-4-->
+        <hr style="border-top: 1px dashed" class="text-primary w-100 mr-2">
+        <button type="button" disabled.bind="!form" class="btn btn-outline-primary ml-auto mr-auto" style="width: 20%; min-width: 135px; font-size: 0.75rem;" click.delegate="prependPage(0)"><i class="fa fa-plus" aria-hidden="true"></i> Insert Page Here</button>   
+        <hr style="border-top: 1px dashed" class="text-primary w-100 ml-2">
+      </div>
+      
+      <!--PAGE-->
+      <template repeat.for="p of form.pages">
+        <div class="w-100 d-flex" id.bind="p.id">
+          <div class="h2 ml-auto text-right text-muted pr-2">
+            <div class="d-flex flex-column">
+              ${$index + 1}
+              <!-- <button type="button" class="btn btn-outline-primary bg-white mb-1" click.delegate="form.selectPage($index)"><i class="fa fa-hand-pointer-o" aria-hidden="true"></i></button> -->
+              <button type="button" class="btn btn-outline-primary bg-white mb-1" click.delegate="deletePage($index)"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+              <button type="button" class="btn btn-outline-primary bg-white" click.delegate="clonePage($index)"><i class="fa fa-clone" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <container id="mainContainer" ref="mycontainer" 
+            pointerup.trigger="updateRange($event)"
+            items.bind="p.items" 
+            edit.bind="true"
+            class="mr-auto ${p.selected ? 'page-selected' : ''} container-class"></container><!--mouseup-->
+        </div>
+
+        <!--APPEND PAGE-->
+        <div class="d-flex p-4">
+          <hr style="border-top: 1px dashed" class="text-primary w-100 mr-2">
+          <button type="button" disabled.bind="!form" class="btn btn-outline-primary ml-auto mr-auto" style="width: 20%; min-width: 135px; font-size: 0.75rem;" click.delegate="appendPage($index)"><i class="fa fa-plus" aria-hidden="true"></i> Insert Page Here</button>   
+          <hr style="border-top: 1px dashed" class="text-primary w-100 ml-2">
+        </div>
+      </template>
+
+      <!--try displaying TABLE EDITOR HERE...-->
+      <!-- <table-cell-options if.bind="selectedItem.table.editMode && c.selected" 
+        cell.bind="c" item.bind="selectedItem" 
+        class="table-cell-options"></table-cell-options> -->
+
+      <table-cell-options if.bind="tableCellOptionsData.show" 
+        cell.bind="tableCellOptionsData.cell" 
+        item.bind="selectedItem" 
+        editor.bind="$this"
+        css="left: ${tableCellOptionsData.rect.x}px; top: ${tableCellOptionsData.rect.y}px;"
+        class="table-cell-options"></table-cell-options><!--  -->
+
+
+    </div>
+  </div>
+</template>

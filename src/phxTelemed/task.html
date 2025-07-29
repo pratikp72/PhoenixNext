@@ -1,0 +1,56 @@
+
+<template>
+  <ux-dialog ref="taskdialog" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">Tasking</h4>
+
+      <i class="fa fa-times fa-lg" style="cursor: pointer; float: right;" click.delegate="saveAndClose()"></i>
+
+    </ux-dialog-header>
+
+    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">
+
+      <div class="tableFixHeadLight" css="height: ${popupHeight - 198}px;">
+        <table class="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Date</th>
+              <th scope="col">Patient</th>
+              <th scope="col">Description</th>
+              <th scope="col" click.delegate="toggleFilterStatus()" style="cursor: pointer;"> Status <i class="fa fa-filter"></i></th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template repeat.for="s of filteredTasks">
+              <tr click.delegate="rowClicked(s)" class.bind="s.selected ? 'table-primary' : 'table-light'">
+
+                <td><i class="fa fa-folder-open fa-lg" style="padding-left: 10px; cursor: pointer;" click.delegate="launchPatient(s)"></i></td>
+                <td>${s.date}</td>
+                <td>${s.data.Patient_Name}</td>
+                <td><textarea class="form-control" value.bind="s.data.Description" input.delegate="setDescription(s)" rows="2" maxlength="8000"></textarea></td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      ${s.data.Status} <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <template repeat.for="m of taskStatusList">
+                        <a class="dropdown-item" href="#" click.delegate="setStatus(s, m)">${m}</a>
+                      </template>
+                    </ul>
+                  </div>
+                </td>
+                <td><i class="fa fa-reply fa-lg" style="cursor: pointer;" click.delegate="forwardTask(s)"></i></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+    </ux-dialog-body>
+    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

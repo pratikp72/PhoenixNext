@@ -1,0 +1,47 @@
+<template>
+
+        <div class="card" style="height: inherit;">
+          <div class="card-header">
+            <h4 class="mr-2 mb-0" style="display: inline-block; vertical-align: middle;"><i class="fa fa-folder-o mr-2"></i>Move to folder...</h4>
+            <i class="fa fa-close fa-2x float-right" style="vertical-align: middle;" click.delegate="cancel()"></i></a>
+          </div>
+          <div class="card-body" style="overflow-y: scroll;">
+
+            <div repeat.for="a of folders">
+
+              <div class="d-flex align-items-center text-primary" click.delegate="$this.folderClick(a)">
+                <i class="fa fa-folder-o fa-2x pr-1" aria-hidden="true"></i>
+                <div class="text-capitalize">${a.name}</div>
+              </div>
+              <hr class="my-2">
+
+              <div repeat.for="b of a.folders">
+                <div class="d-flex align-items-center text-primary ml-4" click.delegate="$this.folderClick(b)">
+                  <i class="fa fa-folder-o fa-2x pr-1" aria-hidden="true"></i>
+                  <div class="text-capitalize">${b.name}</div>
+                </div>
+                <hr class="my-2">
+
+                <div repeat.for="c of b.folders">
+                  <div class="d-flex align-items-center text-primary ml-8" click.delegate="$this.folderClick(c)">
+                    <i class="fa fa-folder-o fa-2x pr-1" aria-hidden="true"></i>
+                    <div class="text-capitalize">${c.name}</div>
+                  </div>
+                  <hr class="my-2">
+
+                  <div repeat.for="d of c.folders">
+                    <div class="d-flex align-items-center text-primary ml-8" click.delegate="$this.folderClick(d)">
+                      <i class="fa fa-folder-o fa-2x pr-1" aria-hidden="true"></i>
+                      <div class="text-capitalize">${d.name}</div>
+                    </div>
+                    <hr class="my-2">
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+</template>

@@ -1,0 +1,78 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+  <require from="./text-toolbar"></require> 
+
+  <style>
+    input:hover{
+      cursor: pointer;
+    }
+
+    .table-style{
+      display: inline-block;
+      width: auto;
+    }
+
+    .no-resize{
+      resize: none;
+    }
+
+    .incomplete{
+      border: 1px solid red !important;
+    }
+
+  </style>
+
+  <div
+    ref="dndElement"
+    class="${item.addBoxClass ? 'box' : 'table-style'}"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)">
+
+    <div class="card w-100 h-100 mb-1 border-0" css="${item.disabled ? 'pointer-events: none;' : ''}">
+      <div ref="cardbody" class="card-body p-1 d-flex align-items-center">
+
+        <i if.bind="showDbElementIcon" class="fa fa-database mr-1 text-muted" aria-hidden="true"></i>
+
+          <textarea if.bind="item.inputType != 'date'"
+            id.bind="item.elementId" 
+            class="flex-grow-1 form-control no-resize ${isRequired ? 'is-invalid' : ''}" 
+            css="min-width: ${minWidth}px;"
+            style.bind="item.style"
+            rows.bind="item.textRows"
+            placeholder.bind="placeholder" 
+            readonly.bind="item.disabled"
+            value.bind="item.value"></textarea>
+
+          <input if.bind="item.inputType == 'date'"
+            type.bind="item.inputType"
+            id.bind="item.elementId" 
+            class="flex-grow-1 form-control no-resize ${isRequired ? 'is-invalid' : ''}" 
+            css="min-width: ${minWidth}px;"
+            style.bind="item.style"
+            placeholder.bind="placeholder" 
+            readonly.bind="item.disabled"
+            value.bind="item.value"></input>
+
+            <!-- <input
+            type.two-way="item.inputType"
+            id.bind="item.elementId" 
+            class="flex-grow-1 form-control no-resize ${isRequired ? 'is-invalid' : ''}" 
+            css="min-width: ${minWidth}px;"
+            style.bind="item.style"
+            placeholder.bind="placeholder" 
+            readonly.bind="item.disabled"
+            value.bind="item.value"></input> -->
+
+      </div>
+    </div>
+
+    <resize-corner
+      if.bind="item.addBoxClass"
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

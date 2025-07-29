@@ -1,0 +1,49 @@
+
+<template>
+  <ux-dialog style="width: 75%;">
+    <ux-dialog-header>
+<!--      <i class.bind="iconClass" aria-hidden="true"-->
+<!--         css="color: ${color};"-->
+<!--         style="padding: 5px 5px 5px 0px;-->
+<!--           vertical-align: baseline;"></i>-->
+      <h4 style="display: inline-block; margin-bottom: 0px;">Diagnosis</h4>
+    </ux-dialog-header>
+    <ux-dialog-body>
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control"
+               placeholder="search code or description..."
+               aria-label="search code or description..."
+               aria-describedby="button-addon2" value.bind="searchString">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary"
+                  type="button" id="button-addon2" click.delegate="searchClicked()">Search</button>
+        </div>
+      </div>
+
+      <div class="tableFixHeadLight">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Desc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template repeat.for="s of searchResults">
+              <tr click.delegate="rowClicked(s)" class.bind="s.selected ? 'table-primary' : 'table-light'">
+                <td>${s.code}</td>
+                <td>${s.description}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button click.delegate="close()">OK</button>
+      <button click.delegate="cancel()">Cancel</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

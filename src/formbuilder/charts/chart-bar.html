@@ -1,0 +1,32 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+
+  <style>
+    .table-style{
+      display: inline-block;
+      width: auto;
+    }
+  </style>
+
+  <div
+    ref="dndElement"
+    class.bind="elementClass"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)">
+
+    <div class="card w-100 h-100 mb-1 bg-transparent border-0" >
+      <div ref="cardbody" class="card-body p-1 d-flex align-items-center">
+        <canvas ref="canvasChart"></canvas>
+      </div>
+    </div>
+
+    <resize-corner 
+      if.bind="item.addBoxClass"
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

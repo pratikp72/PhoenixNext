@@ -1,0 +1,146 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+  <require from="./listbox-toolbar"></require> 
+
+  <style>
+    .is-required{
+      border-color: #dc3545;
+    }
+
+    .table-style{
+      display: inline-block;
+      width: auto;
+    }
+
+    .is-invalid{
+      border-color: #dc3545;
+      padding-right: calc(0.75em + 2.3125rem);
+      display: block;
+    }
+
+    .is-invalid-color{
+      border-color: #dc3545 !important;
+    }
+
+    .btn-dropdown {
+      color: #fff;
+      background-color: unset;
+      border-color: #357ebd; /*set the color you want here*/
+      color: #212529;
+      box-shadow: none!important;
+      border: 1 !important;
+    }
+
+    .btn-dropdown:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+        color: #212529;
+        background-color: unset;
+        border-color: #285e8e; /*set the color you want here*/
+    }
+
+    .no-resize{
+      resize: none;
+    }
+
+    textarea{
+      overflow: auto !important;
+    }
+
+  </style>
+
+  <div
+    ref="dndElement"
+    class="${item.addBoxClass ? 'box' : 'table-style'}"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)">
+
+    <div class="card w-100 h-100 mb-1 border-0" css="${item.disabled ? 'pointer-events: none;' : ''}">
+      <div ref="cardbody" class="card-body p-1 d-flex align-items-center">
+
+        <i if.bind="showDbElementIcon" class="fa fa-list-ul mr-1 text-muted" aria-hidden="true"></i>
+
+        <!--USED FOR EDITOR TO SHOW DB NAME in PLACEHOLDER-->
+        <!-- <input if.bind="!showSelect" id.bind="item.elementId" readonly
+          class="flex-grow-1 form-control ${isRequired ? 'is-invalid' : ''}" 
+          css="min-width: ${minWidth}px;"
+          placeholder.bind="placeholder" 
+          type.bind="item.inputType"> -->
+
+
+        <textarea if.bind="!showSelect" id.bind="item.elementId"
+          class="flex-grow-1 form-control no-resize ${isRequired ? 'is-invalid' : ''}" 
+          css="min-width: ${minWidth}px;"
+          placeholder.bind="placeholder" 
+          rows.bind="item.textRows"></textarea>
+          <!--readonly readonly.bind="item.disabled"
+              style.bind="item.style"
+              value.bind="item.value"-->
+
+        <!--USED IN VIEWER for input data-->
+        <!-- <div ref="viewerDropdown" if.bind="showSelect" class="input-group">
+          <input id.bind="item.elementId" type="text" class="form-control ${isRequired ? 'is-invalid': ''}" 
+                style="border-right: none; border: 1!important; box-shadow: none!important;" value.bind="item.value" css="background-color: ${backgroundColor}">
+          <div class="input-group-append">
+            <button class="btn btn-dropdown ${isRequired ? 'is-invalid-color': ''}" 
+                    style="border-top-right-radius: 0.25rem;
+                    border-bottom-right-radius: 0.25rem;
+                    border-left: none;
+                    border-color: #ced4da;" 
+                    css="background-color: ${backgroundColor}"
+                    type="button" data-toggle="dropdown" aria-expanded="false" data-display="static">
+              <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-sm-left" style="width: -webkit-fill-available;">
+              <a class="dropdown-item" repeat.for="i of item.dataColumn.listOptions" href="#" click.delegate="listSelected(i)">${i.text}</a>
+            </div>
+          </div>
+        </div> -->
+
+        <div ref="viewerDropdown" if.bind="showSelect" class="input-group">
+          <!-- <input id.bind="item.elementId" 
+                type="text" 
+                class="form-control ${isRequired ? 'is-invalid': ''}" 
+                style="border-right: none; border: 1!important; box-shadow: none!important;" 
+                value.bind="item.value" 
+                css="background-color: ${backgroundColor}"> -->
+
+          <textarea id.bind="item.elementId"
+                class="flex-grow-1 form-control no-resize ${isRequired ? 'is-invalid' : ''}" 
+                style="border-right: none; border: 1!important; box-shadow: none!important;" 
+                css="min-width: ${minWidth}px; background-color: ${backgroundColor}"
+                value.bind="item.value" 
+                rows.bind="item.textRows"></textarea>
+
+
+          <div class="input-group-append">
+            <button class="btn btn-dropdown ${isRequired ? 'is-invalid-color': ''}" 
+                    style="border-top-right-radius: 0.25rem;
+                    border-bottom-right-radius: 0.25rem;
+                    border-left: none;
+                    border-color: #ced4da;" 
+                    css="background-color: ${backgroundColor}"
+                    type="button" data-toggle="dropdown" aria-expanded="false" data-display="static">
+              <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-sm-left" style="width: -webkit-fill-available;">
+              <a class="dropdown-item text-truncate" 
+                repeat.for="i of item.dataColumn.listOptions" href="#" click.delegate="listSelected(i)">${i.text}</a>
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </div>
+
+    <resize-corner
+      if.bind="item.addBoxClass"
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

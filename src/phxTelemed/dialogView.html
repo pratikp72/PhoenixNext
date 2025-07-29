@@ -1,0 +1,17 @@
+
+<template>
+  <ux-dialog css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <button click.delegate="close()">OK</button>
+    </ux-dialog-header>
+    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">
+      <div class="tableFixHeadLight" css="height: ${popupHeight - 198}px;">
+<!--        <embed src.bind="url"></embed>-->
+      </div>
+    </ux-dialog-body>
+<!--    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">-->
+<!--      <button click.delegate="close()">OK</button>-->
+<!--      <button click.delegate="cancel()">Cancel</button>-->
+<!--    </ux-dialog-footer>-->
+  </ux-dialog>
+</template>

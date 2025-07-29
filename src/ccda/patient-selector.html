@@ -1,0 +1,34 @@
+
+<template>
+    <ux-dialog>
+        <ux-dialog-body>
+            <h2>Select Matched Patient</h2>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-bordered table-hover table-sm">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>DOB</th>
+                                <th>Email</th>
+                                <th>PatientID</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr click.delegate="patientSelected(patient)" style="cursor: pointer;" repeat.for="patient of model.patients">
+                                <td>${patient.NameFirst}</td>
+                                <td>${patient.NameLast}</td>
+                                <td>${formatDate(patient.DOB)}</td>
+                                <td>${patient.Email}</td>
+                                <td>${patient.PatientID}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </ux-dialog-body>
+    </ux-dialog>
+</template>

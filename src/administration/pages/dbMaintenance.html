@@ -1,0 +1,83 @@
+<template>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card" css="height: ${height}px;">
+      <div class="card-header">
+        <h4 class="d-inline-block m-0 pt-1">DB Maintenance</h4>
+      </div>
+
+      <div class="card-body" style="overflow-y:auto;">
+
+        <h5>Delete Patient Visit</h5>
+        <div class="d-flex">
+          <div class="pr-2 pt-2">PatientID</div>
+          <div class="pr-2"><input type="text" class="form-control" value.bind="deletePatientVisitPatientId"></div>
+          <div class="pr-2 pt-2">Date</div>
+<!--          <div class="input-group pr-2" style="width: unset;">-->
+            <abp-datetime-picker class="pr-2" style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="deletePatientDatepicker" value.bind="deletePatientVisitDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+<!--            <div class="input-group-append">-->
+<!--              <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="pr-2"><button type="button" class="btn btn-danger" click.delegate="submit('deletePatientVisit')">SUBMIT</button></div>
+        </div>
+        <small class="form-text text-muted">Deletes all records associated with patient and date.</small>
+        <br>
+
+
+
+
+
+
+        <h5>Change Visit Date</h5>
+        <div class="d-flex">
+          <div class="pr-2 pt-2">PatientID</div>
+          <div class="pr-2"><input type="text" class="form-control" value.bind="changeVisitDatePatientId"></div>
+          <div class="pr-2 pt-2">Original Date</div>
+<!--          <div class="input-group pr-2" style="width: unset;">-->
+            <abp-datetime-picker class="pr-2" style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="changeVisitOriginalDatepicker" value.bind="changeVisitDateOriginal" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+<!--            <div class="input-group-append">-->
+<!--              <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="pr-2 pt-2">New Date</div>
+<!--          <div class="input-group pr-2" style="width: unset;">-->
+            <abp-datetime-picker class="pr-2" style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="changeVisitNewDatepicker" value.bind="changeVisitDateNew" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+<!--            <div class="input-group-append">-->
+<!--              <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="pr-2"><button type="button" class="btn btn-danger" click.delegate="submit('changeVisitDate')">SUBMIT</button></div>
+        </div>
+        <small class="form-text text-muted">Changes all dates associated with records for patient and date.</small>
+        <br>
+
+
+
+
+
+
+
+        <h5>Change Patient of Specific Visit</h5>
+        <div class="d-flex">
+          <div class="pr-2 pt-2">Original PatientID</div>
+          <div class="pr-2"><input type="text" class="form-control" value.bind="changePatientOriginalPatientId"></div>
+          <div class="pr-2 pt-2">New PatientID</div>
+          <div class="pr-2"><input type="text" class="form-control" value.bind="changePatientNewPatientId"></div>
+          <div class="pr-2 pt-2">Date</div>
+<!--          <div class="input-group pr-2" style="width: unset;">-->
+            <abp-datetime-picker class="pr-2" style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="changePatientDatepicker" value.bind="changePatientDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+<!--            <div class="input-group-append">-->
+<!--              <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="pr-2"><button type="button" class="btn btn-danger" click.delegate="submit('changeVisitPatient')">SUBMIT</button></div>
+        </div>
+        <small class="form-text text-muted">Changes patient id associated with records for original patient and date.</small>
+        <br>
+
+      </div>
+    </div>
+  </div>
+</div>
+</template>

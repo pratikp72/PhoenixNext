@@ -1,0 +1,42 @@
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+
+
+  <ux-dialog ref="genTablePop" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px; z-index: ${zIndex} !important;">
+    <ux-dialog-header ref="dxheader">
+      <h4 style="display: inline-block; margin-bottom: 0px;">${header}</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body style="height: 75%;" class="p-0">
+      <div class="row">
+        <div class="col-md-12">
+<!--          ${description}-->
+          <div class="tableFixHeadLight" css="height: ${scrollHeight}px;" style="overflow-y: scroll; overflow-x: hidden;">
+            <table class="table"><!-- class="w-auto">-->
+              <thead style="font-size: small; color: grey;">
+                <tr>
+                  <th repeat.for="h of columnHeaders" scope="col">${h}</th>
+                </tr>
+              </thead>
+              <tbody>
+              <template repeat.for="r of rows">
+                <tr click.delegate="rowClick(r)" class.bind="r.selected ? 'table-primary' : 'table-light'">
+                  <td repeat.for="c of r.cells">${c}</td>
+                </tr>
+              </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </ux-dialog-body>
+    <ux-dialog-footer ref="footer">
+      <button click.delegate="ok()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

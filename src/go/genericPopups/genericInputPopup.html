@@ -1,0 +1,27 @@
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+
+  <ux-dialog ref="genInput" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+        <h4 style="display: inline-block; margin-bottom: 0px;">${message}</h4>
+        <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+      <div class="row justify-content-center">
+        <div repeat.for="i of inputs"
+             class="col">
+          <small class="form-text text-muted">${i.description}</small>
+          <input type.bind="i.inputType" value.bind="i.value" placeholder.bind="i.placeholder" class="form-control">
+        </div>
+      </div>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button type="button" class="btn btn-primary float-right" click.delegate="buttonClick()">${buttonText}</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

@@ -1,0 +1,55 @@
+<template>
+
+  <require from="../customElements/blockPreferencePicker"></require>
+
+  <div class="card-header pr-1" style="height: 44px;">
+    <h6 class="float-left mb-0">JOINT INJECTION <small class="text-muted">${orders.length}</small></h6>
+
+    <button type="button" class="btn btn-primary" style="position: absolute;
+                                                  top: 4px;
+                                                  padding: 4px 12px 4px 12px;
+                                                  margin-left: 10px;"
+            click.delegate="openPrefPicker()">Pref</button>
+
+    <a class="btn btn-default float-right" href="#" style="padding: 0 50px 0 0; margin-top: -7px;">
+      <i class="fa fa-plus fa-2x text-primary"  click.delegate="openInjection()"></i></a>
+  </div>
+  <div class="card-body p-0 overflow-auto">
+    <div class="tableFixHeadLight">
+      <table class="table table-striped table-sm">
+        <thead>
+        <tr style="background-color:#f7f7f7;">
+          <th scope="col">Code</th>
+          <th scope="col">Desc</th>
+          <th scope="col" if.bind="displayDeleteHeader" class="au-animate animate-swipe-row-right"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <template repeat.for="s of orders">
+
+          <tr if.bind="globals.isTouchDevice" hammer-swipe.call="rowSwipe($event, s)">
+            <td>${s.code}</td>
+            <td>${s.description}</td>
+            <td if.bind="displayDeleteHeader && !s.displayDelete"></td>
+            <td if.bind="s.displayDelete" style="background-color: #dd3444;vertical-align: middle;" class="au-animate animate-swipe-row-left animate-swipe-row-right">
+              <button type="button" class="btn btn-danger" style="display: block; margin: auto;"
+                      click.delegate="deleteInjClick($index)"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+          <tr if.bind="!globals.isTouchDevice">
+            <td>${s.code}</td>
+            <td>${s.description}</td>
+            <!-- <td if.bind="displayDeleteHeader && !s.displayDelete"></td> -->
+            <td style="vertical-align: middle;">
+              <button if.bind="s.canDelete" type="button" class="btn" style="display: block; margin: auto;"
+                      click.delegate="deleteInjClick($index)"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+        </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

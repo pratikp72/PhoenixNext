@@ -1,0 +1,101 @@
+<template>
+
+    <require from="./blockCustomAttribute"></require>
+
+  <style>
+    .btn:focus {
+      box-shadow: none;
+    }
+  </style>
+
+
+
+  <div block-custom  ref="blockelement"  class="block pack-w25 pack-h25" data-id="${data.id}">
+
+    <div class="card" style="height: 100%; box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);">
+
+      <!--dropdown toolbar-->
+      <div if.bind="!data.editing" class="dropdown block-button mr-1 mt-0">
+        <button class="btn" type="button" id="dropdownTools" data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-ellipsis-h fa-2x" style="color: lightgrey;"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#" click.delegate="toggleResize()">
+            <i class="fa fa-expand fa-2x"></i>
+            Expand
+          </a>
+          <a class="dropdown-item" href="#" click.delegate="editBoard()">
+            <i class="fa fa-pencil-square-o fa-2x"></i>
+            Edit
+          </a>
+        </div>
+      </div>
+
+
+
+
+      <!--EDITING-->
+      <div if.bind="data.editing" class="position-absolute w-100 h-100" style="background-color: rgba(255, 255, 255, 0.85); z-index: 1 !important;"><!--z-index: 1000; -->
+        <div class="row h-100 d-flex justify-content-center">
+          <div class="col-sm-6 my-auto">
+            <div class="btn-toolbar mb-3" role="toolbar">
+
+              <!-- <div class="dropdown">
+                <button class="btn btn-secondary btn-sm dropdown-toggle float-right mr-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-arrows-h" aria-hidden="true"></i>${data.width}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a repeat.for="w of sizeList" class="dropdown-item" href="#" click.delegate="setWidthWithLayout(w)">${w}</a>
+                </div>
+              </div>
+
+              <div class="dropdown">
+                <button class="btn btn-secondary btn-sm dropdown-toggle float-right mr-2" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-arrows-v" aria-hidden="true"></i>${data.width}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                  <a repeat.for="w of sizeList" class="dropdown-item" href="#" click.delegate="setHeightWithLayout(w)">${w}</a>
+                </div>
+              </div> -->
+
+              <div class="input-group mr-1">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-arrows-h" aria-hidden="true"></i></span>
+                </div>
+                <select class="custom-select" value.bind="data.widthMult" change.delegate="setWidthWithLayout(data.widthMult)">
+                  <option repeat.for="w of sizeList" model.bind="w">${w}</option>
+                </select>
+              </div>
+
+              <div class="input-group mr-1">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-arrows-v" aria-hidden="true"></i></span>
+                </div>
+                <select class="custom-select" value.bind="data.heightMult" change.delegate="setHeightWithLayout(data.heightMult)">
+                  <option repeat.for="h of heightList" model.bind="h">${h}</option>
+                </select>
+              </div>
+
+              <!-- <button type="button" class="btn ${data.pinned ? 'btn-secondary' : 'btn-outline-secondary'} btn-sm mr-1" click.delegate="togglePin()">
+                <i class="fa fa-thumb-tack" aria-hidden="true"></i>
+              </button> -->
+
+              <button type="button" class="btn btn-danger btn-sm" click.delegate="deleteBlock()">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END-->
+
+      <compose view-model="./blocks/${data.blockType}" model.bind="data" containerless></compose>
+
+
+      </div>
+
+    </div>
+
+
+</template>

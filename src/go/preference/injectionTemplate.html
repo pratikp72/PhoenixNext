@@ -1,0 +1,79 @@
+<template>
+
+  <div id="injectionSection" class="d-flex align-items-center border-bottom px-4 py-0"
+        style="background-color: rgba(0, 0, 0, 0.03); min-height: 48px;">
+
+    <h5 class="m-0" style="display: inline-block; vertical-align: middle;">${section.name}</h5>
+
+    <div class="input-group ml-auto" style="width: unset; align-items: unset;">
+      <select class="form-item form-control mr-0"
+        value.bind="selectedPref" 
+        style="width: 250px; display: inline-block;">
+        <option model.bind="null">Prefs...</option>
+        <option repeat.for="m of prefList"
+                model.bind="m">
+          ${m.Description}
+        </option>
+      </select>
+      <div class="input-group-append">
+        <i class="fa fa-plus fa-2x px-2 input-group-text" aria-hidden="true" click.delegate="addPref()"></i>
+      </div>
+    </div>
+  </div>
+
+  <div repeat.for="i of section.items"
+    class="d-flex align-items-center border-bottom pl-4 pr-2 py-2" 
+    style="min-height: 55px;">
+
+    <div>
+      <div class="d-flex align-items-center">
+
+        <h5 class="d-inline-block">
+          ${i.data.InjectionDesc}
+          <small class="text-muted">${i.data.JCode}</small>
+        </h5>
+
+        <a class="btn btn-danger ml-auto" href="#"
+          click.delegate="section.removeItem(null, i)">
+          <i class="fa fa-trash-o fa-lg"></i>
+        </a>
+      </div>
+
+      <h6>${i.data.CPTDesc}<small class="ml-1 text-muted">${i.data.CPTCode}</small></h6>
+      <h6>Injection Site:<span class="text-muted ml-1">${i.data.InjectSite}</span></h6>
+
+      <p class="text-muted">${i.data.Instruction}</p>
+    </div>
+
+
+
+
+
+    <!-- <div with.bind="selectedPref">
+      <div if.bind="!selectedPref">
+        <p class="text-muted">Select Preference from list...</p>
+      </div>
+      <div if.bind="selectedPref">
+        <div class="d-flex align-items-center">
+
+          <h5 class="d-inline-block">
+            ${InjectionDesc}
+            <small class="text-muted">${JCode}</small>
+          </h5>
+  
+          <a class="btn btn-danger ml-auto" href="#"
+            click.delegate="section.removeItem(null, i)">
+            <i class="fa fa-trash-o fa-lg"></i>
+          </a>
+        </div>
+
+        <h6>${CPTDesc}<small class="ml-1 text-muted">${CPTCode}</small></h6>
+        <h6>Injection Site:<span class="text-muted ml-1">${InjectSite}</span></h6>
+
+        <p class="text-muted">${Instruction}</p>
+      </div>
+    </div> -->
+
+  </div>
+
+</template>

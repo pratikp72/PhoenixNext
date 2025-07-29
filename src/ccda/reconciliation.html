@@ -1,0 +1,302 @@
+
+<template>
+    <style type="text/css">
+        .outline {
+            border: 1px solid black;
+        }
+        .card-list {
+            margin-bottom: 20px;
+        }
+        .selected-item {
+            color: #fff;
+            background-color: #007bff !important;
+        }
+        .selected-added-item {
+            color: #fff;
+            background-color: #dc3545 !important;
+        }
+        .waiting {
+            /*opacity: 0.5;*/
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            /*background-color: white;*/
+        }
+        .waiting-background {
+            opacity: 0.5;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            background-color: white;
+        }
+        .added {
+            background-color: lightgreen;
+        }
+    </style>
+  <div style="display: flex; flex-direction: row; flex: 1; justify-content: space-between;">
+
+    <h1 style="display: inline;" class="p-3">${message}</h1>
+
+    <div style="padding: 20px;">
+      <div class="card">
+        <div class="card-body" style="padding: 3px 3px 3px 10px;">
+          <label>receive this document for the current visit?</label>
+          <button disabled.bind="reconciledCCDA.VisitCodeID > 0" click.delegate="receiveClicked()" class="m-3 btn btn-info">${reconciledCCDA.VisitCodeID === 0 ? 'yes, receive' : 'received'}</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+    <button click.delegate="backClicked()" class="m-3 btn btn-info">Back</button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>DOB</th>
+                        <th>Gender</th>
+                        <th>PatientId</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>${PhoenixPatient.Patient.NameFirst}</td>
+                        <td>${PhoenixPatient.Patient.NameLast}</td>
+                        <td>${PhoenixPatient.Patient.DOB}</td>
+                        <td>${PhoenixPatient.Patient.Sex}</td>
+                        <td>${PhoenixPatient.Patient.PatientID}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <h3 class="card-header">Incoming</h3>
+                    <div class="card-body">
+                        <div>
+                            <span style="float: left;">
+                                <h4>Medications:</h4>
+                            </span>
+                        </div>
+                        <table class="table table-sm table-hover table-bordered">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Prescribed By</th>
+                                <th>Modified</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr repeat.for="medication of ConnectEhrPatient.tblMedications" click.delegate="incomingItemClicked('med', medication)" class="${selectedItem && selectedItem.data == medication ? 'selected-item' : ''}">
+                                <td>${medication.MedicationName}</td>
+                                <td>${medication.Code}</td>
+                                <td>${medication.AuthorInfo}</td>
+                                <td>${formatDate(medication.LastModified)}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <h4>Allergies:</h4>
+                        <table class="table table-sm table-hover table-bordered">
+                            <thead>
+                            <tr class="thead-dark">
+                                <th>Substance</th>
+                                <th>Code</th>
+                                <th>Reaction</th>
+                                <th>Modified</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr repeat.for="allergy of ConnectEhrPatient.tblMedicationAllergies" click.delegate="incomingItemClicked('allergy', allergy)" class="${selectedItem && selectedItem.data == allergy ? 'selected-item' : ''}">
+                                <td>
+                                    ${allergy.AllergySubstance}
+                                </td>
+                                <td>
+                                    ${allergy.AllergyCode}
+                                </td>
+                                <td>
+                                    ${allergy.Reaction}
+                                </td>
+                                <td>
+                                    ${formatDate(allergy.LastModified)}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <h4>Problems:</h4>
+                        <table class="table table-sm table-hover table-bordered">
+                            <thead>
+                            <tr class="thead-dark">
+                                <th>Description</th>
+                                <th>Code</th>
+                                <th>Modified</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr repeat.for="problem of ConnectEhrPatient.tblProblems" click.delegate="incomingItemClicked('problem', problem)" class="${selectedItem && selectedItem.data == problem ? 'selected-item' : ''}">
+                                <td>
+                                    ${problem.ProblemDescription}
+                                </td>
+                                <td>
+                                    ${problem.Code}
+                                </td>
+                                <td>
+                                    ${formatDate(problem.LastModified)}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+            </div>
+            <div class="col-1 ">
+                <button class="mb-2 btn btn-primary" click.delegate="addClicked()" disabled.bind="!incomingItemSelected">Add -></button>
+                <button class="btn btn-danger" click.delegate="removeClicked()" disabled.bind="!addedItemSelected">Remove</button>
+            </div>
+            <div class="col ">
+                <div class="card">
+                    <div style="padding: 10px 10px 5px 20px;" class="card-header">
+                        <h3 class="mt-1 float-left">Patient Record</h3>
+                        <button click.delegate="saveClicked()" disabled.bind="!hasChanges" class="d-inline float-right btn btn-success">Save</button>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <span style="float: left;">
+                                <h4>Medications:</h4>
+                            </span>
+                            <span if.bind="!reconciledCCDA.MedsReconciled" style="float: right; margin: 0 0 10px 0;">
+                                <button click.delegate="updateCCDA('rxs/list')" class="btn btn-info">Reconcile</button>
+                            </span>
+                            <span if.bind="reconciledCCDA.MedsReconciled" style="float: right; margin: 0 0 10px 0; color: green;">
+                                Reconciled!
+                            </span>
+
+                        </div>
+                        <table class="table table-sm table-hover table-bordered">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Prescribed By</th>
+                                <th>Modified</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr repeat.for="medication of PhoenixPatient.Meds" click.delegate="finalItemClicked('med', medication)" class="${selectedItem && selectedItem.data == medication ? 'selected-added-item' : ''} ${medication.state}">
+                                <td>
+                                    ${medication.RX_Sig}
+                                </td>
+                                <td>
+                                    ${medication.RxNormCode}
+                                </td>
+                                <td>
+                                    ${medication.RX_Notes}
+                                </td>
+                                <td>
+                                    ${formatDate(medication.RX_Date)}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <span style="float: left;">
+                                <h4>Allergies:</h4>
+                            </span>
+                            <span if.bind="!reconciledCCDA.AllergiesReconciled" style="float: right; margin: 0 0 10px 0;">
+                                <button click.delegate="updateCCDA('patientallergies/list')" class="btn btn-info">Reconcile</button>
+                            </span>
+                            <span if.bind="reconciledCCDA.AllergiesReconciled" style="float: right; margin: 0 0 10px 0; color: green;">
+                                Reconciled!
+                            </span>
+
+                        </div>
+                        <table class="table table-sm table-hover table-bordered">
+                            <thead>
+                            <tr class="thead-dark">
+                                <th>Substance</th>
+                                <th>Code</th>
+                                <th>Reaction</th>
+                                <th>Modified</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr repeat.for="allergy of PhoenixPatient.Allergies" click.delegate="finalItemClicked('allergy', allergy)" class="${selectedItem && selectedItem.data == allergy ? 'selected-added-item' : ''} ${allergy.state}">
+                                <td>
+                                    ${allergy.Substance}
+                                </td>
+                                <td>
+                                    ${allergy.RxNormCode}
+                                </td>
+                                <td>
+                                    ${allergy.Reaction}
+                                </td>
+                                <td>
+                                    ${formatDate(allergy.DateCreated)}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <span style="float: left;">
+                                <h4>Problems:</h4>
+                            </span>
+                            <span if.bind="!reconciledCCDA.ProblemsReconciled" style="float: right; margin: 0 0 10px 0;">
+                                <button click.delegate="updateCCDA('patientdiagnosis/list')" class="btn btn-info">Reconcile</button>
+                            </span>
+                            <span if.bind="reconciledCCDA.ProblemsReconciled" style="float: right; margin: 0 0 10px 0; color: green;">
+                                Reconciled!
+                            </span>
+
+                        </div>
+                        <table class="table table-sm table-hover table-bordered">
+                            <thead>
+                            <tr class="thead-dark">
+                                <th>Description</th>
+                                <th>Code</th>
+                                <th>Modified</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr repeat.for="problem of PhoenixPatient.Problems" click.delegate="finalItemClicked('problem', problem)" class="${selectedItem && selectedItem.data == problem ? 'selected-added-item' : ''} ${problem.state}">
+                                <td>
+                                    ${problem.OD_Patient_Dx_Sno.ConceptDescription}
+                                </td>
+                                <td>
+                                    ${problem.OD_Patient_Dx_Sno.SnoConcept}
+                                </td>
+                                <td>
+                                    ${formatDate(problem.DateModified)}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div show.bind="saving" class="waiting">
+        <div class="waiting-background"></div>
+        <h1 style="
+            position: absolute;
+            margin: auto;
+            top: 45%;
+            left: 45%;
+            padding: 20px;
+            text-align: center;"
+        >
+            ${savingMessage}
+        </h1>
+    </div>
+</template>

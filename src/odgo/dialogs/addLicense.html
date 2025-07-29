@@ -1,0 +1,28 @@
+<template>
+  <div ref="addLicense" class="card" style="box-shadow: 0 5px 15px rgba(0,0,0,.5);">
+    <div class="card-header">
+      <h4 style="display: inline-block; margin-bottom: 0px;"><i class="fa fa-key mr-2"></i>New License</h4>
+      <i class="fa fa-close fa-2x float-right" click.delegate="cancel()"></i></a>
+    </div>
+    <div class="card-body">
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label>Expire Days</label>
+          <input type="number" class="form-control" id="formGroupExampleInput" placeholder="Expiration days..." value.bind="expireDays">
+        </div>
+        <div class="form-group col-md-6">
+          <label>License Type</label>
+          <select value.bind="selectedLicenseType" class="form-control">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="t of licenseTypes" model.bind="t" >${t}</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="close()">OK</button>
+    </div>
+  </div>
+</template>

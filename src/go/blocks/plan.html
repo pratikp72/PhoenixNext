@@ -1,0 +1,97 @@
+<template>
+  <!-- <require from="../webSpeechCustomElement"></require> -->
+  <require from="../planRowCustomAttribute"></require>
+
+  <style>
+    textarea {
+      resize: none;
+      overflow: hidden;
+      min-height: 50px;
+      /*max-height: 100px;*/
+      width: 100%;
+    }
+    .selected {
+      background-color: #d4eff3;
+    }
+    .selected > textarea{
+      border: 1px solid cadetblue !important;
+      border-radius: 6px;
+    }
+  </style>
+
+  <div class="card-header d-flex align-items-center" style="height: 44px;">
+    <h6 class="mb-0 mr-1">PLAN <small class="text-muted mr-2">${rows.length}</small></h6>
+
+    <div class="dropdown" style="position: inherit;">
+      <button class="btn btn-outline-primary dropdown-toggle" disabled.bind="locked" style="padding: 4px 12px 4px 12px;" type="button" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-plus pr-1"></i>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <h6 class="dropdown-header">New Row</h6>
+        <a class="dropdown-item px-3" repeat.for="b of bodyparts" click.delegate="addRowClick(b)" href="#"><i class="fa fa-plus fa-fw pr-2" aria-hidden="true"></i>${b.part}</a>
+
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item px-3" href="#" click.delegate="openPrefPicker()"><i class="fa fa-user-plus fa-fw pr-2" aria-hidden="true"></i>Pref</a>
+        <a class="dropdown-item px-3" href="#" click.delegate="previousClick()"><i class="fa fa-arrow-circle-left fa-fw pr-2" aria-hidden="true"></i>Previous Plan</a>
+      </div>
+    </div>
+  </div>
+
+  <div ref="scrollbody" class="card-body p-0" style="overflow-y: scroll;">
+
+    <template repeat.for="r of rows">
+      <div if.bind="globals.isTouchDevice" hammer-swipe.call="rowSwipe($event, r)"
+            click.delegate="planRowClicked(r)" 
+            css="height: ${rowHeight}px;"
+            class="${r.selected ? 'selected' : ''} p-2 d-flex flex-column"> <!-- style="height: 100%;">-->
+        <div ref="titleHeader" class="d-flex align-items-center">
+          <label class="form-label"><strong>${r.title}</strong></label>
+          <div if.bind="r.displayDelete" class="ml-auto py-1 au-animate animate-swipe-row-left animate-swipe-row-right">
+            <button type="button" class="btn btn-danger" click.delegate="deletePlanClick($index)"><i class="fa fa-trash pr-1"></i>Delete</button>
+          </div>
+        </div>
+
+        <textarea planrow readonly.bind="locked" class="flex-grow-1"
+          style="width: 100%; border: none; 
+          outline: none; background-color: white; 
+          border-radius: 4px; padding: 5px; overflow-y: auto;" 
+          value.bind="r.text" blur.trigger="trySave()"></textarea>
+      </div>
+
+      <div if.bind="!globals.isTouchDevice"
+            click.delegate="planRowClicked(r)" 
+            css="height: ${rowHeight}px;"
+            class="${r.selected ? 'selected' : ''} p-2 d-flex flex-column"> <!-- style="height: 100%;">-->
+        <div ref="titleHeader" class="d-flex align-items-center">
+          <label class="form-label"><strong>${r.title}</strong></label>
+          <div class="ml-auto py-1">
+            <button if.bind="r.canDelete" type="button" class="btn" click.delegate="deletePlanClick($index)"><i class="fa fa-trash pr-1"></i></button>
+          </div>
+        </div>
+
+        <textarea planrow readonly.bind="locked" class="flex-grow-1"
+          style="width: 100%; border: none; 
+          outline: none; background-color: white; 
+          border-radius: 4px; padding: 5px; overflow-y: auto;" 
+          value.bind="r.text" blur.trigger="trySave()"></textarea>
+      </div>
+
+
+    </template>
+
+
+
+
+    <!--NO PLAN-->
+    <div if.bind="rows.length==0" class="card-body">
+      <div class="text-muted"
+           style="border: 1px dashed #d8d8d8;
+                  border-radius: 7px;
+                  padding: 10px;
+                  text-align: center;">
+          Use the <span class="font-weight-bold"><i class="fa fa-plus px-1 text-muted"></i>Row</span> or <span class="font-weight-bold"><i class="fa fa-user-plus px-1 text-muted"></i>Pref</span> button to add a new plan.
+      </div>
+    </div>
+  </div>
+</template>
+

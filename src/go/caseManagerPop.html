@@ -1,0 +1,90 @@
+<template>
+  <div ref="ptauthpop" class="card">
+    <div class="card-header">
+      <h4 style="display: inline-block; margin-bottom: 0px;"><i class="fa fa-list mr-2"></i>Case Info</h4>
+      <i class="fa fa-close fa-2x float-right"  click.delegate="cancel()"></i></a>
+    </div>
+    <div class="card-body">
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Case Date</label>
+          <div class="input-group ml-auto">
+            <abp-datetime-picker style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="casedatepicker" value.bind="casedate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" click.delegate="openCaseCalendar()"> <i class="fa fa-calendar"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-4">
+          <label>Status</label>
+          <select value.bind="caseData.State" class="form-control">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="p of statusList" model.bind="p" >${p}</option>
+          </select>
+        </div>
+
+        <div class="form-group col-md-4">
+          <label>Provider</label>
+          <select value.bind="selectedProvider" class="form-control">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="p of providers" model.bind="p" >${p.ProviderEntity}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Injury Date</label>
+          <div class="input-group ml-auto">
+            <abp-datetime-picker style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="injurydatepicker" value.bind="injurydate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" click.delegate="openInjuryCalendar()"> <i class="fa fa-calendar"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-4">
+          <label>Bodyside</label>
+          <select value.bind="caseData.CaseBodySide" class="form-control">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="b of bodysides" model.bind="b" >${b}</option>
+          </select>
+        </div>
+
+        <div class="form-group col-md-4">
+          <label>Bodypart</label>
+          <select value.bind="caseData.CaseBodyPart" class="form-control">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="b of bodyparts" model.bind="b" >${b}</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label>Claim ID</label>
+          <input type="text" class="form-control" value.bind="caseData.ClaimID">
+        </div>
+        <div class="form-group col-md-6">
+          <label>Case ID</label>
+          <input type="text" class="form-control" value.bind="caseData.CaseKey">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-12">
+          <label>Injury Details</label>
+          <textarea type="text" class="form-control" value.bind="caseData.CaseInjDetail"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="close()">OK</button>
+      <button if.bind="statusText =='ACTIVE'" type="button" class="btn btn-danger" click.delegate="delete()">DELETE</button>
+    </div>
+  </div>
+</template>

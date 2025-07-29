@@ -1,0 +1,37 @@
+<template>
+
+  <div id.bind="templateId" class="d-flex align-items-center border-bottom px-4 py-0"
+        style="background-color: rgba(0, 0, 0, 0.03); min-height: 48px;">
+    <h5 class="m-0" style="display: inline-block; vertical-align: middle;">${section.name}</h5>
+  </div>
+
+  <div repeat.for="i of section.items"
+    class="d-flex align-items-center border-bottom pl-4 pr-2 py-2" 
+    style="min-height: 55px;">
+
+    <h6 class="d-inline-block mb-0">${i.name}
+      <small class="text-muted">${i.details}</small>
+    </h6>
+
+    <select class="form-item form-control ml-auto"
+        value.bind="i.modifier" style="max-width: 85px; display: inline-block;">
+      <option model.bind="null">Mods...</option>
+      <option repeat.for="m of modList"
+            model.bind="m">
+        ${m}
+      </option>
+    </select>
+
+    <!-- <a class="btn btn-default" href="#"
+        click.delegate="displayTaskPop()">
+        <i class="fa fa-thumb-tack fa-2x"></i>
+    </a> -->
+
+    <a class="btn btn-danger ml-2" href="#"
+      click.delegate="section.removeItem(null, i)">
+      <i class="fa fa-trash-o fa-lg"></i>
+    </a>
+
+  </div>
+
+</template>

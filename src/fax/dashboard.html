@@ -1,0 +1,164 @@
+<template>
+    <require from="./reverse"></require>
+
+    <style>
+        .card {
+            margin-bottom: 10px;
+        }
+        .item-list-title {
+            margin-left: 15px;
+        }
+        .button-holder {
+            margin-bottom: 15px;
+        }
+        .fax {
+            cursor: pointer;
+        }
+        #header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: ${headerHeight}px;
+        }
+        #body {
+            position: absolute;
+            top: ${headerHeight}px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        #left-col {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: ${leftColumnWidth}px;
+        }
+        #right-col {
+            position: absolute;
+            top: 0;
+            left: ${leftColumnWidth}px;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+        .col-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: ${columnHeaderHeight}px;
+            padding: 0 0 0 10px;
+        }
+        .col-body {
+            position: absolute;
+            top: ${columnHeaderHeight}px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+    </style>
+
+    <div id="header">
+        <div class="container-fluid" >
+
+            <div class="form-row">
+                    <small class="form-text text-muted">fax pdf's: ${sourcePath},</small>
+                    <span>&nbsp;</span>
+                    <small class="form-text text-muted">watched folder: ${destPath}</small>
+            </div>
+
+            <div class="form-row button-holder">
+                <div class="col-auto">
+
+                    <button disabled.bind="!enableButtons" type="button" class="btn btn-primary" click.delegate="startTest()">Start Test</button>
+                    <button disabled.bind="!enableButtons" type="button" class="btn btn-danger" click.delegate="clearAndReset()">Clear and Reset</button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="body">
+        <div class="container-fluid">
+
+            <div class="row">
+
+                <div id="left-col" class="col-sm-auto">
+                    <div class="col-header">
+                        <h3>Faxes (${totalFaxes}):</h3>
+                    </div>
+
+                    <div class="col-body">
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <template if.bind="faxes.length > 0">
+                                        <template repeat.for="fax of faxes | reverse">
+                                            <li click.delegate="faxSelected(fax)" class="fax list-group-item ${selectedFax == fax ? setSelectedCardStyle(fax) : setCardStyle(fax)}">
+                                                <h5 class="card-title">${fax.Title}</h5>
+                                                <h6 if.bind="fax.Status !== 'succeeded'" class="card-subtitle">${fax.Status == 'succeeded' ? 'finished' : fax.Status}</h6>
+                                                <template if.bind="fax.Result">
+                                                    <div>
+                                                        <small><strong>Matched PatientId:</strong></small>
+                                                    </div>
+                                                    <div style="margin: -8px 0 0 0;">
+                                                        <small> ${fax.Result}</small>
+                                                    </div>
+                                                    <div>
+                                                        <small>Confidence: ${fax.Confidence}</small>
+                                                    </div>
+                                                </template>
+                                                <template if.bind="!fax.Result && fax.Status === 'succeeded'">
+                                                    <small>No match found</small>
+                                                </template>
+                                            </li>
+                                        </template>
+                                    </template>
+                                    <template if.bind="faxes.length == 0">
+                                        <p class="card-text">
+                                            Click "Start Test" to get started
+                                        </p>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="right-col" class="col-auto">
+
+                    <div class="col-header">
+                        <h3>Match Steps for ${selectedFax.Title}:</h3>
+                    </div>
+
+                    <div class="col-body">
+                        <template repeat.for="message of selectedFax.JobLog.LogMessages | reverse">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="card-text"><strong>${message.LogStep}</strong>: <span innerhtml.bind="message.Message"></span></p>
+                                </div>
+
+                                <template if.bind="message.Items">
+                                    <div if.bind="message.Items.ItemType !== '' && message.Items.ItemType" class="card-title item-list-title"><strong innerhtml.bind="message.Items.ItemType"></strong>:</div>
+                                    <ul class="list-group list-group-flush">
+                                        <template repeat.for="item of message.Items.Items">
+                                            <li class="list-group-item" innerhtml.bind="item">
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</template>

@@ -1,0 +1,156 @@
+<template>
+
+  <style>
+
+  .track {
+    border: none;
+    width: 100%; 
+    height: 6px;
+    border-radius: 2px;
+    -webkit-appearance: none;
+    background: linear-gradient(
+      to right,
+      #ff0000 0%,
+      #ffff00 17%,
+      #00ff00 33%,
+      #00ffff 50%,
+      #0000ff 67%,
+      #ff00ff 83%,
+      #ff0000 100%
+    );
+  }
+
+  .blocker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    content: ' ';
+    background: rgba(0,0,0,.5);
+    z-index: 2000;
+  }
+
+  .tool{
+    width: 233px;
+    height: 243px;
+    border-radius: 6px;
+    background-color: #383838;
+    font-family: 'arial';
+    position: fixed;
+    z-index: 2001;
+  }
+
+  .color-box{
+  width: 100%;
+  height: 50%;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.circle{
+  background-color: #6e28d9;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px
+}
+
+.slider{
+  width: 135px;
+  display: inline-block;
+  margin: auto;
+}
+
+.tool-area{
+	padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.flex-align-items-center{
+	display: flex;
+    align-items: center;
+}
+
+.hex-label{
+	font-size: 10pt;
+    color: grey;
+    margin-right: 10px;
+    margin-left: 0px;
+    width: 30px;
+}
+
+.color-value{
+	background-color: transparent;
+    border: 1px solid grey;
+    width: 135px;
+    display: block;
+    color: white;
+    padding: 4px;
+    font-size: 10pt;
+    text-align: center;
+    border-radius: 2px;
+   	width: 135px;
+  	display: inline-block;
+  	margin: auto;
+}
+
+.swatch{
+	width: 15px;
+  height: 15px;
+  border: 1px solid grey;
+  display: inline-block;
+  margin-right: 7px;
+  margin-top: 7px;
+}
+
+.add{
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 7px;
+  margin-top: 7px;
+  color: grey;
+}
+
+.wrap{
+	flex-wrap: wrap;
+}
+
+  </style>
+
+
+  <div class="tool" css="left: ${left}px; top: ${top}px;">
+    <canvas ref="colorCanvas" 
+            style="cursor: crosshair;" 
+            class="color-box" 
+            pointerup.delegate="colorPickerClick($event)"></canvas>
+
+    <div class="tool-area">
+      <div class="flex-align-items-center">
+        <div class="circle" css="background-color: ${color};"></div>
+        <input ref="hueInput" class="track slider" id="hue" type="range" max="360"
+                value.bind="hueValue" input.delegate="setHue()">
+      </div>
+      <div class="flex-align-items-center">
+        <span class="hex-label">HEX</span>
+        <input type="text" class="color-value" value.bind="color">
+      </div>
+      <div class="flex-align-items-center wrap">
+        <i class="fa fa-plus add" aria-hidden="true" pointerup.delegate="addFav()"></i>
+      	<div class="swatch" repeat.for="s of formHelper.swatches" 
+              css="background-color: ${s};" pointerup.delegate="swatchClicked(s)"></div>
+      </div>
+      <!-- <div class="swatch" click.delegate="addFavorite()">
+        <i class="fa fa-plus add" aria-hidden="true" click.delegate="addFavorite()"></i></div> -->
+    </div>
+  </div>
+  <div class="blocker" pointerup.delegate="hidePopup()"></div>
+
+
+
+
+</template>

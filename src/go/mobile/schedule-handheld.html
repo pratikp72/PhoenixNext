@@ -1,0 +1,115 @@
+<template>
+
+  <div class="card-header d-flex align-items-center">
+
+
+    <svg width="50px" height="100%" viewBox="0 0 4167 4167" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><circle cx="2085.32" cy="2085.29" r="2072.92" style="fill:#5cb3bb;"/><path d="M2648.2,981.492c-352.948,-16.075 -689.951,81.06 -968.17,204.159c-423.495,187.377 -898.237,540.494 -898.237,540.494c-0,-0 385.105,-38.711 505.985,33.645c406.199,243.138 -847.669,395.233 -847.669,395.233c-0,0 1029.07,297.257 1349.24,404.81c205.911,69.171 337.482,358.493 -280.932,301.023c126.032,112.642 539.295,347.504 1037.12,374.825c621.769,34.122 1150.1,-453.703 1178.42,-1075.76c28.331,-622.06 -453.703,-1150.1 -1075.76,-1178.42Z" style="fill:#a00022;"/><path d="M2843.89,2719.09c-117.968,-4.351 -223.977,-33.835 -315.439,-73.299c-113.925,-49.156 -205.279,-113.798 -269.057,-164.641c-121.364,-96.751 -413.739,-377.986 -594.205,-457.087c138.583,-70.399 505.946,-238.042 704.417,-293.622c127.644,-35.745 216.837,-207.974 -161.841,-192.203c80.317,-64.725 339.489,-194.994 643.739,-196.145c379.996,-1.438 686.793,312.312 684.692,692.305c-2.101,379.993 -312.565,698.698 -692.306,684.692Z" style="fill:#fff;"/></svg>
+
+    <!-- <i class="fa fa-clock-o fa-2x px-2" aria-hidden="true"></i> -->
+
+    <abp-datetime-picker class="pr-2 ml-auto" style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" value.bind="scheduleDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+
+    <div class="form-group mb-0">
+      <select ref="providerpicker" value.bind="home.currentProvider" class="form-control" id="exampleFormControlSelect1" change.delegate="providerSelected()">
+        <option model.bind="null">Choose...</option>
+        <option scheduleprovider repeat.for="p of home.providers" model.bind="p" >${p.ProviderEntity}</option>
+      </select>
+    </div>
+
+    <div class="dropdown btn-group">
+
+      <div if.bind="fullSizeSchedule" class="d-inline-block" style="padding: 7px 0px 0px 8px;">${currentLocation.LocationName}</div>
+
+      <button id="btnGroupDrop1" class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-filter" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnGroupDrop1">
+        <a repeat.for="l of locations" class="dropdown-item" href="#" click.delegate="getScheduleWithLocation(l)">
+          <i class="fa fa-map-marker" aria-hidden="true"></i>
+          ${l.LocationName}
+        </a>
+      </div>
+    </div>
+   
+  </div>
+
+
+
+  <table ref="scheduletable" class="table" style="table-layout: fixed;">
+    <thead style="font-size: small; color: grey;">
+      <tr if.bind="!fullSizeSchedule">
+        <th scope="col" style="width:7px;padding: 0;"></th>
+        <th scope="col" style="width:20px;"></th>
+        <th scope="col" style="width:80px;">Time</th>
+        <th scope="col" style="width:150px;">Name</th>
+<!--            <th scope="col" style="width:95px;">Status</th>-->
+        <th scope="col" style="width:75px;">Type</th>
+      </tr>
+      <tr if.bind="fullSizeSchedule">
+        <th scope="col" style="width:7px; padding: 0;"></th>
+        <th scope="col" style="width:20px;"></th>
+        <th scope="col" style="width:80px;">Time</th>
+        <th scope="col">Name</th>
+        <th scope="col">Status</th>
+        <th scope="col">Type</th>
+        <th scope="col">Reason</th>
+        <th scope="col">Room</th>
+        <th scope="col">Pod</th>
+        <th scope="col">Provider</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template  repeat.for="r of home.schedule">
+        <tr click.delegate="rowClick(r, $event)" class="${r.bgColor} ${r.nearestSchedule ? 'current-item' : ''}">
+          <td if.bind="r.nearestSchedule" style="background-color: #007bff;"></td>
+          <td if.bind="!r.nearestSchedule"></td>
+          <td css="color: ${r.txtColor}"><i class="fa fa-clock-o pr-1" aria-hidden="true"></i></td>
+          <td css="color: ${r.txtColor}" class="text-nowrap">${r.time}</td>
+          <td css="color: ${r.txtColor}" class="text-nowrap font-weight-bold text-truncate">${r.name}</td>
+
+          <!--small schedule-->
+<!--              <td if.bind="!fullSizeSchedule" css="color: ${r.txtColor}" class="text-nowrap">${r.status}</td>-->
+
+          <!--full-size schedule-->
+          <td if.bind="fullSizeSchedule" class="text-nowrap" style="padding: 0 12px 0 12px;">
+            <select value.bind="r.status" change.delegate="statusSelected(r)" css="color: ${r.txtColor}"
+                    style="width: 100%; height: 48px; border: none; background: none;">
+              <option>Choose...</option>
+              <option repeat.for="s of statusList" model.bind="s" >${s}</option>
+            </select>
+          </td>
+
+          <td css="color: ${r.txtColor}" class="text-nowrap">${r.type}</td>
+
+          <!--REASON-->
+          <td if.bind="fullSizeSchedule" css="color: ${r.txtColor}" class="p-0" style="vertical-align: middle;">
+            <textarea class="form-control" rows="1" value.bind="r.reasonForVisit" style="resize: none; background-color: transparent; border: none;" click.delegate="reasonForVisitFocus(r, $event)"></textarea>
+<!--                ${r.reasonForVisit}-->
+          </td>
+
+          <td if.bind="fullSizeSchedule" class="text-nowrap" style="padding: 0 12px 0 12px;">
+            <select value.bind="r.room" change.delegate="roomSelected(r)" css="color: ${r.txtColor}"
+                    style="width: 100%; height: 48px; border: none; background: none;">
+              <option>Choose...</option>
+              <option repeat.for="s of roomList" model.bind="s.Description1" >${s.Description1}</option>
+            </select>
+          </td>
+
+          <td if.bind="fullSizeSchedule" class="text-nowrap" style="padding: 0 12px 0 12px;">
+            <select value.bind="r.pod" change.delegate="podSelected(r)" css="color: ${r.txtColor}"
+                    style="width: 100%; height: 48px; border: none; background: none;">
+              <option>Choose...</option>
+              <option repeat.for="s of podList" model.bind="s.Description1" >${s.Description1}</option>
+            </select>
+          </td>
+
+          <!--PROVIDER-->
+          <td if.bind="fullSizeSchedule" css="color: ${r.txtColor}" class="text-nowrap">
+            ${r.providerName}
+          </td>
+
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</template>

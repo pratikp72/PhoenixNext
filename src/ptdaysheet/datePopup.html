@@ -1,0 +1,51 @@
+
+<template>
+  <ux-dialog>
+    <ux-dialog-header>
+      <div class="row">
+        <div class="col-sm-12 d-flex">
+          <h4>Due Date</h4>
+          <i class="fa fa-times ml-auto" click.delegate="close()"></i>
+        </div>
+      </div>
+    </ux-dialog-header>
+
+    <ux-dialog-body>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <div class="form-check form-check-inline" repeat.for="o of dateDisplayOptions">
+          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" checked.bind="dateDisplay" value.bind="o">
+          <label class="form-check-label" for="inlineRadio1">${o}</label>
+        </div>
+      </div>
+
+      <form class="form-inline my-2 my-lg-0" if.bind="dateDisplay=='date'">
+        <div class="input-group">
+          <abp-datetime-picker icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" value.bind="selectedDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" click.delegate="showPicker()"> <i class="fa fa-calendar"></i></button>
+          </div>
+        </div>
+      </form>
+      <div class="input-group mb-3" if.bind="dateDisplay=='days'">
+        <input type="number" class="form-control" placeholder="number of days..." aria-label="Number of Days" value.bind="selectedDate">
+        <div class="input-group-append">
+          <span class="input-group-text">Days</span>
+        </div>
+      </div>
+      <div class="input-group mb-3" if.bind="dateDisplay=='weeks'">
+        <input type="number" class="form-control" placeholder="number of weeks..." aria-label="Number of Weeks" value.bind="selectedDate">
+        <div class="input-group-append">
+          <span class="input-group-text">Weeks</span>
+        </div>
+      </div>
+
+
+    </ux-dialog-body>
+
+    <ux-dialog-footer>
+      <button click.delegate="close()">Done</button>
+    </ux-dialog-footer>
+
+  </ux-dialog>
+</template>

@@ -1,0 +1,387 @@
+<template>
+
+  <require from="./cell"></require>
+  <require from="./draggable"></require>
+
+
+
+  <div class="daysheet-timer" if.bind="stopwatch.displayStopwatch" draggable>
+      <i class.bind="stopwatch.btnClass" style="padding-left: 5px;"
+         css="color: ${stopwatch.btnColor};" click.delegate="stopwatch.timerClick()"></i>
+      <span style="padding-left: 10px;">${stopwatch.displayTime}</span>
+      <i class="fa fa-times ml-auto" style="float: right; padding-right: 5px; padding-top: 3px;" click.delegate="stopwatch.close()"></i>
+  </div>
+
+
+  <div class="card" style="position: absolute;top: 0;left: 0;right: 0;bottom: 0;"  ref="mainCard"><!-- css="height:${screenHeight}px;" css="height:${screenHeight}px;width:${screenWidth}px;"-->
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item" if.bind="datagridHelper.editMode" style="font-size: medium; padding: 0.5rem 1rem;">Daysheet Editor</li>
+        <li class="nav-item" click.delegate="selectFirstGoal()">
+          <span style="display: block;padding: 0.5rem 1rem;" click.delegate="toggleGoalVisibility()"><b>Goals</b>          
+            <i class="fa ${datagridHelper.displayAssessment ? 'fa-caret-down' : 'fa-caret-up'} ml-1"></i></span>
+        </li>
+        <template repeat.for="g of datagridHelper.goals">
+          <div if.bind="!g.editingDescription">
+            <div if.bind="g.visible">
+              <li class="nav-item">
+                <a click.delegate="goalClicked(g)" class="nav-link" class.bind="g.selected ? 'active' : ''">${g.description}</a><!--href="#"-->
+              </li>
+            </div>
+          </div>
+          <div class="nav-link" class.bind="g.selected ? 'active' : ''" style="display: inline-flex" else>
+<!--            <input type="text" placeholder="Enter Goal Description..." value.bind="g.description">-->
+
+            <!--Goal TXT Description Dropdown-->
+            <div class="dropdown" style="display: inline-block;" id="goalDropdown">
+
+              <button class="btn dropdown-toggle" style="border: 1px solid lightgray; padding: 1px 10px 0px 4px;"
+                      type="button" id="goalDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <input type="text" style="border: none;"
+                       ref="assessmentInput" placeholder="Enter Goal Description..."
+                       value.bind="g.description">
+              </button>
+
+              <div class="dropdown-menu" id="goalDropdownItems"
+                   aria-labelledby="dropdownAssessment"
+                   style="width: max-content;">
+                <div repeat.for="i of goalDropdownItems">
+                  <a class="dropdown-item" click.delegate="goalDropDownClick(i, g)">
+                    ${i}
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <i class="fa fa-check-square fa-lg" style="color: green; padding: 7px 0 7px 7px;" aria-hidden="true" click.delegate="goalCheckClick(g)"></i>
+
+            <i class="fa fa-times-circle fa-lg" style="color: grey; padding: 7px 0 7px 7px;" aria-hidden="true" click.delegate="goalCreateCancelClick(g)"></i>
+          </div>
+        </template>
+        <li class="nav-item" >
+          <a class="nav-link ${!addGoalPlusEnabled ? 'disabled' : '' }"
+             click.delegate="newGoalClick()">
+            <i class="fa fa-plus fa-lg" css="color: ${addGoalPlusEnabled ? 'grey' : 'lightgrey'};" style="color: grey;" data-toggle="tooltip" data-placement="bottom" title="Add Goal"></i>
+          </a>
+        </li>
+
+
+<!--        debug-->
+        <!--debug icons-->
+
+
+          <li class="nav-item" if.bind="displayAuthorizationButton">
+            <button type="button" class="btn btn-outline-primary" click.delegate="authorizePopup()"><i class="fa fa-thumbs-o-up mr-1"></i>Authorize</button>
+          </li>
+
+
+          <li class="nav-item" if.bind="displayDebugTools">
+            <i class="fa fa-floppy-o fa-lg mx-1" style="color: green;padding-top: 13px;" click.delegate="saveClick()"></i>
+          </li>
+          <li class="nav-item" if.bind="displayDebugTools">
+            <i class="fa fa-refresh fa-lg mx-1" style="color: blue;padding-top: 13px;" click.delegate="refreshClick()"></i>
+          </li>
+          <li class="nav-item" if.bind="displayDebugTools">
+            <i class="fa fa-folder-open fa-lg mx-1" style="padding-top: 13px;" click.delegate="prefLoad()"></i>
+          </li>
+
+
+        <li class="nav-item ml-auto" if.bind="datagridHelper.editMode">
+          <select value.bind="selectedProvider" class="custom-select form-control ${!selectedProvider ? 'is-invalid' : ''}" change.delegate="providerSelected()">
+            <option model.bind="null">Provider...</option>
+            <option repeat.for="p of providerList" model.bind="p" >${p.ProviderEntity}</option>
+          </select>
+        </li>
+
+        <li class="nav-item px-1" if.bind="datagridHelper.editMode">
+          <select value.bind="datagridHelper.bodyPart" class="custom-select form-control ${!datagridHelper.bodyPart ? 'is-invalid' : ''}" change.delegate="providerSelected()">
+            <option model.bind="null">Bodypart...</option>
+            <option repeat.for="b of bodypartList" model.bind="b" >${b}</option>
+          </select>
+        </li>
+
+        <li class="nav-item mr-5" if.bind="datagridHelper.editMode">
+          <div class="input-group" style="width:200px;">
+            <select value.bind="datagridHelper.selectedProviderPref" class="custom-select form-control" id="exampleFormControlSelect1" change.delegate="providerPrefSelected()">
+              <option model.bind="null">Prefs...</option>
+              <option repeat.for="p of datagridHelper.preferenceList" model.bind="p" >${p.PrefDescription}</option>
+            </select>
+            <div class="input-group-append">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" 
+                  style="border-top-left-radius: 0;border-bottom-left-radius: 0;" 
+                  type="button" id="prefDropDown" data-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-user"></i>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="prefDropDown">
+                  <a class="dropdown-item px-3 ${!canCreateNewPref ? 'disabled' : ''}" href="#" click.delegate="datagridHelper.newPreferenceClick()"><i class="fa fa-plus fa-fw pr-2" aria-hidden="true"></i>New Pref</a>
+                  <a class="dropdown-item px-3 ${!datagridHelper.selectedProviderPref ? 'disabled' : ''}" href="#" click.delegate="datagridHelper.updatePreferenceClick()"><i class="fa fa-plus fa-fw pr-2" aria-hidden="true"></i>Update Pref</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+
+
+        <!-- <li class="nav-item">
+          <i class="fa fa-cog fa-lg mx-1" style="color: #e8e8e878;padding-top: 13px;" click.delegate="showHideDebugTools()"></i>
+        </li> -->
+
+        <li class="nav-item" if.bind="displayCloseButton" style="position: absolute;right: 0;margin-right: 12px;">
+          <i class="fa fa-close fa-2x" click.delegate="closeButtonClick()"></i>
+        </li>
+
+<!--WOOHOO-->
+
+
+      </ul>
+    </div>
+    <div if.bind="datagridHelper.selectedGoal" class="card-body" style="padding: 0;">
+
+      <!--ASSESSMENT AREA-->
+<!--      <div if.bind="!datagridHelper.selectedGoal.isDischarge" style="padding: 10px 10px 10px 10px;">-->
+      <div if.bind="datagridHelper.displayAssessment" ref="assessmentdiv" style="padding: 10px 10px 10px 10px;">
+        <div class="row justify-content-between" style="margin-bottom: 10px;">
+          <div class="col-6">
+
+            <!--ASSESSMSNT DROPDPWN-->
+            <label class="my-1 mr-2"><b>Assessment</b></label>
+            <div class="dropdown" style="display: inline-block;" id="assessmentDropdown">
+
+              <button class="btn dropdown-toggle" style="border: 1px solid lightgray; padding: 1px 10px 0px 4px;"
+                      type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <input type="text" style="border: none;"
+                       ref="assessmentInput"
+                       value.one-way="datagridHelper.selectedAssessmentPref.Description1">
+              </button>
+
+              <div class="dropdown-menu" id="assessmentDropdownItems"
+                   aria-labelledby="dropdownAssessment"
+                    style="width: max-content;">
+                <div repeat.for="mod of datagridHelper.assessmentPrefList">
+                  <a class="dropdown-item" style="display: inline-block; width: auto;"
+                     click.delegate="addAssessmentPrefClick(mod)">
+                    ${mod.Description1}
+                  </a>
+
+                  <i class="fa fa-eye mx-1" style="float: right; padding: 7px 14px; color: lightgrey;"
+                     role="button" data-toggle="popover" data-trigger="focus"
+                     data-content.bind="mod.Description3"></i>
+                </div>
+              </div>
+            </div>
+            <i class="fa fa-male fa-lg mx-1" click.delegate="saveAssessmentPrefClick()"></i>
+
+          </div>
+          <div class="col-6 py-1">
+            Due Date:
+            <i class="fa fa-calendar-plus-o" click.delegate="showDatePopup()"></i>
+            <span if.bind="datagridHelper.selectedGoal.dueDate">${datagridHelper.selectedGoal.displayDueDate}</span>
+            <br>
+            <span if.bind="datagridHelper.selectedGoal.dueDate" style="color: red;">${datagridHelper.selectedGoal.alertTime}</span>
+          </div>
+        </div>
+        <textarea class="form-control" change.delegate="assessmentGoalCheck()" value.bind="datagridHelper.selectedGoal.assessment" ref="assessmentTextarea"></textarea>
+      </div>
+
+
+      <!--DISCHARGE TAB-->
+      <div if.bind="datagridHelper.selectedGoal.isDischarge" style="padding: 10px 10px 10px 10px;"><!---->
+        <div class="row justify-content-between" style="margin-bottom: 10px;">
+          <div class="col-12">
+
+            <!--DISCHARGE DROPDPWN-->
+            <label class="my-1 mr-2"><b>Reason</b></label>
+            <div class="dropdown" style="display: inline-block;" id="dischargeDropdown">
+
+              <button class="btn dropdown-toggle" style="border: 1px solid lightgray; padding: 1px 10px 0px 4px;"
+                      type="button" id="dischargeDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <input type="text" style="border: none;"
+                       ref="dischargeInput"
+                       value.one-way="datagridHelper.selectedDischargePref.Description1">
+              </button>
+
+              <div class="dropdown-menu" id="dischargeDropdownItems"
+                   aria-labelledby="dropdownDischarge"
+                   style="width: max-content;" click.delegate="dischargeClick($event)">
+                <div repeat.for="mod of datagridHelper.dischargePrefList">
+                  <a class="dropdown-item" style="display: inline-block; width: auto;"
+                     click.delegate="addDischargePrefClick(mod)">
+                    ${mod.Description1}
+                  </a>
+
+<!--                  <i class="fa fa-eye mx-1" style="float: right; padding: 7px 14px; color: lightgrey;"-->
+<!--                     role="button"-->
+<!--                     data-content.bind="mod.Description3" click.delegate="blockClose($event)"></i>&lt;!&ndash;data-toggle="popover" data-trigger="focus"&ndash;&gt;-->
+                </div>
+              </div>
+            </div>
+            <i class="fa fa-male fa-lg mx-1" click.delegate="saveDischargePrefClick()"></i>
+          </div>
+        </div>
+        <textarea class="form-control" value.bind="datagridHelper.selectedGoal.assessment" ref="dischargeTextarea"></textarea>
+      </div>
+
+
+      <div if.bind="!datagridHelper.selectedGoal.isDischarge" class="card"
+           css="border: none; position: absolute; top:${datagridHelper.activityTop}px; left: 0;right: 0;bottom: 0;"
+            ref="toolbar">
+<!--           style="border: none; position: absolute;top: 195px;left: 0;right: 0;bottom: 0;"-->
+
+          <div class="card-header"><!-- style="background-color: rgba(0, 0, 0, 0.0);">-->
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item" repeat.for="t of datagridHelper.selectedGoal.tabs">
+                <a class="nav-link" class.bind="t.selected ? 'active' : ''"
+                   click.delegate="tabClicked(t)">${t.description}</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link"
+                   click.delegate="datagridHelper.newTabClick()">
+                  <i class="fa fa-plus fa-lg" style="color: grey;" data-toggle="tooltip" data-placement="bottom" title="Add Tab"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body" style="padding: 10px 10px 10px 10px;  display: flex; flex-flow: column;" if.bind="datagridHelper.selectedGoal.selectedTab"><!--HIDE/SHOW content-->
+
+            <div class="row">
+              <div class="col-md-12">
+                <form class="form-inline">
+                  <i if.bind="!datagridHelper.editMode" class="fa fa-calendar fa-2x mx-1" click.delegate="calendarClick()"></i>
+                  <i if.bind="!datagridHelper.editMode" class="fa fa-share-square fa-2x mx-1" click.delegate="priorClick()"></i>
+
+                  <select value.bind="datagridHelper.selectedModality">
+                    <option model.bind="null">Select...</option>
+                    <option repeat.for="mod of datagridHelper.selectedGoal.selectedTab.activitylist"
+                            model.bind="mod">
+                      ${mod.description}
+                    </option>
+                  </select>
+
+                  <i class="fa fa-plus-circle fa-2x mx-1" style="color: green;" click.delegate="addModalityClick()"></i>
+
+                  <!--TIMER--><!--if.bind="!datagridHelper.editMode"-->
+                    <div if.bind="!datagridHelper.editMode" with.bind="datagridHelper.selectedGoal.selectedTab.currentDay">
+                      <i class="fa fa-clock-o fa-2x mx-1" style="color: blue;" click.delegate="dayClockClicked($this, datagridHelper.selectedGoal)"></i>
+                      <span if.bind="totalTime" style="font-size: small; font-weight: normal;" class="ml-2">
+                        <span style="font-weight: bold; color: lightskyblue;">Total Time:</span>
+                        <span>${totalTime}</span>
+                      </span>
+                      <span else>
+                        <span if.bind="selected">
+                          <!--display timer if current date-->
+  <!--                        <i class="fa fa-clock-o fa-lg mx-1" style="color: blue;" click.delegate="dayClockClicked($this)"></i>-->
+                          <span if.bind="timeIn" style="font-size: small; font-weight: normal;" class="ml-2">
+                            <span style="font-weight: bold; color: lightskyblue;">In:</span>
+                            <span style="color: lightgrey;">${displayTimeIn()}</span>
+                          </span>
+                          <span if.bind="timeOut" style="font-size: small; font-weight: normal;" class="ml-2">
+                            <span style="font-weight: bold; color: lightskyblue;">Out:</span>
+                            <span style="color: lightgrey;">${displayTimeOut()}</span>
+                          </span>
+                        </span>
+                      </span>
+                    </div>
+
+                  <!--debug icons-->
+                  <div if.bind="displayDebugTools">
+                    <i class="fa fa-floppy-o fa-lg mx-1" style="color: green;" click.delegate="saveClick()"></i>
+                    <i class="fa fa-refresh fa-lg mx-1" style="color: blue;" click.delegate="refreshClick()"></i>
+                    <i class="fa fa-folder-open fa-lg mx-1" click.delegate="prefLoad()"></i>
+                  </div>
+
+
+                  <!-- <i class="fa fa-cog fa-lg mx-1 ml-auto" style="color: #e8e8e878;" click.delegate="showHideDebugTools()"></i> -->
+
+                </form>
+              </div>
+            </div>
+
+
+            <div class="tableFixHead"
+              style="overflow: auto;
+              position: inherit;/* height: 178px; */
+              top: 90px;bottom: 0;left:0; right:0; flex: 1 1 auto;"
+                 ref="grid">                 <!-- css="height: ${gridMaxHeight}px;"-->
+
+                <table id="daysheetTable" class="table table-sm table-bordered table-striped table-hover daysheet-table" style="margin-bottom: 0; table-layout: fixed;">
+                  <thead style="font-weight: bold; background-color: grey; color: white;">
+                  <tr>
+                    <th click.delegate="sortActivitiesClick()" style="vertical-align: top;" css="width: ${activityColumnWidth}px;">Activity
+                      <i if.bind="!datagridHelper.selectedGoal.selectedTab.sortDesc" class="fa fa-sort-up"></i>
+                      <i if.bind="datagridHelper.selectedGoal.selectedTab.sortDesc" class="fa fa-sort-down"></i>
+                    </th><!--datagridHelper.selectedGoal.selectedTab.activityColumnWidth-->
+
+                    <template repeat.for="d of datagridHelper.selectedGoal.selectedTab.days">
+                      <th style="vertical-align: top; min-width: 200px;"
+                          css="${columnWidthProperty}"
+                          class.bind="d.selected ? 'daysheet-day-header-active' : 'daysheet-day-header'"><!--width: 125px"  min-width: 125px; width: 100%;-->
+                        <span>${d.date}</span>
+                        <a class="btn"
+                           style="float: right;"
+                           href="#" role="button" id="dropdownMenuLink"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-cog" style="color: lightgrey;" aria-hidden="true"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                          <a class="dropdown-item" href="#" click.delegate="deleteDayClick(d)">Delete Day</a>
+                          <a class="dropdown-item" href="#" click.delegate="editDayTimeClick(d)">Edit Time</a>
+                        </div>
+                      </th>
+                    </template>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    <tr repeat.for="r of datagridHelper.selectedGoal.selectedTab.activitiesCompletedOnTab">
+                      <td dblclick.delegate="cellDoubleClicked(datagridHelper.selectedGoal.selectedTab.currentDay, datagridHelper.selectedGoal.selectedTab.currentDay.activities[$index])">
+                          <b my-cell-attribute>${r.description}</b>
+                          <!--if.bind="!datagridHelper.selectedGoal.selectedTab.activityHasValue(r.description)"-->
+                          <i class="fa fa-minus-circle fa-lg"
+                            if.bind="!r.hasValue"
+                             click.delegate="datagridHelper.selectedGoal.selectedTab.removeActivity(r.description, datagridHelper.selectedGoal.selectedTab.currentDay.sheetId, datagridHelper.patientId, datagridHelper)"
+                             style="color: lightgrey; float: right; margin-top: 5px;"
+                             aria-hidden="true"></i>
+                      </td>
+                      <template repeat.for="d of datagridHelper.selectedGoal.selectedTab.days">
+                        <td css="background-color: ${d.activities[$parent.$index].backgroundColor}"
+                            class.bind="d.selected ? 'daysheet-day-active' : 'daysheet-day'"
+                            click.delegate="rowClicked(r, d, $index, $parent.$index)"
+                            dblclick.delegate="cellDoubleClickedNoCalc(d, d.activities[$parent.$index])"
+                            style="word-wrap: break-word;">
+
+
+
+                          <div class="d-flex">
+                            <div class="p-2 flex-shrink-1">
+                              <i class="fa fa-calculator text-muted" aria-hidden="true" click.delegate="cellDoubleClicked(d, d.activities[$parent.$index])"></i>
+                            </div>
+                            <div class="p-2 w-100">
+                              <span if.bind="!d.activities[$parent.$index].selected">
+                                ${d.activities[$parent.$index].value}
+                              </span>
+                              <span if.bind="d.activities[$parent.$index].selected">
+                                <textarea rows="2" cols="100" maxlength="500" style="border: 0; background-color: transparent; width: 100%;" type="text"
+                                          value.bind="d.activities[$parent.$index].value & signal:'my-refresh'"
+                                          change.delegate="valueChangedCallback(d, $parent.$index)"></textarea>
+                              </span>
+                            </div>
+                          </div>
+
+
+                        </td>
+                      </template>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+        </div>
+    </div>
+  </div>
+
+
+
+</template>
+
+

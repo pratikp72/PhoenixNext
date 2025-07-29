@@ -1,0 +1,98 @@
+<template>
+
+<style>
+    .status-circle {
+      height: 25px;
+      width: 25px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid;
+  }
+</style>
+
+  <div class="row border border-bottom-0 rounded-top bg-white">
+    <div class="col-md-12" style="padding-top: 15px;">
+
+
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <small id="nameFirstHelp" class="form-text text-muted">Patient</small>
+            <div class="input-group mb-3">
+              <input type="text" readonly class="form-control" value.bind="patientName" placeholder="Patient Name" aria-label="Recipient's username" aria-describedby="button-addon2">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2" click.delegate="openPatientSearch()"><i class="fa fa-search"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-md-12 d-flex align-items-center">
+
+            <i class="fa fa-clock-o text-muted mr-2"></i>
+
+            <abp-datetime-picker class="flex-fill mr-2"
+              icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" 
+              value.bind="scheduleDate" options.bind="{ format: 'dddd, MMMM D' }"></abp-datetime-picker>
+
+            <select value.bind="startTime" class="form-control mr-2" style="width: auto;">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="t of timeList" model.bind="t" disabled.bind="t.disabled">${t.time}</option>
+            </select>
+
+            <select value.bind="endTime" class="form-control" style="width: auto;">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="t of timeList" model.bind="t" disabled.bind="t.disabled">${t.time}</option>
+            </select>
+
+          </div>
+
+          <div class="form-group col-md-6">
+            <small class="form-text text-muted">Provider</small>
+            <select value.bind="selectedProvider" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="p of providers" model.bind="p" >${p.ProviderEntity}</option>
+            </select>
+          </div> 
+
+          <div class="form-group col-md-6">
+            <small class="form-text text-muted">Location</small>
+            <select value.bind="selectedLocation" class="form-control ${selectedLocation == null ? 'is-invalid' : ''}">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="l of locations" model.bind="l" >${l.LocationName}</option>
+            </select>
+            <div class="invalid-feedback">
+              Please provide a location.
+            </div>
+          </div> 
+
+          <div class="form-group col-md-12">
+            <small id="nameLastHelp" class="form-text text-muted">Description</small>
+            <input type="text" placeholder="Reason for visit" class="form-control" value.bind="reasonForVisit" aria-describedby="nameLastHelp">
+          </div> 
+
+          <div class="form-group col-md-12">
+            <small id="nameLastHelp" class="form-text text-muted">Status</small>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle pl-0 d-flex align-items-center" type="button" data-toggle="dropdown" aria-expanded="false">
+                <span class="status-circle mr-1 mb-0 ${statusStyle}" style="padding: 0 !important;" aria-hidden="true"></span>${status}
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item d-flex align-items-center" href="#" click.delegate="setStatus('Ready')"><div class="status-circle mr-1 alert-success" aria-hidden="true"></div>Ready</a>
+                <a class="dropdown-item d-flex align-items-center" href="#" click.delegate="setStatus('Waiting')"><div class="status-circle mr-1 alert-primary" aria-hidden="true"></div>Waiting</a>
+                <a class="dropdown-item d-flex align-items-center" href="#" click.delegate="setStatus('Not Arrived')"><div class="status-circle mr-1 alert-dark" aria-hidden="true"></div>Not Arrived</a>
+                <a class="dropdown-item d-flex align-items-center" href="#" click.delegate="setStatus('Next')"><div class="status-circle mr-1 alert-danger" aria-hidden="true"></div>Next</a>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
+
+    </div>
+  </div>
+  <div class="row justify-content-around pt-2 border border-top-0 rounded-bottom bg-white" style="padding-bottom: 15px;">
+    <button if.bind="editable" class="btn btn-primary" click.delegate="save()">Save</button>
+    <!-- <button class="btn btn-secondary" click.delegate="cancel()">Cancel</button> -->
+  </div>
+</template>

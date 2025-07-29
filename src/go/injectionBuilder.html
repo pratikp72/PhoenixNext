@@ -1,0 +1,147 @@
+<template>
+
+  <require from="./customElements/myCheckbox"></require>
+
+  <style>
+    .group-selected {
+      background-color: #c6e1ff;
+    }
+    .group-unselected {
+      background-color: #fff;
+    }
+  </style>
+
+
+
+  <div ref="intakebody" class="row" css="height:${bodyHeight}px;" style="overflow-y: auto;">
+    <div class="col-md-4 pr-0">
+      <div class="card">
+        <div class="card-header">
+          <select value.bind="selectedBodypart" class="form-control" id="exampleFormControlSelect1" change.delegate="bodypartClick()">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="b of bodyparts" model.bind="b" >${b}</option>
+          </select>
+        </div>
+        <ul class="list-group list-group-flush" style="overflow-y: auto;" css="height:${injectionListHeight}px;">
+          <li repeat.for="i of selectedInjectionSites"
+              class="list-group-item ${i.selected ? 'active' : ''}"
+              aria-current="true" click.delegate="injectionSelected(i)">${i.name}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div if.bind="disableContent" style="position: absolute;
+          background-color: #ffffffd4;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          top: 0;
+          z-index: 1000;"></div>
+
+      <!--PREFERENCES-->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="d-flex align-items-start">
+            <div class="align-self-center pr-1 ml-auto">
+              <label class="col-form-label pr-2" for="examToggleButton"><b>Pref</b></label><!-- pt-1"-->
+
+              <div class="dropdown d-inline-block">
+                <button class="btn btn-secondary dropdown-toggle"
+                        type="button" id="examToggleButton"
+                        style="background-color: white; color: black; border-color: #ced4da;"
+                        data-toggle="dropdown" aria-expanded="false">
+                  ${selectedPreference.description}
+                </button>
+                <div class="dropdown-menu" style="overflow-y: scroll;" css="max-height:${preflength}px;"
+                     aria-labelledby="dropdownMenuButton">
+                  <a class="dropdown-item" repeat.for="p of filteredPreferences"
+                     model.bind="p"
+                     click.delegate="preferenceClick(p)"
+                     href="#">${p.description}</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group dropleft">
+              <button type="button" class="btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h fa-2x text-secondary" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" click.delegate="savePreferenceClick()"><i class="fa fa-male fa-lg text-success pr-2"></i>Save Pref</a>
+                <a class="dropdown-item" href="#" click.delegate="createNewPrefClick()"><i class="fa fa-male fa-lg text-danger pr-2"></i>Create New Pref</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-12">
+            <textarea id="mta" ref="mytextarea" value.bind="injectionText" name="message" rows="3" cols="50"
+                      style="position: relative;width: 100%; resize: none;"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-pills card-header-pills">
+            <li repeat.for="s of injectObject.sections" click.delegate="sectionClick($index, s)" class="nav-item">
+              <a class="nav-link ${s.selected ? 'active' : ''}" href="#">${s.description}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body" css="overflow-y: auto; height:${contentbodyHeight}px;">
+
+          <h5 class="card-title">${currentSection.detail}</h5>
+
+          <div repeat.for="g of currentSection.groups"
+               class="row row-cols-${g.cols} pb-3"
+               if.bind="g.visible">
+
+            <div if.bind="g.detail.length > 0" class="col-12 px-4 pb-3 card-text">
+              ${g.detail}
+            </div>
+
+            <div repeat.for="i of g.items" class="col">
+              <!--CHECKBOX ITEMS-->
+              <my-checkbox if.bind="i.isCheckbox"
+                           selected.bind="i.object.selected"
+                           value.bind="i.object.name"
+                           editing.bind="i.object.editing"
+                           click.delegate="i.object.select($parent.$parent)"></my-checkbox>
+
+              <div if.bind="i.isSlider" class="row">
+                <div class="col-md-2">
+                  <div class="h4">${aspirateValue}</div>
+                </div>
+                <div class="col-md-10 pt-2">
+                  <input value.bind="aspirateValue" type="range"
+                         min="0" max="110" class="form-control-range" style="width: 90%;" id="formControlRange">
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ref="footer" class="row">
+    <div class="col-md-12">
+      <nav class="navbar navbar-light bg-light" style="left: 0; right:0; bottom:0;">
+        <form class="form-inline" style="width: 100%; display: inline-block;">
+          <button class="btn btn-success my-2 my-sm-0 float-right"
+                  click.delegate="add()">Add</button>
+        </form>
+      </nav>
+    </div>
+  </div>
+
+
+
+</template>

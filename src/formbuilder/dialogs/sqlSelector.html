@@ -1,0 +1,153 @@
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+    .sql{
+      font-family: monospace;
+    }
+    .sql-blue{
+      color: blue;
+    }
+    .sql-red{
+      color: red;
+    }
+    .sql-operator{
+      color: gray;
+    }
+    .sql-border{
+      border: 1px solid lightgray;
+      border-radius: 0.25rem;
+    }
+    .sql-x{
+      position: relative; 
+      top: 0; 
+      right: 0; 
+      color: lightgray;
+    }
+    .invalid-feedback{
+      display: block;
+    }
+  </style>
+
+  <ux-dialog ref="genpicklist" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">
+        <i class="fa fa-code mr-1" aria-hidden="true"></i>SQL Selector</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+      <div class="row mb-2">
+        <div class="col-5">
+          <label for="nameInput">Table</label>
+          <div class="form-group mb-0">
+            <select value.bind="table" matcher.bind="tableMatcher" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="t of dataTables" model.bind="t" >${t.TableFriendlyName}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col pl-0">
+          <label for="nameInput">Column</label>
+          <div class="input-group">
+            <select value.bind="column" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="c of dataColumns" model.bind="c" >${c.ColumnFriendlyName}</option>
+            </select>
+            <div class="input-group-append">
+              <button type="button" class="btn btn-outline-secondary btn-sm" style="border-color: #ced4da;" click.delegate="addColumn()">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div if.bind="!isColumnAdded" class="invalid-feedback">
+            Click + to add to query.
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center mb-2">
+        <div class="col-5">
+          <label for="nameInput" class="d-flex align-items-center" style="min-height: 31px;">Where
+            <div if.bind="selectedWhereColumns.length > 0" class="btn-toolbar ml-auto" role="toolbar" aria-label="Toolbar with button groups">
+              <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-outline-primary btn-sm ${isAndSelected ? 'active' : ''}" click.delegate="toggleAndOr()">AND</button>
+                <button type="button" class="btn btn-outline-primary btn-sm ${isOrSelected ? 'active' : ''}" click.delegate="toggleAndOr()">OR</button>
+              </div>
+            </div>
+          </label>
+          <div class="form-group mb-0">
+            <select value.bind="whereColumn" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="c of dataColumns" model.bind="c" >${c.ColumnFriendlyName}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col pl-0" style="align-content: flex-end;">
+          <label style="color: transparent; height: 31px;">Where Col</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <select value.bind="whereColumnOperator" class="form-control" style="max-width: 120px;">
+                <option model.bind="null">Operator...</option>
+                <option repeat.for="o of stringFilterValues" model.bind="o" >${o.friendlyOperator}</option>
+              </select>
+            </div>
+            <input type="text" class="form-control" placeholder="where..." value.bind="whereColumnValue">
+            <div class="input-group-append">
+              <button type="button" class="btn btn-outline-secondary btn-sm" style="border-color: #ced4da;" click.delegate="addWhereColumn()">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div if.bind="!isWhereAdded" class="invalid-feedback">
+            Click + to add to query.
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col">
+          <div class="card p-4">
+
+            <!--SELECT-->
+            <div class="d-flex flex-wrap align-items-start sql" style="flex-direction: unset;">
+              <template repeat.for="c of selectedColumns">
+                <span if.bind="$first" class="mr-2 sql-blue d-inline-flex">SELECT</span> 
+                <div class="mr-2 d-inline-flex sql-border" click.delegate="removeSelect(c)">
+                  <span class="d-inline-flex">${c.ColumnAlias}</span>
+                  <i class="fa fa-times sql-x" aria-hidden="true"></i>
+                </div>
+                <span if.bind="!$last" class="mr-2 d-inline-flex">,</span>
+              </template>
+            </div>
+
+            <!--FROM TABLE-->
+            <div if.bind="table" class="d-flex flex-wrap align-items-start sql" style="flex-direction: unset;">
+              <span class="sql-blue">FROM</span> <span class="ml-2">${table.TableAlias}</span>
+            </div>
+
+            <!--WHERE-->
+            <div class="d-flex flex-wrap align-items-start sql" style="flex-direction: unset;">
+              <template repeat.for="wc of selectedWhereColumns">
+                <span class="mr-2 d-inline-flex ${$first ? 'sql-blue' : 'sql-operator'}">${wc.andOrWhere}</span> 
+                <div class="mr-2 d-inline-flex sql-border" click.delegate="removeWhere(wc)">
+                  <span class="d-inline-flex mr-2">${wc.data.ColumnAlias}</span>
+                  <span class="d-inline-flex mr-2 sql-operator">${wc._operator.op}</span>
+                  <span class="d-inline-flex mr-2 sql-red">'${wc.value}'</span>
+                  <i class="fa fa-times sql-x" aria-hidden="true"></i>
+                </div>
+              </template>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button disabled.bind="incomplete" click.delegate="ok()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

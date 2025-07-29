@@ -1,0 +1,278 @@
+
+<template>
+
+
+  <require from="./bubbleCustomAttribute"></require>
+
+
+  <ux-dialog ref="taskdialog" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px; padding-top:0px;">
+
+    <ux-dialog-body style="position: absolute;width: 100%; padding: 0;"><!-- css="height:${bodyHeight}px;">-->
+
+  <div class="row m-0">
+    <!--conversations-->
+    <div class="col-md-4 border-right pl-2">
+
+
+      <div ref="messagetoolbar" class="d-flex align-items-center">
+        <div if.bind="!editMode" class="dropdown btn-group">
+          <button id="btnGroupDrop1" class="btn text-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><!-- >-->
+            Edit
+          </button>
+
+          <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <li if.bind="showMessages"><a class="dropdown-item ${showMessages ? '' : 'disabled'}" href="#" click.delegate="toggleMessageEdit()">Select Messages
+              <i class="fa fa-check-circle-o" style="cursor: pointer;" ></i>
+            </a>
+            </li>
+            <li if.bind="showMessages"><a class="dropdown-item" href="#" click.delegate="displayActiveMessages()">Display Active
+              <i class="fa fa-comment" style="cursor: pointer;" ></i>
+            </a>
+            <li if.bind="showMessages"><a class="dropdown-item" href="#" click.delegate="displayArchivedMessages()">Display Archived
+              <i class="fa fa-archive" style="cursor: pointer;" ></i>
+            </a>
+            </li>
+            <li if.bind="showMessages"><a class="dropdown-item" href="#" click.delegate="filterUserMessages()">Filter User Messages
+              <i class="fa fa-filter" style="cursor: pointer;" ></i>
+            </a>
+            </li>
+            <li if.bind="showMessages"><a class="dropdown-item" href="#" click.delegate="filterPatientMessages()">Filter Patient Messages
+              <i class="fa fa-filter" style="cursor: pointer;" ></i>
+            </a>
+            </li>
+
+
+            <li if.bind="!showMessages"><a class="dropdown-item" href="#" click.delegate="filterPriority('all')">Filter All
+                <i class="fa fa-filter" style="cursor: pointer;" ></i>
+              </a>
+            </li>
+            <li if.bind="!showMessages"><a class="dropdown-item" href="#" click.delegate="filterPriority('high')">Filter High
+                <i class="fa fa-filter" style="cursor: pointer;" ></i>
+              </a>
+            </li>
+            <li if.bind="!showMessages"><a class="dropdown-item" href="#" click.delegate="filterPriority('med')">Filter Med
+                <i class="fa fa-filter" style="cursor: pointer;" ></i>
+              </a>
+            </li>
+            <li if.bind="!showMessages"><a class="dropdown-item" href="#" click.delegate="filterPriority('low')">Filter Low
+                <i class="fa fa-filter" style="cursor: pointer;" ></i>
+              </a>
+            </li>
+
+          </div>
+
+
+
+
+        </div>
+        <span if.bind="editMode" class="py-2 d-inline-block text-primary" click.delegate="doneClick()">Done</span>
+        <i if.bind="displayMessageTasks" class="fa fa-edit fa-2x py-2 ml-auto" style="color:#9e9e9e"></i>
+        <i if.bind="!displayMessageTasks" class="fa fa-edit fa-2x py-2 text-primary ml-auto" style="cursor: pointer;" click.delegate="newConversation()"></i>
+      </div>
+
+
+      <div ref="messageheader" class="d-flex align-items-center">
+
+        <span click.delegate="toggleTaskClick()">
+          <span if.bind="showMessages">
+            <i class="fa fa-comment fa-2x text-primary"></i>
+            <i class="fa fa-thumb-tack" style="color: #9e9e9e;"></i>
+            <span class="py-1 pl-2 mb-0 h3 d-inline-block font-weight-bold">
+              <span>${displayText}</span>
+            </span>
+          </span>
+
+          <span if.bind="showTasks">
+            <i class="fa fa-thumb-tack fa-2x text-primary"></i>
+            <i class="fa fa-comment" style="color: #9e9e9e;"></i>
+            <span class="py-1 pl-2 mb-0 h3 d-inline-block font-weight-bold">
+              <span>${displayText}</span>
+            </span>
+          </span>
+
+          <span if.bind="showArchive">
+            <i class="fa fa-archive fa-2x text-primary"></i>
+            <span class="py-1 pl-2 mb-0 h3 d-inline-block font-weight-bold">
+              <span>${displayText}</span>
+            </span>
+          </span>
+        </span>
+
+
+        <div class="dropdown ml-auto">
+          <button class="btn dropdown-toggle text-primary" type="button" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-user" aria-hidden="true"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right p-2" style="overflow-y: scroll;" css="height: ${popupHeight - 100}px;">
+            <input type="text" input.delegate="filterUsers($event)"
+              class="form-control"
+              placeholder="Users...">
+            <a repeat.for="u of filteredUserList" class="dropdown-item" href="#" click.delegate="filterByUser(u)">
+              ${u.UserName}
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <div class="row" style="overflow-y: scroll;" css="height:${gridHeight}px;">
+        <!--conversation list-->
+        <div class="col-md-12">
+          <div class="row p-1 mx-0">
+            <div class="input-group">
+              <div class="input-group-text" id="btnGroupAddon" style="border-top: 1px solid #ced4da;
+                                                                      border-bottom: 1px solid #ced4da;
+                                                                      border-left: 1px solid #ced4da;
+                                                                      border-right: none;
+                                                                      border-top-left-radius: 10px;
+                                                                      border-bottom-left-radius: 10px;
+                                                                      background-color: white;
+                                                                      border-top-right-radius: 0;
+                                                                      border-bottom-right-radius: 0;">
+                <i class="fa fa-search" aria-hidden="true" style="color: #adadad;"></i></div>
+              <input type="text" input.delegate="filter($event)"
+                    value.bind="taskHelper.search"
+                     style="border-top: 1px solid #ced4da;
+                     box-shadow: none !important;
+                     border-bottom: 1px solid #ced4da;
+                     border-right: 1px solid #ced4da;
+                     border-left: none;
+                     border-top-right-radius: 10px;
+                     border-bottom-right-radius: 10px;
+                     padding-left: 0;"
+                     class="form-control"
+                     placeholder.bind="displayMessageTasks ? 'Search Task Description...' : 'Search Sender...'"
+                     aria-label="Input group example"
+                     aria-describedby="btnGroupAddon">
+            </div>
+          </div>
+
+          <div  class="row p-1 mx-0 d-flex" style="padding-top: 0 !important;"><!--if.bind="!displayMessageTasks"-->
+
+            <span class="font-weight-light" style="color: #9e9e9e; font-size: small;">
+              <i class="fa fa-user py-1" aria-hidden="true"></i>
+              ${taskHelper.filterUserName}
+            </span>
+            <span class="font-weight-light ml-auto" style="color: #9e9e9e; font-size: small;">
+              <i class="fa fa-filter py-1" aria-hidden="true"></i>
+              <span if.bind="!filterMessagesByUser">Patient</span>
+              <span if.bind="filterMessagesByUser">User</span>
+            </span>
+          </div>
+
+
+          <template repeat.for="s of filteredMessages">
+            <div class="row p-1 mx-0 mt-0 d-flex" click.delegate="messageClicked(s)" class.bind="s.selected ? 'message' : 'border-bottom'">
+
+              <!--EDIT column-->
+              <div if.bind="editingMessages" class="p-0 mr-2 align-self-center" style="line-height: 45px; height: 45px;" click.delegate="messageClickForArchive(s)">
+                <i if.bind="!s.selectedForArchive" class="fa fa-circle-thin fa-lg text-muted pl-1"
+                   aria-hidden="true" style="vertical-align: middle; line-height: normal;"></i>
+                <i if.bind="s.selectedForArchive" class="fa fa-check-circle fa-lg text-primary pl-1"
+                   aria-hidden="true" style="vertical-align: middle; line-height: normal;"></i>
+              </div>
+
+              <!--READ column-->
+              <div if.bind="!editingMessages"  class="p-0 text-center mr-2 align-self-center" style="line-height: 45px; height: 45px; width: 22px;">
+                <i if.bind="!s.read" class="fa fa-circle text-primary" aria-hidden="true" style="font-size: x-small; vertical-align: middle; line-height: normal;"></i>
+              </div>
+
+              <div class="p-0 mr-2 align-self-center">
+                <!--img-->
+                <img if.bind="!s.showAlt" src.bind="s.imagePath" class="rounded-circle py-1" alt="..." style="width: 45px; min-width: 45px;">
+                <div if.bind="s.showAlt" class="d-inline-block rounded-circle"
+                      style="background-color: lightgray;
+                            width: 45px;
+                            height: 45px;
+                            line-height: 45px;
+                            text-align: center;">
+                              <span class="d-inline-block" style="vertical-align: middle; line-height: normal;">${s.alt}</span></div>
+              </div>
+ 
+              <div class="align-self-start flex-grow-1" style="width: 10px;">
+                <div class="d-flex align-items-center">
+                  <span class="font-weight-bold text-truncate">${s.subjectName}</span>
+                  <small class="ml-auto text-muted">${s.date}</small>
+                </div>
+                <div class="text-truncate text-muted">
+                  <small>${s.detail}</small>
+                </div>
+              </div>
+
+
+            </div>
+          </template>
+
+
+
+
+
+
+
+
+          <!--EDIT ROW-->
+          <div if.bind="editingMessages" class="row border-top mx-0"
+               style="background-color: #f7f7f7;
+                      position: absolute;
+                      bottom: 0px;
+                      right: 0;
+                      left: 4px;">
+            <div class="col-md-12 py-2">
+              <div if.bind="archiveList.length > 0" class="float-right text-primary" click.delegate="archiveConversationClick()">Archive</div>
+              <div if.bind="archiveList.length == 0" class="float-right text-muted">Archive</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--details-->
+    <div class="col-md-8">
+      <div class="row border-bottom" style="background-color: #f7f7f7; border-top-right-radius: 5px;">
+        <!--conversation subject-->
+        <div class="col-md-12 text-center">
+          <span class="font-weight-bold py-2 d-inline-block">${currentMessage.subjectName}</span>
+          <span if.bind="displayToBar" class="py-2 d-inline-block text-primary float-right" click.delegate="cancelTobar()">Cancel</span>
+          <i if.bind="!displayToBar" class="fa fa-times fa-2x float-right py-2" style="cursor: pointer;" click.delegate="saveAndClose()"></i>
+        </div>
+      </div>
+
+      <compose if.bind="!displayToBar" view="./messageBubbleView.html" containerless></compose>
+      <compose if.bind="displayToBar" view-model="./messageSearchView" model.bind="$this" containerless></compose>
+
+      <div class="row pb-2" style="position: absolute; bottom: 0; width: 100%;">
+        <!--text input-->
+        <div class="col-md-12">
+          <div if.bind="!displayMessageTasks" class="input-group">
+
+            <textarea value.bind="messageText" class="form-control message-box"
+                      placeholder="message..."
+                      aria-describedby="button-addon2"
+                      style="height: 40px;
+                      resize: none;
+                      border-right: none;
+                      border-top-left-radius: 18px;
+                      border-bottom-left-radius: 18px;"></textarea>
+            <div class="input-group-append">
+                <span style="border:1px solid #ced4da;
+                        border-left: none;
+                        padding-top: 2px;
+                        padding-bottom: 2px;
+                        padding-right: 6px;
+                        border-top-right-radius: 18px;
+                        border-bottom-right-radius: 18px;"
+                        id="button-addon2" click.delegate="messageButtonClick()">
+                  <i class="fa fa-arrow-circle-up text-primary fa-2x" aria-hidden="true"></i>
+                </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    </ux-dialog-body>
+  </ux-dialog>
+</template>

@@ -1,0 +1,47 @@
+<template>
+
+  <require from="./bubbleCustomAttribute"></require>
+
+  <div class="row" css="height: ${detailHeight}px; overflow-y: scroll;" scrolltop.bind="scrollTop"><!--detailHeight-->
+    <div class="col-md-12">
+      <template repeat.for="m of currentMessage.bubbles">
+        <!--replies-->
+        <div class="row" style="clear: both;">
+          <div class="col-md-4">
+            <div if.bind="!m.isRight" class="text-muted p-1 font-weight-light" style="font-size: small;">${m.senderName}</div>
+          </div>
+          <div class="col-md-8">
+            <div if.bind="m.displayDate" class="text-muted p-1 font-weight-light" style="font-size: small;">${m.date}</div>
+          </div>
+        </div>
+        <div ref="bubbleelement" bubble-custom class="message-bubble ${m.isRight ? 'float-right' : 'float-left'}">
+          <div class="message-bubble-content" css="color: ${m.textColor}; background-color:${m.color}"  click.delegate="launchTask(m)">
+            <div class="text-center" if.bind="m.isTask">
+
+              <i if.bind="m.canLaunchTask" class="fa fa-thumb-tack fa-4x"></i>
+
+              <span if.bind="!m.canLaunchTask" class="fa-stack fa-3x">
+                <i class="fa fa-thumb-tack fa-stack-1x"></i>
+                <i class="fa fa-ban fa-stack-2x"></i>
+              </span>
+
+
+              <span class="d-inline-block float-right px-2 pb-2"><i class="fa fa-check" aria-hidden="true" click.delegate="completeTask(m.data, $event)"></i></span>
+              <span class="d-inline-block float-right px-2 pb-2" click.delegate="forwardTask(m, $event)"><i class="fa fa-share" aria-hidden="true"></i></span>
+            </div>
+            ${m.description}
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:serif="http://www.serif.com/"
+               width="20px"
+               viewBox="0 0 157 94" version="1.1" xml:space="preserve"
+               class="${m.isRight ? 'message-bubble-tag-right ' : ''}"
+               style="position: absolute;">
+                  <path d="M50.146,-0.079c0,0 -8.999,42.511 -48.054,82.968c-0,-0 -6.314,12.475 13.868,10.242c0,-0 120.698,-9.28 140.133,-93.088l-105.947,-0.122Z" css="fill:${m.color};"/>
+                </svg>
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
+

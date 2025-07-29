@@ -1,0 +1,23 @@
+<template>
+    <require from="../value-converters/keys"></require>
+
+    <div class="row" style="padding: 10px;">
+        <div class="col" change.delegate="save()">
+
+            <div class="row" repeat.for="option of options">
+                <div class="col">
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input checked.bind="option.showThis" class="form-check-input" type="checkbox">
+                            <label class="form-check-label">
+                                ${option.friendlyName}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</template>

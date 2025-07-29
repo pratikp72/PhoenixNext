@@ -1,0 +1,92 @@
+
+<template>
+
+  <style>
+    td {
+      vertical-align: middle !important;
+    }
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+
+
+  <ux-dialog ref="pxSearch" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">${headerDescription}</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control"
+               placeholder="search code or description..."
+               aria-label="search code or description..."
+               keydown.trigger="inputKeydown($event)"
+               aria-describedby="button-addon2" value.bind="searchString">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary"
+                  type="button" id="button-addon2" click.delegate="searchClicked()">
+                  <i class="fa fa-search"></i></button>
+
+
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">${selectedType}</button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" repeat.for="t of typeList" href="#" click.delegate="typeClicked(t)">${t}</a>
+          </div>
+        </div>
+      </div>
+
+
+      <i if.bind="displaySpinner" class="fa fa-spinner fa-pulse fa-3x fa-fw" style="position: absolute;" css="left:${spinnerLeft}px; top:${spinnerTop}px;"></i>
+
+      <div id="selectedProcedures" class="d-flex flex-wrap">
+        <span repeat.for="t of selectedProcedures" click.delegate="removeProcedureClick(t)" class="p-1 text-primary d-inline-block">
+          ${t.code}&nbsp;${t.description}&nbsp;${t.side}
+          <i class="fa fa-times float-right" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div class="tableFixHeadLight" css="height: ${searchResultsHeight}px;">
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Code</th>
+            <th scope="col">Desc</th>
+            <th scope="col">Part</th>
+            <th scope="col"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="s of searchResults">
+            <tr class.bind="s.selected ? 'table-primary' : 'table-light'">
+              <td click.delegate="addClicked(s)"><i class="fa fa-plus-square fa-2x text-primary"></i></td>
+              <td>${s.code}</td>
+              <td>${s.description}</td>
+              <td>${s.data.Body_Part}</td>
+              <td>
+                <div if.bind="displayMods" class="dropdown">
+                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span if.bind="s.modifier">${s.modifier}</span>
+                    <span if.bind="!s.modifier">MOD</span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <template repeat.for="m of modifiers">
+                      <a class="dropdown-item" href="#" click.delegate="setSelectedModifier(s, m)">${m}</a>
+                    </template>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+
+    </ux-dialog-body>
+    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">
+      <button click.delegate="close()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

@@ -1,0 +1,57 @@
+<template>
+
+  <style>
+    .sidebar-item-disabled .nav-link{
+      color: #adb5bd;
+      pointer-events: none;
+      background-color: #fff;
+    }
+  </style>
+
+
+  <li if.bind="!item.moreMenu" id="toolbar-workflow" style="height: 65px; width: 71px;" class="${item.disabled ? 'sidebar-item-disabled' : ''}">
+    <div class="dropdown">
+      <a href="#" class="nav-link py-3 dropdown-toggle" role="button" title="Orders" data-toggle="dropdown" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i class="fa fa-sticky-note-o fa-2x"></i>
+      </a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <a href="#" click.delegate="togglePicker('returnto')" class="dropdown-item">
+          Return To...
+        </a>
+        <a href="#" click.delegate="togglePicker('ptOrder')" class="dropdown-item">
+          Therapy Order
+        </a>
+        <a href="#" click.delegate="togglePicker('surgerySchedule')" class="dropdown-item">
+          Surgery Schedule
+        </a>
+        <!--TEST CUSTOM FORMS HERE-->
+        <a repeat.for="f of forms" href="#" click.delegate="openGoForm(f)" class="dropdown-item">
+          ${f.Description}
+        </a>
+      </div>
+    </div>
+  </li>
+
+  <div if.bind="item.moreMenu" style="height: 67px; width: 71px; background-color: #f8f9fa; border: 1px solid #dee2e6;" class="${item.disabled ? 'sidebar-item-disabled' : ''}">
+    <div class="dropdown">
+      <a href="#" class="nav-link py-3 dropdown-toggle" role="button" title="Orders" data-toggle="dropdown" data-bs-toggle="tooltip" data-bs-placement="right">
+        <i class="fa fa-sticky-note-o fa-2x"></i>
+      </a>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <a href="#" click.delegate="togglePicker('returnto')" class="dropdown-item">
+          Return to...
+        </a>
+        <a href="#" click.delegate="togglePicker('ptOrder')" class="dropdown-item">
+          Therapy Order
+        </a>
+        <a href="#" click.delegate="togglePicker('surgerySchedule')" class="dropdown-item">
+          Surgery Schedule
+        </a>
+        <!--TEST CUSTOM FORMS HERE-->
+        <a repeat.for="f of forms" href="#" click.delegate="openGoForm(f)" class="dropdown-item">
+          ${f.Description}
+        </a>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,102 @@
+<template>
+
+  <style>
+    .is-invalid{
+      border-color: #dc3545;
+      padding-right: calc(0.75em + 2.3125rem);
+      display: block;
+    }
+
+    .is-invalid-color{
+      border-color: #dc3545 !important;
+    }
+
+    .invalid-feedback{
+      display: block !important;
+    }
+
+    .dialog-header-content{
+      display: flex !important;
+    }
+  
+  </style>
+
+  <ux-dialog ref="genpicklist" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">
+        <i class="fa fa-database mr-2"></i>New Custom Value</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+
+
+      <div class="row">
+        <div class="col-md-12">
+          <label for="nameInput">Name</label>
+          <input id="nameInput" type="text" value.bind="customValueName" class="form-control ${!customValueName ? 'is-invalid': ''}">
+          <div if.bind="!customValueName" class="invalid-feedback">
+            Name is required.
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row">
+        <div class="col-md-6">
+          <label for="typePicker">Dataset</label>
+          <div class="input-group">
+            <input type="text" class="form-control ${!datasetName ? 'is-invalid': ''}" 
+                  style="border-right: none;" value.bind="datasetName">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary ${!datasetName ? 'is-invalid-color': ''}" 
+                      style="border-top-right-radius: 0.25rem;
+                      border-bottom-right-radius: 0.25rem;
+                      border-left: none;
+                      border-color: #ced4da;" 
+                      type="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" repeat.for="t of datasetList" href="#" click.delegate="selectDataset(t)">${t}</a>
+              </div>
+            </div>
+          </div>
+          <div if.bind="!datasetName" class="invalid-feedback">
+            Dataset is required.
+          </div>
+        </div>
+
+        <div class="col-md-auto">
+          <label for="typePicker">Datatype</label>
+          <div class="input-group">
+            <input type="text" class="form-control ${!dataType ? 'is-invalid': ''}" 
+                  style="border-right: none;" value.bind="dataType.name">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary ${!dataType ? 'is-invalid-color': ''}" 
+                      style="border-top-right-radius: 0.25rem;
+                      border-bottom-right-radius: 0.25rem;
+                      border-left: none;
+                      border-color: #ced4da;" 
+                      type="button" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" repeat.for="t of dataTypes" href="#" click.delegate="selectDataType(t)">${t.name}</a>
+              </div>
+            </div>
+          </div>
+          <div if.bind="!dataType" class="invalid-feedback">
+            Datatype is required.
+          </div>
+        </div>
+
+      </div>
+
+
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button disabled.bind="incomplete" click.delegate="ok()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

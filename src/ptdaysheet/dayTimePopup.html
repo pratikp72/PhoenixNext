@@ -1,0 +1,27 @@
+
+<template>
+  <ux-dialog>
+    <ux-dialog-header>
+      <div class="row">
+        <div class="col-sm-12 d-flex">
+          <h4>Due Date</h4>
+          <i class="fa fa-times ml-auto" click.delegate="close()"></i>
+        </div>
+      </div>
+    </ux-dialog-header>
+
+    <ux-dialog-body>
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="time..." aria-label="Time" value.bind="timeValue">
+        <div class="input-group-append">
+          <span class="input-group-text">Time</span>
+        </div>
+      </div>
+    </ux-dialog-body>
+
+    <ux-dialog-footer>
+      <button click.delegate="close()">Done</button>
+    </ux-dialog-footer>
+
+  </ux-dialog>
+</template>

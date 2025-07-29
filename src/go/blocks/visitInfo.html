@@ -1,0 +1,79 @@
+<template>
+
+<style>
+
+.dropdown-toggle::after{
+  -ms-flex-item-align: center !important;
+    align-self: center !important;
+}
+</style>
+
+  <div id="visitinfo" class="row px-1 pt-0 bg-primary d-block" style="border-bottom: 1px solid #606060; min-height: 50px; max-height: 50px;margin-right: 25px;">
+    <div class="d-flex align-items-start">
+      <div class="ml-3 mb-0 mr-auto align-self-center h4 text-white">
+        <b>${patientName}</b>
+      </div>
+      
+      <button disabled.bind="!taskHelper.hasTaskableObject" type="button" class="btn btn-primary">
+        <i class="fa fa-thumb-tack fa-2x" click.delegate="taskCurrentObject()"></i>
+      </button>
+
+      <div if.bind="displayPreference" class="align-self-center pr-1">
+        <label class="col-form-label pr-2" for="examToggleButton"><b>Pref</b></label><!-- pt-1"-->
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary" id="examToggleButton"
+                  style="background-color: white; color: black; border-color: #ced4da;"
+                  click.delegate="togglePrefTypeClicked()">${prefTypes[prefTypeIndex]}</button>
+          <button type="button"
+                  style="background-color: white; border-color: #ced4da;"
+                  class="btn btn-secondary dropdown-toggle dropdown-toggle-split caret"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          </button>
+          <div class="dropdown-menu" style="overflow-y: scroll;" css="height: ${prefDropdownHeight}px;">
+            <a class="dropdown-item" repeat.for="p of preferences"
+               model.bind="p"
+               click.delegate="preferenceClick(p)"
+               href="#">
+               <i class="fa ${p.isMap ? 'fa-map-marker' : 'fa-user-o'} mr-2"></i>
+               ${p.description}
+              </a>
+          </div>
+        </div>
+      </div>
+
+      <div if.bind="displayPreference" class="align-self-center">
+        <select class="form-item form-control"
+                value.bind="selectedBodyPart"
+                change.delegate="filterExamPref(providerId)">
+          <option model.bind="null">Bodypart...</option>
+          <option repeat.for="b of bodyparts"
+                  model.bind="b">
+            ${b}
+          </option>
+        </select>
+      </div>
+
+
+<!--      <i class="fa fa-user fa-2x align-self-center text-light" style="padding: 0 20px 0 10px;" aria-hidden="true" click.delegate="openPreferenceEditor()"></i>-->
+
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle d-flex" type="button" data-toggle="dropdown" aria-expanded="false">
+          <i class="fa fa-user fa-2x align-self-center text-light mr-1" aria-hidden="true" ></i><span class="align-self-center">${userName}</span>
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#" click.delegate="openPreferenceEditor()">
+            <i class="fa fa-user text-secondary fa-fw mr-1" aria-hidden="true"></i>Preference Editor</a>
+          <a class="dropdown-item" href="#" click.delegate="doHelp($event)">
+            <i class="fa fa-question-circle text-secondary fa-fw mr-1" aria-hidden="true"></i>Help</a>
+          <a class="dropdown-item" href="#" click.delegate="logout()">
+            <i class="fa fa-sign-out text-secondary fa-fw mr-1" aria-hidden="true"></i>Logout</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+</template>

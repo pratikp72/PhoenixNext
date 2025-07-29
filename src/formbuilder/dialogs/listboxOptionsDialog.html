@@ -1,0 +1,39 @@
+<template>
+
+      <div class="row">
+        <div class="col-md-12">
+          <h5 if.bind="showName" class="text-uppercase">${listName}</h5>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="add option" value.bind="optionToAdd">
+            <div class="input-group-append">
+              <button disabled.bind="!enableAdd" class="btn btn-outline-secondary" type="button" id="button-addon2" click.delegate="addOption()">Add</button>
+              <button disabled.bind="!enableAddSql" class="btn btn-outline-secondary" type="button" id="button-addon2" click.delegate="addSql()">SQL</button>
+            </div>
+          </div>
+
+          <ul class="list-group list-group-flush" style="overflow-y: scroll;" css="height: ${listHeight}px;">
+            <li repeat.for="o of options" class="list-group-item px-0">
+              <div class="d-inline-block" style="width: 70%;"><i if.bind="o.sql" class="fa fa-code mr-1" aria-hidden="true"></i>${o.text}</div>
+              <div class="d-inline-block" style="width: 135px; vertical-align: top;">
+                <button if.bind="showNormal && !o.sql" class="btn ${o.normal ? 'btn-primary' : 'btn-outline-primary'} mr-2" type="button" id="button-addon2" click.delegate="normalClicked(o)">
+                  Normal
+                </button>
+                <button if.bind="showNormal && o.sql" class="btn btn-outline-primary mr-2" type="button" id="button-addon2" click.delegate="editClicked(o)">
+                  Edit
+                </button>
+                <button class="btn btn-outline-danger" type="button" id="button-addon2" click.delegate="deleteOption(o)">
+                  <i class="fa fa-trash-o"></i>
+                </button>
+              </div>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <button if.bind="showSaveButton" class="btn btn-primary float-right" click.delegate="ok()">OK</button>
+        </div>
+      </div>
+  
+</template>

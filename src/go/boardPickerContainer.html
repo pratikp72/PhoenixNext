@@ -1,0 +1,25 @@
+<template>
+  <div id="boardpicker" class="card h-50" style="position: absolute; bottom: 0; left: 0; width: 18rem; box-shadow: 2px 5px .25rem rgba(0,0,0, 0.3);">
+    <div class="card-header">
+      <ul class="nav nav-pills card-header-pills">
+        <li class="nav-item">
+          <a class="nav-link ${componentSelected ? 'active' : ''} ${componentEnabled ? '' : 'disabled'}" href="#" click.delegate="selectTab('card')">
+            <i class="fa fa-plus-square"></i>
+            Card</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link ${userBoardSelected ? 'active' : ''}" href="#" click.delegate="selectTab('user')">
+            <i class="fa fa-th"></i>
+            User Boards</a>
+        </li>
+      </ul>
+    </div>
+
+    <compose if.bind="userBoardSelected" view-model="./boardPicker" model.bind="boardPickerModel" containerless></compose>
+
+    <compose if.bind="componentSelected" view-model="./componentPicker" model.bind="boardPickerModel" containerless></compose>
+  </div>
+
+  <i class="fa fa-caret-left fa-3x" style="position: absolute; bottom: 0; left: -16px;"></i>
+
+</template>

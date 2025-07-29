@@ -1,0 +1,235 @@
+<template>
+
+
+  <div class="row">
+    <div class="col">
+
+
+  <!--<div class="row" ref="navbar">-->
+    <!--<div class="col-12">-->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light" ref="navbar">
+        <a class="navbar-brand" href="#">
+          <i class="fa fa-tablet fa-lg"></i>
+          Kiosk Check-In</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Providers
+              </a>
+              <div class="dropdown-menu"
+                   style="height: auto; overflow-y: auto;"
+                   css="max-height: ${dropdownMaxHeight}px; "
+                   aria-labelledby="navbarDropdown">
+                <form class="form-inline" style="padding-left: 10px;">
+                  <template repeat.for="p of providers">
+                    <div class="form-check dropdown-item">
+                      <input type="checkbox" class="form-check-input"
+                             checked.bind="p.selected" change.delegate="filterByProvider()">
+                      <label class="form-check-label">
+                        ${p.name}
+                      </label>
+                    </div>
+                  </template>
+                </form>
+              </div>
+            </li>
+          </ul>
+          <form class="form-inline my-2 my-lg-0">
+            <div class="input-group">
+              <abp-datetime-picker element.bind="datepicker" value.bind="selectedDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" click.delegate="showPicker()"> <i class="fa fa-calendar"></i></button>
+              </div>
+            </div>
+          </form>
+
+
+          <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-cog fa-lg" style="color: lightgrey;"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton"  style="padding: 10px 0px 10px 20px;">
+              <template repeat.for="c of columns">
+                <div class="dropper" id="1"
+                     dragover.delegate="allowDrop($this, $event)"
+                     drop.delegate="drop($this, $event)">
+                  <div class="form-check" style="justify-content: flex-start; padding-left: 10px;"
+                       draggable="true"
+                       id="2">
+                    <input class="form-check-input" type="checkbox" value="" id="${c.Name}"  checked.bind="c.Visible" change.delegate="updateDisplayedRowCells()">
+                    <label class="form-check-label" for="${c.Name}">
+                      ${c.Name}
+                    </label>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <i if.bind="displayCloseButton" class="fa fa-times fa-2x float-right" style="cursor: pointer;" click.delegate="closeWithDialog()"></i>
+
+        </div>
+      </nav>
+    <!--</div>-->
+  <!--</div>-->
+
+
+
+  <div class="container-fluid" style="padding: 0px; top: 55px;">
+
+    <div class="row">
+      <div class="col-3" if.bind="sidebarVisible">
+        <ul class="list-group">
+          <li class="list-group-item">Item 1</li>
+          <li class="list-group-item">Item 2</li>
+          <li class="list-group-item">Item 3</li>
+          <li class="list-group-item">Item 4</li>
+          <li class="list-group-item">Item 5</li>
+          <li class="list-group-item">Item 6</li>
+        </ul>
+      </div>
+
+      <div class="${sidebarVisible ? 'col-9' : 'col-12'}">
+
+
+        <!--<div class="grid" style="color: white;-->
+                    <!--background-color: grey;-->
+                    <!--font-weight: bold;" css="grid-template-columns: ${gridColumnCss}">-->
+          <!--<template repeat.for="c of columns">-->
+            <!--<div scope="col" if.bind="c.Visible">${c.Name}</div>-->
+          <!--</template>-->
+        <!--</div>-->
+        <!--<div id="outerTableGrid" style="overflow: scroll" css="height: ${tableHeight}px;">-->
+          <!--<template repeat.for="r of filteredRows">-->
+            <!--<div class="grid" data-testLast.bind="scrollToGridDiv($last)" css="background-color: ${r.selected ? '#ff7600' : ''}; grid-template-columns: ${gridColumnCss};">-->
+              <!--<template repeat.for="cell of r.cells">-->
+                <!--<div if.bind="cell.visible">-->
+                  <!--<span if.bind="cell.value">${cell.value}</span>-->
+                  <!--<i else.bind="cell.image" class.bind="cell.image" css="color: ${cell.cssStyle};" click.delegate="statusIconClick($event, r, cell)"></i>-->
+                <!--</div>-->
+              <!--</template>-->
+            <!--</div>-->
+          <!--</template>-->
+        <!--</div>-->
+
+
+
+
+        <!--<div class="row" style="padding: 10px;-->
+                    <!--color: white;-->
+                    <!--background-color: grey;-->
+                    <!--font-weight: bold;">-->
+          <!--<template repeat.for="c of columns">-->
+            <!--<div class="col-md-1 myCell" scope="col" if.bind="c.Visible">${c.Name}</div>-->
+          <!--</template>-->
+        <!--</div>-->
+        <!--<div style="overflow: scroll" css="height: ${tableHeight}px;">-->
+          <!--<template repeat.for="r of filteredRows">-->
+            <!--<div class="row" data-testLast.bind="scrollToRow($last)" css="background-color: ${r.selected ? '#ff7600' : ''}">-->
+              <!--<template repeat.for="cell of r.cells">-->
+                <!--<div class="col-md-1 myCell" if.bind="cell.visible">-->
+                  <!--<span if.bind="cell.value">${cell.value}</span>-->
+                  <!--<i else.bind="cell.image" class.bind="cell.image" css="color: ${cell.cssStyle};" click.delegate="statusIconClick($event, r, cell)"></i>-->
+                <!--</div>-->
+              <!--</template>-->
+            <!--</div>-->
+          <!--</template>-->
+        <!--</div>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!--<div class="row" style="padding: 10px;-->
+                    <!--color: white;-->
+                    <!--background-color: grey;-->
+                    <!--font-weight: bold;">-->
+          <!--<template repeat.for="c of columns">-->
+            <!--<div class="col-md-1 myCell" scope="col" if.bind="c.Visible">${c.Name}</div>-->
+          <!--</template>-->
+        <!--</div>-->
+        <!--<div style="overflow: scroll" css="height: ${tableHeight}px;">-->
+          <!--<template repeat.for="r of filteredRows">-->
+            <!--<div class="row" data-testLast.bind="scrollToRow($last)" css="background-color: ${r.selected ? '#ff7600' : ''}">-->
+              <!--<template repeat.for="cell of r.cells">-->
+                <!--<div class="col-md-1 myCell" if.bind="cell.visible">-->
+                  <!--<span if.bind="cell.value">${cell.value}</span>-->
+                  <!--<i else.bind="cell.image" class.bind="cell.image" css="color: ${cell.cssStyle};" click.delegate="statusIconClick($event, r, cell)"></i>-->
+                <!--</div>-->
+              <!--</template>-->
+            <!--</div>-->
+          <!--</template>-->
+        <!--</div>-->
+
+
+
+
+
+
+
+
+
+
+
+        <div class="tableFixHead" css="height: ${tableHeight}px;">
+          <table class="table table-sm table-striped" id="myTable">
+            <thead ref="tableheader">
+            <tr style="background-color: grey; color: white;">
+              <template repeat.for="c of columns">
+                <th scope="col" if.bind="c.Visible">${c.Name}</th>
+              </template>
+            </tr>
+            </thead>
+            <tbody ref="tablebody">
+
+            <template repeat.for="r of filteredRows">
+              <tr data-testLast.bind="scrollToRow($last)" css="background-color: ${r.selected ? 'antiquewhite' : ''}">
+                <template repeat.for="cell of r.cells">
+
+                  <td if.bind="cell.visible">
+                    <span if.bind="cell.value">${cell.value}</span>
+                    <i else.bind="cell.image" class.bind="cell.image" css="color: ${cell.cssStyle};" click.delegate="statusIconClick($event, r, cell)"></i>
+                  </td>
+
+                </template>
+              </tr>
+            </template>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    </div>
+  </div>
+
+
+</template>

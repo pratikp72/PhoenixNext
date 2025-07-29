@@ -1,0 +1,10 @@
+<template>
+  <div class="card-header pr-1 d-flex align-items-center" style="height: 44px;">
+    <h6 class="mb-0 d-inline-block">${description}</h6>
+    <a class="btn btn-default ml-auto" href="#" style="margin-right: 38px;">
+      <i class="fa fa-cog fa-2x text-black-50" click.delegate="openFormPicker()"></i></a>
+  </div>
+  <div class="card-body p-0" style="overflow-y: auto; overflow-x: hidden;"><!--overflow-auto-->
+    <compose view-model.bind="viewPath" model.bind="viewModel" containerless></compose>
+  </div>
+</template>

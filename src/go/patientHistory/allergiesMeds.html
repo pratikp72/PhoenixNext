@@ -1,0 +1,113 @@
+<template>
+
+  <require from="../customElements/myCheckbox"></require>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-2">
+        <div class="card-header py-0">
+          <div class="d-inline-block align-middle py-2 h4 m-1">Allergies</div>
+
+          <my-checkbox with.bind="history.allergies.noKnownDrugAllergies"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right text-primary"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noKnowDrugAllergiesChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+
+        </div>
+        <div class="card-body">
+          <div if.bind="parent.edit" class="row">
+            <div class="col-md-12">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control"
+                       placeholder="Search allergy..."
+                       aria-describedby="button-addon2"
+                       style="border-radius: 0.25rem;"
+                       keyup.delegate="searchAllergies()"
+                       value.bind="allergySearch">
+                <ul id="algpicker" class="list-group" style="display: inline-block;
+                                              position: absolute;
+                                              z-index: 500;
+                                              top: 40px; height: 500px;
+                                              overflow-y: auto;">
+                  <li repeat.for="r of allergySearchResult" class="list-group-item demo" click.delegate="allergyResultClick(r)">${r.BN}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div repeat.for="a of allergies" if.bind="a.visible" class="row">
+
+
+
+            <div class="col-md-4">
+              <label class="col-form-label">${a.name}</label>
+            </div>
+            <div class="col-md-4">
+              <label if.bind="!parent.edit" class="col-form-label">${a.data.Reaction}</label>
+              <div if.bind="parent.edit" class="d-inline-block" style="width: 50%;">
+                <select value.bind="a.selectedReaction" class="form-control">
+                  <option model.bind="null">Choose...</option>
+                  <option repeat.for="o of allergyReactionList" model.bind="o" >${o}</option>
+                </select>
+              </div>
+              <button if.bind="parent.edit" type="button" class="btn btn-danger d-inline-block ml-1" click.delegate="deleteAllergy(a)">
+                Delete
+             </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-2">
+        <div class="card-header py-0">
+          <div class="d-inline-block align-middle py-2 h4 m-1">Medications</div>
+
+          <my-checkbox with.bind="history.meds.noCurrentMeds"
+                       if.bind="visible"
+                       class="d-inline-block m-1 float-right text-primary"
+                       selected.bind="selected"
+                       value.bind="name"
+                       editing.bind="editing"
+                       callback.call="noCurrentMedsChecked(checked)"
+                       click.delegate="select()"></my-checkbox>
+
+        </div>
+        <div class="card-body">
+          <div if.bind="parent.edit" class="row">
+            <div class="col-md-12">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control"
+                       placeholder="Search medication..."
+                       aria-describedby="button-addon2"
+                       style="border-radius: 0.25rem;"
+                       value.bind="medSearch"
+                       keyup.delegate="searchMeds()">
+                <ul id="medpicker" class="list-group"
+                    style="display: inline-block;
+                            position: absolute;
+                            z-index: 500;
+                            top: 40px; height: 500px;
+                            overflow-y: auto;">
+                  <li repeat.for="r of medSearchResult" class="list-group-item" click.delegate="medResultClick(r)">${r.LN}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div repeat.for="m of meds" if.bind="m.visible" class="row">
+            <div class="col-md-12">
+              <label class="col-form-label">${m.name}</label>
+              <button if.bind="parent.edit" type="button" class="btn m-1 btn-danger float-right" click.delegate="deleteMed(m)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>

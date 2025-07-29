@@ -1,0 +1,31 @@
+<template>
+
+  <require from="./text-toolbar"></require> 
+  <require from="./listbox-toolbar"></require> 
+  <require from="./toolbar-extra-element"></require>
+
+  <div>
+
+    <!--disabled toolbar-->
+    <div if.bind="!showTextToolbar && !showListToolbar && !showExtra" class="card" style="border: 1px dashed rgba(0, 123, 255, 0.65);">
+      <div class="card-body text-muted py-2 px-3" style="color: rgba(0, 123, 255, 0.65) !important;">
+        Select a tool for options...
+      </div>
+    </div>
+
+    <text-toolbar ref="texttoolbar" item.bind="item" 
+                  target-element-id.bind="item.elementId" 
+                  dnd-id.bind="item.id" 
+                  show.bind="showTextToolbar"></text-toolbar>
+
+    <listbox-toolbar ref="listboxtoolbar" item.bind="item" 
+                  target-element-id.bind="item.elementId" 
+                  dnd-id.bind="item.id" 
+                  options.bind="item.dataColumn.listOptions"
+                  show.bind="showListToolbar"></listbox-toolbar>
+
+    <toolbar-extra-element ref="extratoolbar" item.bind="item" show.bind="showExtra"></toolbar-extra-element>
+
+  </div>
+
+</template>

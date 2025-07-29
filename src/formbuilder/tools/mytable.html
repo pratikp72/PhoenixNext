@@ -1,0 +1,152 @@
+<template>
+  <require from="../styles/box.css"></require>
+  <require from="../resize-corner"></require> 
+  <require from="./toolbar-table"></require>
+  <require from="../dialogs/tableCellOptions"></require>
+  <require from="./static-text"></require>
+  <require from="./checkbox"></require>
+  <require from="./textbox"></require>
+  <require from="./listbox"></require>
+  <require from="./signature"></require>
+  <require from="./imagebox"></require>
+
+  <style>
+
+    [contenteditable]{
+      outline: 0px solid transparent;
+    }
+    .edit-mode table{
+      border: 2px solid #007bff !important;
+    }
+
+    .row-selected td{
+      /* border: 2px solid #007bff !important; */
+    }
+
+    .cell-selected{
+      box-shadow: #007bff 0px 0px 10px 1px; 
+    }
+
+    /* .table-cell-options{
+      position: absolute;
+      border-radius: 4px;
+      border: 1px solid #007bff;
+      background-color: white;
+      left: 0;
+      bottom: -40px;
+      box-shadow: #007bff 3px 3px 10px 0px;
+      width: 445px;
+      z-index: 2000;
+    } */
+
+    table{
+      table-layout: fixed;
+    }
+
+    .repeater{
+      position: absolute;
+      top: 6px;
+      z-index: 1;
+      color: #007bff;
+      font-size: small;
+      right: 8px;
+    }
+
+    .viewer-edit-column{
+      text-align: center !important;
+    }
+
+    .viewer-colgroup{
+      width: 35px;
+    }
+
+  </style>
+
+  <div
+    ref="dndElement"
+    class="box"
+    style.bind="positionCss" id.bind="item.id" pointerup.delegate="itemClicked($event)">
+
+    <div class="card w-100 h-100 mb-1 bg-transparent border-0">
+      <div ref="cardbody" class="card-body p-1 ${item.table.editMode ? 'edit-mode': ''}">
+
+        <!--REPEATER ICON-->
+        <i if.bind="item.table.isRepeater && item.editMode" 
+          class="fa fa-repeat repeater" aria-hidden="true"></i>
+
+        <table id.bind="item.elementId" style.bind="item.table.style">
+
+          <colgroup>
+            <template repeat.for="c of item.table.columns">
+              <col css="width: ${c.width}">
+              <col if.bind="$last && item.table.isRepeater && !item.editMode" 
+                    class="viewer-colgroup">
+            </template>
+          </colgroup>
+
+          <template repeat.for="r of item.table.rows">
+            
+            <tr if.bind="r.display" class="${r.selected ? 'row-selected': ''}" >
+     
+              <template repeat.for="c of r.cells">
+
+                <td style.bind="c.styleAsString" 
+                    id.bind="c.cId"
+                    class="${c.selected ? 'cell-selected' : ''}" 
+                    pointerup.delegate="cellClick(r, $index, $event)" 
+                    colspan.bind="c.colspan">
+  
+                    <template if.bind="c.item.toolType==='STATICTEXT'">
+                      <static-text item.bind="c.item"></static-text>
+                    </template>
+                    <template if.bind="c.item.toolType=='CHECKBOX'">
+                      <checkbox item.bind="c.item"></checkbox>
+                    </template>
+                    <template if.bind="c.item.toolType=='TEXTBOX'">
+                      <textbox item.bind="c.item"></textbox>
+                    </template>
+                    <template if.bind="c.item.toolType=='LISTBOX'">
+                      <listbox item.bind="c.item"></listbox>
+                    </template>
+                    <template if.bind="c.item.toolType=='SIGNATURE'">
+                      <signature item.bind="c.item"></signature>
+                    </template>
+                    <template if.bind="c.item.toolType=='IMAGEBOX'">
+                      <imagebox item.bind="c.item"></imagebox>
+                    </template>      
+                </td>
+
+                <!--DISPLAY VIEWER LOGIC HERE-->
+                <template if.bind="$last && item.table.isRepeater && !item.editMode">
+                  <td if.bind="$parent.$index == 0" 
+                      style.bind="c.styleAsString"
+                      class="${c.selected ? 'cell-selected' : ''} viewer-edit-column">
+                    <i class="fa fa-plus text-muted" aria-hidden="true" click.delegate="addRow()"></i>
+                  </td>
+                  <td if.bind="$parent.$index > 0"
+                      style.bind="c.styleAsString"
+                      class="${c.selected ? 'cell-selected' : ''} viewer-edit-column">
+                    <i class="fa fa-trash-o text-danger" aria-hidden="true" click.delegate="deleteRow($parent.$index)"></i>
+                  </td>
+                </template>
+
+              </template>
+
+       
+            </tr>
+          </template>
+        </table>
+
+
+      </div>
+    </div>
+
+    <resize-corner
+      repeat.for="mode of ['se','sw','nw','ne']"
+      mode.bind="mode"
+      item-id.bind="item.id"
+      editing.bind="item.selected">
+    </resize-corner>
+  </div>
+
+</template>

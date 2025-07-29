@@ -1,0 +1,102 @@
+<template>
+
+<style>
+    .input-button{
+      /* width: 24px; */
+      display: inline-block;
+      /* text-align: center; */
+      border: none;
+      padding-left: 2px;
+      padding-right: 2px;
+      color: #495057;
+      left: 8px;
+      position: relative;
+      height: 36px;
+    }
+
+    input:focus {
+      outline:none;
+    }
+    .btn:focus{
+      box-shadow: none;
+    }
+    .form-control:focus{
+      box-shadow: none;
+    }
+</style>
+
+
+  <div ref="newuser" class="card">
+    <!-- <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">${listType}</a>
+        </li>
+      </ul>
+    </div> -->
+    <div class="card-body">
+      <form>
+        <div class="form-row">
+          <div if.bind="!additionalLists" class="form-group col-md-6">
+            <label>List Item</label>
+            <input type="text" class="form-control" value.bind="item.Description1">
+          </div>
+          <div if.bind="additionalLists" class="form-group col-md-6">
+            <template repeat.for="list of additionalLists">
+              <label>List Item</label>
+
+              <div class="btn-group d-flex" style="border: 1px solid #cedfda; border-radius: 0.25rem;" role="group">
+                <input type="text" class="form-control input-button"  
+                  value.bind="item.Description1">
+                <button type="button" class="btn dropdown-toggle ml-auto" 
+                  data-toggle="dropdown" style="border: none;" aria-expanded="false">
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" style="width: 100%;">
+                  <a repeat.for="i of list.items" style="font-family: 'arial';" 
+                    class="dropdown-item" href="#" click.delegate="listItemClicked(i)">${i}</a>
+                </div>
+              </div>
+
+
+              <!-- <select class="form-control" value.bind="item.Description1">
+                <option model.bind="null">Choose...</option>
+                <option repeat.for="i of list.items" model.bind="i" >${i}</option>
+              </select> -->
+
+
+            </template>
+          </div>
+          <div if.bind="displayDescription" class="form-group col-md-6">
+            <label>Description</label>
+            <!-- <input type="text" class="form-control" value.bind="item.Description2" readonly> -->
+            <select value.bind="selectedDescription2" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="b of description2ListItems" model.bind="b" >${b.description}</option>
+            </select>
+          </div>
+          <div if.bind="displayBodyparts" class="form-group col-md-6">
+            <label>Bodypart</label>
+            <select value.bind="selectedBodyPart" class="form-control">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="b of bodyparts" model.bind="b" >${b}</option>
+            </select>
+          </div>
+        </div>
+        <!--ADDITIONAL LISTS-->
+        <!-- <div repeat.for="list of additionalLists" class="form-row">
+          <div class="form-group col-md-6">
+            <label>${list.description}</label>
+            <select class="form-control" value.bind="list.selectedItem">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="i of list.items" model.bind="r" >${i}</option>
+            </select>
+          </div>
+        </div> -->
+      </form>
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="update()">${saveOrUpdate}</button>
+      <button type="button" class="btn btn-danger float-right mr-2" disabled.bind="disableDelete" click.delegate="delete()">Delete</button>
+    </div>
+  </div>
+</template>

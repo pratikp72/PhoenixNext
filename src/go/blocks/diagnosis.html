@@ -1,0 +1,53 @@
+<template>
+
+  <div class="card-header pr-1" style="height: 44px;">
+    <h6 class="float-left mb-0">DIAGNOSIS <small class="text-muted">${data.length}</small></h6>
+    <a class="btn btn-default float-right ${locked ? 'disabled':''}" href="#" style="padding: 0 50px 0 0; margin-top: -7px;">
+      <i class="fa fa-search fa-2x text-primary"  click.delegate="displayDxPop()"></i></a>
+  </div>
+
+  <div class="card-body p-0 overflow-auto"><!-- style="z-index: 999;"-->
+    <div class="tableFixHeadLight" style="height: auto;">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col" class="${home.currentBoard.editing ? 'tableFixHeadLightEditing' : ''}">Date</th>
+            <th scope="col" class="${home.currentBoard.editing ? 'tableFixHeadLightEditing' : ''}">Code</th>
+            <th scope="col" class="${home.currentBoard.editing ? 'tableFixHeadLightEditing' : ''}">Desc</th>
+            <th scope="col" if.bind="displayDeleteHeader" class="au-animate animate-swipe-row-right"></th>
+          </tr>
+        </thead>
+        <tbody>
+        <template repeat.for="s of data">
+          <tr if.bind="globals.isTouchDevice" class="${!s.historical ? 'table-success' : 'table-secondary'}"
+              hammer-swipe.call="rowSwipe($event, s)">
+            <td><i if.bind="s.displayPlus" class="fa fa-plus-square" click.delegate="dxChecked(s)"></i></td>
+            <td>${s.date}</td>
+            <td>${s.code}</td>
+            <td>${s.description}</td>
+            <td if.bind="displayDeleteHeader && !s.displayDelete"></td>
+            <td if.bind="s.displayDelete" style="background-color: #dd3444;vertical-align: middle;" class="au-animate animate-swipe-row-left animate-swipe-row-right">
+              <button type="button" class="btn btn-danger" style="display: block; margin: auto;"
+                      click.delegate="deleteDxClick($index)"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+          <tr if.bind="!globals.isTouchDevice" class="${!s.historical ? 'table-success' : 'table-secondary'}">
+            <td><i if.bind="s.displayPlus" class="fa fa-plus-square" click.delegate="dxChecked(s)"></i></td>
+            <td>${s.date}</td>
+            <td>${s.code}</td>
+            <td>${s.description}</td>
+            <!-- <td if.bind="displayDeleteHeader && !s.displayDelete"></td> -->
+            <!-- <td style="background-color: #dd3444;vertical-align: middle;"> -->
+            <td style="vertical-align: middle;">
+              <button if.bind="!s.historical" type="button" class="btn" style="display: block; margin: auto;"
+                      click.delegate="deleteDxClick($index)"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+        </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

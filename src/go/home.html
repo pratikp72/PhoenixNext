@@ -1,0 +1,253 @@
+<template>
+
+  <style>
+    .nav-link-vert{
+      padding-top: 0.7rem;
+      padding-bottom: 0.7rem;
+    }
+    .dropdown-item.disabled, .dropdown-item:disabled {
+      fill: #adb5bd !important;
+    }
+    .prescription.disabled{
+      fill: #adb5bd !important;
+    }
+
+    #toolbar-prescription.disabled{
+      pointer-events: none;
+    }
+    #toolbar-prescription.disabled #toolbar-prescription-icon {
+      fill: #adb5bd !important;
+    }
+
+    .goform-menu-disabled{
+      pointer-events: none;
+      color: #adb5bd!important;
+    }
+  </style>
+
+  <compose if.bind="globals.mobileView" view="./mobile/home-handheld.html" containerless></compose>
+
+  <div if.bind="!globals.mobileView" ref="home" style="position: absolute; top:0; bottom: 0; width: 100%;">
+
+   <!--sidebar-->
+   <compose view-model.ref="sidebarRef" view-model="./sidebar" model.bind="$this" containerless></compose>
+    <!--ADMIN-->
+    <div if.bind="adminVisible" style="height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0px; right:0; z-index: 4000; background-color: white;">
+      <compose view-model="../administration/admin" model.bind="$this" containerless></compose>
+    </div>
+
+    <!--DEMOGRAPHICS-->
+    <div if.bind="demographicsVisible" id="demo" style="height: 100%;
+                position: absolute;
+                top: 0;
+                left: 71px; z-index: 4000;"><!--  right:0;   class="au-animate animate-slide-in-left animate-slide-out-left"-->
+      <compose view-model="./demographics" model.bind="$this" containerless></compose>
+    </div>
+
+    <!--SCHEDULE-->
+    <div if.bind="scheduleVisible" id="myschedule" style="height: 100%;
+                position: absolute;
+                top: 0;
+                left: 80px; right:0; z-index: 4000;">
+      <compose view-model="./schedule" containerless></compose>
+    </div>
+
+    <!--BOARD PICKER  -->
+    <div if.bind="boardPickerVisible" id="myboardpicker" style="height: 100%;
+                position: absolute;
+                bottom: 0;
+                left: 80px; right:0; z-index: 3000;">
+      <compose view-model="./boardPickerContainer" model.bind="boardPickerModel" containerless></compose>
+    </div>
+
+    <!--VISIT PICKER-->
+    <div if.bind="visitPickerVisible" style="height: 100%;
+                position: absolute;
+                top: 0;
+                left: 80px; right:0; z-index: 3000;">
+      <compose view-model="./visitPicker" model.bind="patientVisits" containerless></compose>
+    </div>
+
+    <!--workflow-->
+    <div if.bind="workflowVisible" style="height: 100%;
+                position: absolute;
+                top: 0;
+                left: 80px; right:0; z-index: 4000;">
+      <compose view-model="./workflow" model.bind="providers" containerless></compose>
+    </div>
+
+    <div id="mycontainer" style="height: 100%;
+                position: fixed;
+                top: 0;
+                left: 80px; right:0">
+
+
+    <!--new LAYOUT button position???-->
+    <!-- <div class="nav-item" style="position: absolute; bottom: 20px; right: 20px; background-color: rgba(255, 255, 255, 0.648); z-index: 2000;">
+      <a class="btn btn-outline-primary" href="#" 
+          click.delegate="toggleBoardLayout($event)">
+        <i class="fa ${currentBoard.blockLayout ? 'fa-th' : 'fa-bars'}" 
+            title="${currentBoard.blockLayout ? 'Block View' : 'List View'}"></i>
+      </a>
+    </div> -->
+
+    <!--Visit INFO-->
+    <div if.bind="!currentBoard.editing" ref="bluebar" class="row" style="position: relative; top:0; right: 0; left: 15px; z-index: 3000;  box-shadow: -1px -4px 5px 9px #00000052;">
+      <div class="col-sm p-0">
+        <compose view-model="./blocks/visitInfo" model.bind="currentBoard" containerless></compose>
+      </div>
+    </div>
+
+
+      <div id="scrollcontainer" class="container-fluid d-flex flex-column overflow-auto" style="top: 55px; position: absolute;" css="height: ${scrollContainerHeight}px;"><!--  style="margin-top: 55px;"-->
+
+
+        <!--DOCUMENT tray-->
+        <div if.bind="!currentBoard.editing && !displayDaysheet" class="row">
+          <div class="col-sm p-0"><!-- if.bind="currentBoard.documents.length > 0"-->
+            <div class="accordion mt-2 mr-2" id="accordionExample">
+              <div class="card" style="box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25); overflow: visible;">
+                <div ref="documentTray" class="card-header" id="doctray" style="padding: 0 8px 0 8px;" data-toggle="collapse" aria-controls="collapseOne" click.delegate="doctrayClick()"><!--data-target="#collapseOne" -->
+
+
+                  <nav class="navbar navbar-expand navbar-light bg-light p-0">
+                    <div class="navbar-collapse collapse" id="navbarSupportedContent">
+                      <ul class="navbar-nav align-items-center" style="flex: 1;">
+
+                        <!--VISIT DETAILS-->
+                        <li class="nav-item">
+                          <i click.delegate="openVisitPopup()" class="fa ${locked ? 'fa-lock' : 'fa-calendar-o'} fa-2x nav-link-vert text-primary mr-2" aria-hidden="true"></i>
+                        </li>
+                        <li class="nav-item">
+                          <!-- <i click.delegate="openVisitPopup()" class="fa ${locked ? 'fa-lock' : 'fa-calendar-o'} fa-2x nav-link-vert text-primary" aria-hidden="true"></i> -->
+                          <div if.bind="currentBoard != undefined" class="d-inline-block mr-2"><!-- style="padding: 3px;"-->
+                            <div style="font-size: 1.2em;">
+                              <b>${currentBoard.visitInfo.providerName}</b>
+                              <i if.bind="showPatientAlertIcon" class="fa fa-exclamation-triangle text-danger" aria-hidden="true"></i>
+                            </div>
+                            <div style="margin-top: -2px;">
+                              <span class="${is_visit_today ? 'text-primary' : 'text-danger'}" style="padding-right: 5px;">${currentBoard.visitInfo.date}</span>
+                              <span class="text-uppercase"
+                                    style="font-weight: normal;
+                                  color: black;
+                                  padding-left: 2px;
+                                  padding-right: 2px;">${currentBoard.visitInfo.visitType}</span><!--background-color: #fffdb6;-->
+                            </div>
+                          </div>
+                        </li>
+
+                        <li if.bind="currentBoard.visitInfo" class="nav-item">
+                          <button type="button" class="btn btn-outline-secondary" click.delegate="openProcedureSearch()">
+                            <span if.bind="currentBoard.visitInfo.visitCode.Visit_Code_Selected === null">Code</span>
+                            <span if.bind="currentBoard.visitInfo.visitCode.Visit_Code_Selected !== null">${currentBoard.visitInfo.visitCode.Visit_Code_Selected}</span>
+                            <i class="fa fa-search pl-1"></i>
+                          </button>
+                        </li>
+
+
+                        <!--PT button-->
+                        <li if.bind="currentBoard.visitInfo.isPt" class="nav-item ml-auto">
+                          <a class="nav-link nav-link-vert" href="#" role="button">
+                            <i class="fa fa-wheelchair-alt fa-2x text-primary" click.delegate="openPtForPatient()"></i>
+                          </a>
+                        </li>
+
+                        <!--new document button-->
+                        <li class="nav-item dropdown ${currentBoard.visitInfo.isPt ? '' : 'ml-auto'}">
+                          <a disabled.bind="saveQueue.isSaving" class="nav-link nav-link-vert pr-0" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                            <div class="${!saveQueue.isSaving ? ' text-primary' : 'text-secondary'}" style="position:relative; display: inline-block;">
+                              <i class="fa fa-file-o fa-2x"></i>
+                              <i class="fa fa-plus" style="position: absolute;left: 6px;top: 10px;"></i>
+                            </div>
+                            <div if.bind="documentCount > 0" class="translate-middle badge rounded-pill bg-danger text-light"
+                              style="position: relative; right: 5px;top: -14px;">
+                              ${documentCount}
+                            </div>
+                          </a>
+                          <div class="dropdown-menu" style="overflow: scroll; max-height: 700px; right: 0; left: auto;" aria-labelledby="navbarDropdown">
+                            <h6 class="dropdown-header">${currentProvider.ProviderEntity}</h6>
+                            <a repeat.for="p of webdocs.provider" class="dropdown-item" href="#" click.delegate="webdocClick(p)">${p.Description}</a>
+                            <div class="dropdown-divider"></div>
+                            <a repeat.for="d of webdocs.default" class="dropdown-item" href="#" click.delegate="webdocClick(d)">${d.Description}</a>
+                          </div>
+                        </li>
+
+                        <!--new form button-->
+                        <li class="nav-item dropdown">
+                          <a disabled.bind="saveQueue.isSaving" class="nav-link nav-link-vert" 
+                             href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                              <i class="fa fa-list-alt fa-2x ${!saveQueue.isSaving ? ' text-primary' : 'text-secondary'}"></i>
+                          </a>
+                          <div class="dropdown-menu" style="overflow: scroll; max-height: 700px; right: 0; left: auto; width: 250px;" aria-labelledby="navbarDropdown">
+                            <div repeat.for="f of goForms" class="d-flex align-items-center px-2 py-1 text-truncate">
+                              <div click.delegate="openGoForm(f)">
+                                <i class="fa fa-list-alt mr-1"></i> ${f.Description}
+                              </div>
+                              <button if.bind="showAdminButton" type="button" class="btn btn-outline-primary ml-auto" click.delegate="openGoFormPreferenceEditor(f)">
+                                <i class="fa fa-user"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </li>
+
+                        <!--og layout buttons-->
+                        <li class="nav-item">
+                            <a class="btn btn-outline-primary" href="#" 
+                                click.delegate="toggleBoardLayout($event)">
+                              <i class="fa ${currentBoard.blockLayout ? 'fa-th-large' : 'fa-bars'}" 
+                                  title="${currentBoard.blockLayout ? 'Block View' : 'List View'}"></i>
+                            </a>
+                        </li>
+
+                      </ul>
+                    </div>
+                  </nav>
+                </div>
+                <!--document view-->
+                <div if.bind="showDocumentTray" ref="docTray" id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                  <div if.bind="displayDocumentSpinner" class="position: relative;">
+                    <i class="fa fa-spinner fa-pulse fa-3x fa-fw" style="width: 61px;
+                              position: absolute;
+                              top: 50%;
+                              left: 50%;
+                              transform: translate(-50%, -50%);
+                              z-index: 5000;
+                              color: lightgrey;"></i>
+                  </div>
+                  <div class="card-deck" style="padding-left: 25px; padding-bottom: 10px; padding-right: 10px;">
+                    <compose repeat.for="d of currentBoard.documents" view-model="./blocks/miniFile" model.bind="d" containerless></compose>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--BOARD-->
+        <div show.bind="!displayDaysheet" id="blockContainer" class="row flex-fill mt-2"><!--h-100-->
+          <div class="col-sm p-0">
+            <div class="pack-w25"></div>
+            <compose view-model="./board" model.bind="currentBoard" containerless></compose><!--currentBoard-->
+          </div>
+        </div>
+
+        <assistance-header if.bind="globals.showAssistanceHeader"></assistance-header>
+
+         <floating-chatbot></floating-chatbot>
+
+        <!--DAYSHEET-->
+        <div show.bind="displayDaysheet" id="ptcontainer" class="row flex-fill mt-2"
+             style="margin-right: -7px; margin-bottom: 10px; box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);"><!--h-100-->
+          <div class="col-sm p-0">
+            <compose view-model="../ptdaysheet/datagrid" model.bind="daysheetParams" containerless></compose>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</template>

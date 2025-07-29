@@ -1,0 +1,86 @@
+<template>
+  <div ref="newuser" class="card">
+
+    <div class="card-body">
+
+      <form>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label>Code</label>
+            <input type="text" class="form-control ${code.CptKey.length==0 || code.CptKey == null ? 'is-invalid' : ''}" 
+              value.bind="code.CptKey" aria-describedby="codeError" placeholder="cpt code">
+            <div id="codeError" class="invalid-feedback">
+              Cpt Code is required
+            </div>
+          </div>
+          <div class="form-group col-md-9">
+            <label>Description</label>
+            <input type="text" class="form-control ${code.Description.length==0 || code.Description == null ? 'is-invalid' : ''}" 
+              value.bind="code.Description" aria-describedby="descError" placeholder="cpt description">
+            <div id="descError" class="invalid-feedback">
+              Cpt Description is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Type</label>
+            <select class="form-control ${code.Type==null ? 'is-invalid' : ''}" value.bind="code.Type">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="r of types" model.bind="r" >${r}</option>
+            </select>
+            <div class="invalid-feedback">
+              Code type is required
+            </div>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Part</label>
+            <select class="form-control ${code.Body_Part==null ? 'is-invalid' : ''}" value.bind="code.Body_Part">
+              <option model.bind="null">Choose...</option>
+              <option repeat.for="r of bodyparts" model.bind="r.Description1" >${r.Description1}</option>
+            </select>
+            <div class="invalid-feedback">
+              Body Part is required
+            </div>
+          </div>
+          <div class="form-group col-md-2">
+            <label>Billable</label>
+            <select class="form-control ${code.Billable==null ? 'is-invalid' : ''}" value.bind="code.Billable">
+              <option model.bind="Yes">Yes</option>
+              <option model.bind="No">No</option>
+            </select>
+            <div class="invalid-feedback">
+              Billable is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Global</label>
+            <input type="text" class="form-control" 
+              value.bind="code.Global" aria-describedby="globalErr" placeholder="global">
+            <!-- <div id="globalErr" class="invalid-feedback">
+              Global is required
+            </div> -->
+          </div>
+          <div class="form-group col-md-6">
+            <label>Units</label>
+            <input type="text" class="form-control ${code.Units.length==0 || code.Units == null ? 'is-invalid' : ''}" 
+              value.bind="code.Units" aria-describedby="unitsErr" placeholder="units">
+            <div id="unitsErr" class="invalid-feedback">
+              Units is required
+            </div>
+          </div>
+        </div>
+
+
+      </form>
+
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" disabled.bind="!canSave" click.delegate="add()">${buttonText}</button>
+    </div>
+  </div>
+</template>

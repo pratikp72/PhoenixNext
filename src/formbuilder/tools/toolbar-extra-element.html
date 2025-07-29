@@ -1,0 +1,38 @@
+<template>
+  <div class="dropdown d-inline-block" role="group" style="background-color: #ffff;">
+    <button type="button" class="btn btn-outline-primary border-left-0" style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+      data-toggle="dropdown" aria-expanded="false">
+      <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+    </button>
+    <div class="dropdown-menu" style="max-height: 500px; overflow-y: scroll;">
+      <!-- <a class="dropdown-item ${item.anchorLeft ? 'active' : ''} ${anchorLeftDisabled ? 'disabled': ''}" 
+          href="#"
+          click.delegate="anchorLeftClick()">
+        <i class="fa fa-anchor mr-2" aria-hidden="true"></i>
+        Anchor Left
+      </a>
+      <a class="dropdown-item ${item.anchorRight ? 'active' : ''} ${anchorRightDisabled ? 'disabled': ''}" 
+          href="#"
+          click.delegate="anchorRightClick()">
+        <i class="fa fa-anchor mr-2" aria-hidden="true"></i>
+        Anchor Right
+      </a> -->
+      <a class="dropdown-item ${item.required ? 'active' : ''} ${requiredDisabled ? 'disabled': ''}" 
+          href="#"
+          click.delegate="required()">
+        <i class="fa fa-exclamation-triangle mr-2" aria-hidden="true"></i>
+        Required
+      </a>
+      <a class="dropdown-item ${cloneDisabled ? 'disabled': ''}" 
+          href="#"
+          click.delegate="clone($event)">
+        <i class="fa fa-clone mr-2" aria-hidden="true"></i>
+        Clone
+      </a>
+      <a class="dropdown-item" href="#" click.delegate="delete()">
+        <i class="fa fa-trash-o mr-2" aria-hidden="true"></i>
+        Delete
+      </a>
+    </div>
+  </div>
+</template>

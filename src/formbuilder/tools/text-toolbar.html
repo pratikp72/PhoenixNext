@@ -1,0 +1,332 @@
+<template>
+
+  <require from="./toolbar-extra-element"></require>
+  <require from="./toolbar-hr"></require>
+  <require from="./toolbar-table"></require>
+
+  <style>
+    .hide-color-picker{
+      display: none;
+    }
+    /* svg:hover {
+      fill: white;
+      stroke: white;
+    } */
+    .line-height-button:hover .line-height-svg{
+      stroke: white !important;
+    }
+    .line-height-svg{
+      stroke: #007bff;
+    }
+    .btn-group .show .line-height-svg{
+      stroke: white;
+    }
+    .input-button{
+      width: 24px;
+      display: inline-block;
+      text-align: center;
+      border: none;
+      padding-left: 2px;
+      padding-right: 2px;
+      color: #047bff;
+      left: 8px;
+      position: relative;
+      height: 36px;
+    }
+    /* .dropdown-toggle::after{
+      width: 100px;
+    } */
+
+    .text-select-group{
+      border: 1px solid #047bff;;
+      border-radius: 4px;
+    }
+    .text-select-left-button{
+      border-right: 1px solid;
+      border-top:none;
+      border-bottom: none;
+      border-left: none;
+    }
+
+  </style>
+
+  <!--FONT section-->
+  <div if.bind="enableFonts" class="btn-group mr-2 text-select-group" role="group" style="background-color: white; z-index: 200; height:38px;">
+    <div class="btn-group" role="group">
+      <button type="button" css="font-family:${fontFamily};" style="width: 150px;"
+        class="btn btn-outline-primary dropdown-toggle text-truncate text-select-left-button" 
+        data-toggle="dropdown" aria-expanded="false">
+        ${fontFamily}
+      </button>
+      <div class="dropdown-menu" style="height: 500px; overflow-y: scroll;">
+        <a repeat.for="ff of formhelper.fonts" css="font-family: ${ff}" class="dropdown-item" href="#" click.delegate="fontfamilyClicked(ff)">${ff}</a>
+      </div>
+    </div>
+
+    <div class="btn-group" role="group">
+      <input type="text" class="form-control input-button"  
+        value.bind="fontsize">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+        data-toggle="dropdown" style="border: none;" aria-expanded="false">
+        <!-- ${fontsize} -->
+
+      </button>
+      <div class="dropdown-menu">
+        <a repeat.for="f of fontsizes" style="font-family: 'arial';" class="dropdown-item" href="#" click.delegate="fontSizeClicked(f)">${f.points}</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group formatDropdown" role="group" style="background-color: white; z-index: 200;"><!--position-absolute -->
+
+
+    <button if.bind="enableBold" type="button" class="btn btn-outline-primary ${isBold ? 'active' : ''}" click.delegate="boldClicked()"><i class="fa fa-bold" aria-hidden="true"></i></button>
+    <button if.bind="enableItalic" type="button" class="btn btn-outline-primary ${isItalic ? 'active' : ''}" click.delegate="italicClicked()"><i class="fa fa-italic" aria-hidden="true"></i></button>
+
+    <!--text color-->
+    <div if.bind="enableColor" class="d-inline-block btn btn-outline-primary" 
+      style="border-radius: 0;
+        padding-bottom: 1px;
+        padding-left: 6px;
+        padding-right: 6px;">
+      <label style="margin: 0;">
+        <i class="fa fa-font" aria-hidden="true"></i>
+        <input type="color" change.delegate="updateTextColor($event)" input.delegate="updateTextColor($event)" style="display: none;"><!--"-->
+      </label>
+      <div style="position: relative;
+            width: 25px;
+            height: 5px;
+            background-color: rgb(0, 0, 0);
+            bottom: 3px;" 
+        css="background-color: ${textColor}">
+      </div>
+    </div>
+
+    <!--background color-->
+    <div if.bind="enableBackgroundColor" class="d-inline-block btn btn-outline-primary" 
+      style="border-radius: 0;
+        padding-bottom: 1px;
+        padding-left: 6px;
+        padding-right: 6px;">
+      <label style="margin: 0;">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:serif="http://www.serif.com/" fill="#000000" width="20px" height="20px" viewBox="0 0 64 64" version="1.1" xml:space="preserve" 
+          style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;bottom: 2px;position: relative;">
+
+          <rect id="Icons" x="-128" y="-320" width="1280" height="800" style="fill:none;"/>
+          
+          <g id="Icons1" serif:id="Icons">
+            <g id="Strike"></g>
+            <g id="H1"></g>
+            <g id="H2"></g>
+            <g id="H3"></g>
+            <g id="list-ul"></g>
+            <g id="hamburger-1"></g>
+            <g id="hamburger-2"></g>
+            <g id="list-ol"></g>
+            <g id="list-task"></g>
+            <g id="trash"></g>
+            <g id="vertical-menu"></g>
+            <g id="horizontal-menu"></g>
+            <g id="sidebar-2"></g>
+            <g id="Pen"></g>
+            <g id="Pen1" serif:id="Pen"></g>
+            <g id="clock"></g>
+            <g id="external-link"></g>
+            <g id="hr"></g>
+            <g id="info"></g>
+            <g id="warning"></g>
+            <g id="plus-circle"></g>
+            <g id="minus-circle"></g>
+            <g id="vue"></g>
+            <g id="cog"></g>
+            <path d="M10.158,56.151c-0.219,0.016 -0.437,-0.004 -0.645,-0.057c-1.24,-0.223 -1.363,-0.999 -1.458,-1.659c-0.011,-0.076 -0.016,-0.153 -0.017,-0.229c-0.001,-0.014 -0.002,-0.028 -0.003,-0.042l-0.035,-5.492c0.017,-0.521 0.064,-0.862 0.586,-1.427l16.089,-15.434l0.007,-3.346c0.099,-0.75 0.155,-0.778 0.578,-1.24l19.299,-19.225l5.659,0l-21.543,21.467l0,3.346l10.461,10.432l2.621,0l14.243,-12.323l-0.021,5.3l-11.979,10.438c-0.595,0.545 -0.644,0.552 -1.414,0.585l-3.45,0l-8.261,8.37c-0.603,0.47 -0.662,0.451 -1.299,0.479l-19.418,0.057Zm16.747,-21.568l-14.9,14.9l0.013,2.668l16.717,-0.057l7.787,-7.887l-9.617,-9.624Z" style="fill-rule:nonzero;"/>
+            <g id="logo"></g>
+            <g id="radio-check"></g>
+            <g id="eye-slash"></g>
+            <g id="eye"></g>
+            <g id="toggle-off"></g>
+            <g id="shredder"></g>
+            <g id="spinner--loading--dots-" serif:id="spinner [loading, dots]"></g>
+            <g id="react"></g>
+            <g id="check-selected"></g>
+            <g id="turn-off"></g>
+            <g id="code-block"></g>
+            <g id="user"></g>
+            <g id="coffee-bean"></g>
+            <g id="coffee-beans">
+              <g id="coffee-bean1" serif:id="coffee-bean"></g>
+            </g>
+            <g id="coffee-bean-filled"></g>
+            <g id="coffee-beans-filled">
+              <g id="coffee-bean2" serif:id="coffee-bean"></g>
+            </g>
+            <g id="clipboard"></g>
+            <g id="clipboard-paste"></g>
+            <g id="clipboard-copy"></g>
+            <g id="Layer1"></g>
+            </g>
+          
+          </svg>
+        <input type="color" input.delegate="updateBackgroundColor($event)" style="display: none;">
+      </label>
+      <div style="position: relative;
+            width: 25px;
+            height: 5px;
+            background-color: rgb(0, 0, 0);
+            bottom: 3px;" 
+        css="background-color: ${backgroundColor}">
+      </div>
+    </div>
+
+  <!--lists-->
+    <div if.bind="enableListItems" class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-list-ul" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="#" click.delegate="toggleTag('ul')">
+          <i class="fa fa-list-ul" aria-hidden="true"></i>
+        </a>
+        <a class="dropdown-item" href="#" click.delegate="toggleTag('ol')">
+          <i class="fa fa-list-ol" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+    <!--INDENT-->
+    <div if.bind="enableIndent" class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-indent" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="#" click.delegate="indentDedent('indent')">
+          <i class="fa fa-indent" aria-hidden="true"></i>
+        </a>
+        <a class="dropdown-item" href="#" click.delegate="indentDedent('dedent')">
+          <i class="fa fa-outdent" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+
+
+    <!--Input types-->
+    <div if.bind="enableInputType" class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        Input Type
+      </button>
+      <div class="dropdown-menu">
+        <a repeat.for="i of inputTypes" class="dropdown-item" href="#" click.delegate="inputTypeClicked(i)">
+          ${i}
+        </a>
+      </div>
+      <button if.bind="showDateOption" type="button" class="btn btn-outline-primary ${item.dataColumn.isSystemDate ? 'active' : ''}" click.delegate="toggleSystemDate()"><i class="fa fa-calendar-check-o" aria-hidden="true"></i></button>
+    </div>
+
+
+
+  <!--text row height-->
+  <div if.bind="enableTextRows" class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+      Rows
+    </button>
+    <div class="dropdown-menu">
+      <a repeat.for="i of textRowHeights" class="dropdown-item" href="#" click.delegate="textRowHeightClicked(i)">
+        ${i}
+      </a>
+    </div>
+  </div>
+
+
+
+    <!--alignment-->
+    <div if.bind="enableAlignment" class="btn-group" role="group">
+      <button type="button" 
+              style="border-top-right-radius: 0;border-bottom-right-radius: 0;" 
+              class="btn btn-outline-primary dropdown-toggle"
+              data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-align-left" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu">
+
+        <a if.bind="item.toolType=='STATICTEXT' || item.toolType=='MYTABLE'" class="dropdown-item" href="#" click.delegate="textAlign('left')">
+          <i class="fa fa-align-left mr-2" aria-hidden="true"></i>Align Left
+        </a>
+
+        <a if.bind="item.toolType=='STATICTEXT' || item.toolType=='MYTABLE'" class="dropdown-item" href="#" click.delegate="textAlign('center')">
+          <i class="fa fa-align-center mr-2" aria-hidden="true"></i>Align Center
+        </a>
+
+        <a if.bind="item.toolType=='STATICTEXT' || item.toolType=='MYTABLE'" class="dropdown-item" href="#" click.delegate="textAlign('right')">
+          <i class="fa fa-align-right mr-2" aria-hidden="true"></i>Align Right
+        </a>
+
+        <a class="dropdown-item" href="#" click.delegate="align(dndId, 'left')">
+          <svg width="19px" height="19px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <g id="Layer_2" data-name="Layer 2">
+              <g id="invisible_box" data-name="invisible box">
+                <rect width="48" height="48" fill="none"/>
+              </g>
+              <g id="Layer_7" data-name="Layer 7">
+                <g>
+                  <path d="M8,2A2,2,0,0,0,6,4V44a2,2,0,0,0,4,0V4A2,2,0,0,0,8,2Z"/>
+                  <path d="M16,22H32a2,2,0,0,0,2-2V8a2,2,0,0,0-2-2H16a2,2,0,0,0-2,2V20A2,2,0,0,0,16,22Zm2-12H30v8H18Z"/>
+                  <path d="M40,26H16a2,2,0,0,0-2,2V40a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V28A2,2,0,0,0,40,26ZM38,38H18V30H38Z"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+          <span class="ml-2">Object Left</span>
+        </a>
+
+        <a class="dropdown-item" href="#" click.delegate="align(dndId, 'top')">
+          <svg version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+            viewBox="0 0 32 32" xml:space="preserve" width="20px" height="20px" fill="#000000">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.064"></g>
+              <g id="SVGRepo_iconCarrier"> 
+                <style type="text/css"> .st0{fill:none;stroke:#000000;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}  </style> 
+                <line class="st0" x1="29" y1="3" x2="3" y2="3"></line> 
+                <rect x="15.5" y="10.5" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 35.5 -7.5)" class="st0" width="12" height="7"></rect> 
+                <rect x="0.5" y="14.5" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 28.5 7.5)" class="st0" width="20" height="7"></rect> 
+              </g>
+            </svg>
+            <span class="ml-2">Object Top</span>
+        </a>
+      </div>
+    </div>
+
+
+    <!--line height-->
+    <div if.bind="enableLineHeight" class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle line-height-button" 
+        style="padding-top: 4px; padding-left:8px; color:#007bff;" 
+        data-toggle="dropdown" aria-expanded="false">
+        <svg class="line-height-svg" width="22px" height="22px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path stroke-linecap="square" stroke-linejoin="round" stroke-width="2" d="M6 10V5m0 0L4 7m2-2 2 2m-2 7v5m0 0 2-2m-2 2-2-2m8-10h8m0 5h-8m0 5h8"></path></g></svg>
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" repeat.for="l of lineHeights" href="#" click.delegate="lineHeightClicked(l)">
+          ${l}
+        </a>
+      </div>
+    </div>
+
+    <button if.bind="enableStyleErase" 
+            style="border-top-right-radius: 0;border-bottom-right-radius: 0;" 
+            type="button" class="btn btn-outline-primary" click.delegate="removeStyle()"><i class="fa fa-eraser" aria-hidden="true"></i></button>
+
+    <toolbar-hr if.bind="enableHr" parent-toolbar.bind="$this" item.bind="item"></toolbar-hr>
+
+    <toolbar-table if.bind="enableTable" parent-toolbar.bind="$this" item.bind="item"></toolbar-table>
+
+    <!-- <toolbar-extra-element item.bind="item"></toolbar-extra-element> -->
+
+  </div>
+</template>
+
+
+
+
+
+
+<svg version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" width="223px" height="223px" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.064"></g><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:none;stroke:#000000;stroke-width:2.112;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}  </style> <line class="st0" x1="29" y1="4" x2="3" y2="4"></line> <rect x="15.5" y="10.5" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 35.5 -7.5)" class="st0" width="12" height="7"></rect> <rect x="0.5" y="14.5" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 28.5 7.5)" class="st0" width="20" height="7"></rect> </g></svg>

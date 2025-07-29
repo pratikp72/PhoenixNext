@@ -1,0 +1,17 @@
+
+<template>
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+  <ux-dialog ref="docpop" css="position: absolute; top: ${docTop}px; left: ${popupLeft}px; width: ${popupWidth}; height: ${popupHeight}; background: ${bgColor};">
+    <ux-dialog-header css="background: ${bgColor}; border: ${borderSize};" style="padding: 8px;">
+      <h4 style="display: inline-block; margin-bottom: 0px;">${title}</h4>
+      <i class="fa fa-times fa-lg fa-2x ml-auto mr-2" style="cursor: pointer;" css="color: ${closeColor};" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body style="height: 100%; overflow-y: auto; padding: 0;">
+      <iframe ref="docframe" load.bind="onFrameLoad()" css="border: ${borderSize};" src.bind="url" title.bind="title" width="100%" height.bind="contentHeight" ></iframe><!--height.bind="contentHeight"-->
+    </ux-dialog-body>
+  </ux-dialog>
+</template>

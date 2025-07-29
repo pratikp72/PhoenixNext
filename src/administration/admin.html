@@ -1,0 +1,20 @@
+<template>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#"><i class="fa fa-cog mr-2" aria-hidden="true"></i>Settings</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav mr-auto">
+        <a repeat.for="p of pages" class="nav-link ${p.selected ? 'active' : ''}" href="#" click.delegate="tabClicked(p)">${p.name}</a>
+      </div>
+      <i class="fa fa-times mr-2 fa-2x" aria-hidden="true" click.delegate="close()"></i>
+    </div>
+  </nav>
+
+  <div class="row px-2">
+    <div class="col-md-12">
+      <compose ref="adm" view-model.bind="selectedPage.path" model.bind="$this" containerless></compose>
+    </div>
+  </div>
+</template>

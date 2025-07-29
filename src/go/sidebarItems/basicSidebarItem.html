@@ -1,0 +1,23 @@
+<template>
+
+  <style>
+    .sidebar-item-disabled .nav-link{
+      color: #adb5bd;
+      pointer-events: none;
+      background-color: #fff;
+    }
+  </style>
+
+  <li if.bind="!item.moreMenu" id.bind="item.id" style="height: 65px; width: 71px;" class="${item.disabled ? 'sidebar-item-disabled' : ''}">
+    <a href="#" click.delegate="togglePicker(item.togglePickerValue)"  class="nav-link py-3 border-top" title.bind="item.title" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="fa ${item.icon} fa-2x"></i>
+    </a>
+  </li>
+
+  <div if.bind="item.moreMenu" id.bind="item.id" style="height: 67px; width: 71px; background-color: #f8f9fa; border: 1px solid #dee2e6;" class="${item.disabled ? 'sidebar-item-disabled' : ''}">
+    <a href="#" click.delegate="togglePicker(item.togglePickerValue)"  class="nav-link py-3 border-top" title.bind="item.title" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="fa ${item.icon} fa-2x"></i>
+    </a>
+  </div>
+
+</template>

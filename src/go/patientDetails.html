@@ -1,0 +1,271 @@
+<template>
+
+  <h4 if.bind="!displayInPopup">
+    Demographics
+    <button type="button" class="btn btn-outline-primary" click.delegate="openCamera()"><i class="fa fa-camera pr-1" aria-hidden="true"></i>Photo</button>
+    <small class="form-text text-muted float-right">${patient.data.PatientID}</small>
+  </h4>
+
+  <div if.bind="displayInPopup" class="d-flex align-items-center border-bottom" 
+    style="background-color: #f8f9fa;
+    padding: 4px;">
+    <h4 class="mx-2 mb-0">Create Patient</h4>
+    <button type="button" class="btn btn-primary" disabled.bind="!canSave" click.delegate="saveDemographics()">
+      <i class="fa fa-floppy-o mr-1" aria-hidden="true"></i> Save</button>
+    <i class="fa fa-times fa-2x ml-auto mr-2" aria-hidden="true" click.delegate="close()"></i>
+  </div>
+
+
+
+  <form style="overflow-x: hidden; overflow-y: scroll;" class="${displayInPopup ? 'p-4' : ''}" css="height:${scrollHeight}px;">
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="nameFirstHelp" class="form-text text-muted">First Name</small>
+        <input type="text" placeholder="First" class="form-control ${patient.data.NameFirst.length==0 || patient.data.NameFirst == null ? 'is-invalid' : ''}" 
+          readonly.bind="disableDemographics" 
+          value.bind="patient.data.NameFirst" 
+          aria-describedby="nameFirstHelp">
+        <div id="lastNameError" class="invalid-feedback">
+          First name required
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <small id="nameMiddleHelp" class="form-text text-muted">Middle Name</small>
+        <input type="text" placeholder="Middle" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.NameMiddle" aria-describedby="nameMiddleHelp">
+      </div>
+      <div class="form-group col-md-4">
+        <small id="nameLastHelp" class="form-text text-muted">Last Name</small>
+        <input type="text" placeholder="Last" class="form-control ${patient.data.NameLast.length==0 || patient.data.NameLast == null ? 'is-invalid' : ''}" 
+          readonly.bind="disableDemographics" 
+          value.bind="patient.data.NameLast" 
+          aria-describedby="nameLastHelp">
+        <div id="lastNameError" class="invalid-feedback">
+          Last name required
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-8">
+        <small id="address1help" class="form-text text-muted">Address1</small>
+        <input type="text" placeholder="Address1" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.Address1" aria-describedby="address1help">
+      </div>
+      <div class="col-md-2">
+        <small id="sexHelp" class="form-text text-muted">Sex</small>
+        <select value.bind="patient.data.Sex" disabled.bind="disableDemographics" class="form-control" aria-describedby="sexHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of sexList" model.bind="s" >${s}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-8">
+        <small id="address2help" class="form-text text-muted">Address2</small>
+        <input type="text" placeholder="Address2" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.Address2" aria-describedby="address2help">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="addressCityHelp" class="form-text text-muted">City</small>
+        <input type="text" placeholder="City" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.AddressCity" aria-describedby="addressCityHelp">
+      </div>
+      <div class="col-md-2">
+        <small id="addressStateHelp" class="form-text text-muted">State</small>
+        <select value.bind="patient.data.AddressState" disabled.bind="disableDemographics" class="form-control" aria-describedby="addressStateHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of stateList" model.bind="s" >${s}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-3">
+        <small id="adressZipHelp" class="form-text text-muted">Zip</small>
+        <input type="text" placeholder="Zip" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.AddressZip" aria-describedby="adressZipHelp">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="phoneHomeHelp" class="form-text text-muted">Home Phone</small>
+        <input type="text" placeholder="Home Phone" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.PhoneHome" aria-describedby="phoneHomeHelp">
+      </div>
+      <div class="form-group col-md-4">
+        <small id="phoneWorkHelp" class="form-text text-muted">Work Phone</small>
+        <input type="text" placeholder="Work Phone" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.PhoneWork" aria-describedby="phoneWorkHelp">
+      </div>
+      <div class="form-group col-md-4">
+        <small id="phoneCellHelp" class="form-text text-muted">Cell Phone</small>
+        <input type="text" placeholder="Cell Phone" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.PhoneCell" aria-describedby="phoneCellHelp">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-8">
+        <small id="emailHelp" class="form-text text-muted">Email</small>
+        <input type="text" placeholder="Email Address" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.Email" aria-describedby="emailHelp">
+      </div>
+    </div>
+
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="DOBHelp" class="form-text text-muted">DOB</small>
+        <input type="date" placeholder="DOB" class="form-control ${patient.data.DOB==0 || patient.data.DOB == null ? 'is-invalid' : ''}" 
+          readonly.bind="disableDemographics" value.bind="patient.data.DOB" aria-describedby="DOBHelp">
+        <div id="usernameError" class="invalid-feedback">
+          DOB is required
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <small id="SSNHelp" class="form-text text-muted">SSN</small>
+        <input type="text" placeholder="SSN" class="form-control" readonly.bind="disableDemographics" value.bind="patient.data.SSNumber" aria-describedby="SSNHelp">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="maritalHelp" class="form-text text-muted">Marital Status</small>
+        <select value.bind="patient.data.MaritalStatus" disabled.bind="disableDemographics" class="form-control" aria-describedby="maritalHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of marriedList" model.bind="s" >${s}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <small id="spouseFirstHelp" class="form-text text-muted">Spouse First</small>
+        <input type="text" placeholder="Spouse First" class="form-control" value.bind="patient.data.SpouseFirst" aria-describedby="spouseFirstHelp">
+      </div>
+      <div class="form-group col-md-4">
+        <small id="spouseLastHelp" class="form-text text-muted">Spouse Last</small>
+        <input type="text" placeholder="Spouse Last" class="form-control" value.bind="patient.data.SpouseLast" aria-describedby="spouseLastHelp">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <div class="card">
+          <div class="card-body pb-0">
+            <h6 class="card-subtitle mb-2 text-muted">PCP</h6>
+            <div class="form-row">
+              <div class="form-group col-md-8">
+                <select value.bind="primaryCareProvider" class="form-control">
+                  <option model.bind="null">Choose...</option>
+                  <option repeat.for="s of providerList" model.bind="s" >${s.ReferringEntity}</option>
+                </select>
+              </div>
+            </div>
+            <div if.bind="primaryCareProvider">
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <small id="primAddressHelp" class="form-text text-muted">Address</small>
+                  <input type="text" readonly class="form-control-plaintext" value.bind="primaryCareProvider.Address1" aria-describedby="primAddressHelp">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <small id="primCityHelp" class="form-text text-muted">City</small>
+                  <input type="text" readonly class="form-control-plaintext" value.bind="primaryCareProvider.AddressCity" aria-describedby="primCityHelp">
+                </div>
+                <div class="form-group col-md-2">
+                  <small id="primStateHelp" class="form-text text-muted">State</small>
+                  <input type="text" readonly class="form-control-plaintext" value.bind="primaryCareProvider.AddressState" aria-describedby="primStateHelp">
+                </div>
+                <div class="form-group col-md-3">
+                  <small id="primZipHelp" class="form-text text-muted">Zip</small>
+                  <input type="text" readonly class="form-control-plaintext" value.bind="primaryCareProvider.AddressZip" aria-describedby="primZipHelp">
+                </div>
+                <div class="form-group col-md-3">
+                  <small id="primPhoneHelp" class="form-text text-muted">Phone</small>
+                  <input type="text" readonly class="form-control-plaintext" value.bind="primaryCareProvider.Phone" aria-describedby="primPhoneHelp">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <div class="card">
+          <div class="card-body pb-0">
+            <h6 class="card-subtitle mb-2 text-muted">Referring</h6>
+            <div class="form-row">
+              <div class="form-group col-md-8">
+                <select value.bind="referringProvider" class="form-control">
+                  <option model.bind="null">Choose...</option>
+                  <option repeat.for="s of providerList" model.bind="s" >${s.ReferringEntity}</option>
+                </select>
+              </div>
+            </div>
+            <div if.bind="referringProvider">
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <input type="text" readonly class="form-control-plaintext" value.bind="referringProvider.Address1">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <input type="text" readonly class="form-control-plaintext" value.bind="referringProvider.AddressCity">
+                </div>
+                <div class="form-group col-md-2">
+                  <input type="text" readonly class="form-control-plaintext" value.bind="referringProvider.AddressState">
+                </div>
+                <div class="form-group col-md-3">
+                  <input type="text" readonly class="form-control-plaintext" value.bind="referringProvider.AddressZip">
+                </div>
+                <div class="form-group col-md-3">
+                  <input type="text" readonly class="form-control-plaintext" value.bind="referringProvider.Phone">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="languageHelp" class="form-text text-muted">Preferred Language</small>
+        <select value.bind="selectedLanguage" class="form-control" aria-describedby="languageHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of languages" model.bind="s" >${s.description}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <small id="raceHelp" class="form-text text-muted">Race</small>
+        <select value.bind="selectedRace" class="form-control" aria-describedby="raceHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of races" model.bind="s" >${s.description}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <small id="ethnicityHelp" class="form-text text-muted">Ethnicity</small>
+        <select value.bind="selectedEthnicity" class="form-control" aria-describedby="ethnicityHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of ethnicities" model.bind="s" >${s.description}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <small id="sexPrefHelp" class="form-text text-muted">Sexual Preference</small>
+        <select value.bind="selectedSexualPref" class="form-control" aria-describedby="sexPrefHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of sexPrefs" model.bind="s" >${s.description}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <small id="genderIdHelp" class="form-text text-muted">Gender ID</small>
+        <select value.bind="selectedGenderID" class="form-control" aria-describedby="genderIdHelp">
+          <option model.bind="null">Choose...</option>
+          <option repeat.for="s of genderIds" model.bind="s" >${s.description}</option>
+        </select>
+      </div>
+    </div>
+  </form>
+</template>

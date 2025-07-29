@@ -1,0 +1,23 @@
+<template>
+  <div class="card">
+    <div class="card-header">
+      <label for="bodypart">Body Part</label>
+      <select id="bodypart" class="form-item form-control"
+              value.bind="selectedBodyPart"
+              style="display: inline-block; width: auto;"
+              change.delegate="filterByBodypart()">
+        <option model.bind="null">Bodypart...</option>
+        <option repeat.for="b of bodyparts"
+                model.bind="b">
+          ${b}
+        </option>
+      </select>
+    </div>
+    <ul class="list-group list-group-flush" style="overflow-y: auto; height: 250px;">
+      <li repeat.for="p of filteredPreferences" class="list-group-item ${p.selected ? 'active' : ''}" click.delegate="prefSelected(p)" >${p.description}</li>
+    </ul>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary float-right" click.delegate="add()">Add</button>
+    </div>
+  </div>
+</template>

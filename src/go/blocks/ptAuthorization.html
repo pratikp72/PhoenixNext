@@ -1,0 +1,36 @@
+<template>
+  <div class="card-header pr-1" style="height: 44px;">
+    <h6 class="float-left mb-0"><i class="fa fa-list pr-2" aria-hidden="true"></i>Therapy Auth <small class="text-muted">${rows.length}</small></h6>
+    <a class="btn btn-default float-right ${locked ? 'disabled' : ''}" href="#" style="padding: 0 50px 0 0; margin-top: -7px;">
+      <i class="fa fa-plus fa-2x text-primary"  click.delegate="addAuth()"></i></a>
+  </div>
+  <div class="card-body p-0" style="overflow-y: scroll;">
+    <div repeat.for="s of rows" class="card-body p-2 position-relative ${s.data.Status == 'ACT' ? 'alert-success' : 'alert-danger'}" style="border-bottom: 1px solid #cbcbcb;">
+
+      <h5 class="d-flex">
+        <div class="font-weight-bold pr-2">${s.data.Type}</div>
+        <div class="text-uppercase font-weight-light pr-2">${s.bodypart}</div>
+        <span class="badge ${s.expired ? 'badge-danger' : 'badge-warning'}">${s.daysRemaining} days, ${s.visitsRemaining} of ${s.data.AuthVisits} visits used</span>
+        <i class="fa fa-pencil-square-o ml-auto alert-link pl-4 pr-2" style="position: absolute; right: 10px; font-weight: normal;" click.delegate="edit(s)"></i>
+      </h5>
+      <!--insurance-->
+      <div class="mb-2 d-flex">
+        <div class="flex-fill pr-2">
+          <small class="pr-1 font-weight-bold">Insurance:</small><small>${insurance}</small>
+        </div>
+      </div>
+      <div class="mb-2 d-flex">
+        <div class="flex-fill pr-2">
+          <small class="pr-1 font-weight-bold"><i class="fa fa-calendar-o pr-1" aria-hidden="true"></i>AUTH:</small><small>${s.date}</small>
+          <br><span if.bind="s.data.AuthDays" class="pr-1">${s.data.AuthDays} days</span><span if.bind="s.data.AuthVisits">${s.data.AuthVisits} visits</span>
+        </div>
+        <div class="flex-fill pr-2" if.bind="s.data.AuthNumber"><small class="font-weight-bold">AUTH#</small>
+          <br>${s.data.AuthNumber}</div>
+        <div if.bind="s.data.ClaimID" class="flex-fill pr-2"><small class="font-weight-bold">CID:</small>
+          <br>${s.data.ClaimID}</div>
+      </div>
+      <p class="card-text text-muted">${s.data.Comments}</p>
+
+    </div>
+  </div>
+</template>

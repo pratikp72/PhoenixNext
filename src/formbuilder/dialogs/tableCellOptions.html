@@ -1,0 +1,158 @@
+<template>
+
+  <require from="../tools/colorPicker"></require>
+
+  <style>
+    .color-circle {
+      height: 24px;
+      width: 24px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid;
+    }
+
+    .input-value{
+      display: inline-block;
+      padding: 0;
+      height: 24px;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+    }
+  </style>
+
+<div>
+
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+      style="border-radius: 0;border-left: none;" 
+      data-toggle="dropdown" aria-expanded="false">
+      Row Col
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item ${myTableObject.isRepeater ? 'disabled' : ''}" click.delegate="addRow()">
+        <i class="fa fa-plus mr-1" aria-hidden="true"></i> Row
+      </a>
+      <a class="dropdown-item" click.delegate="addColumn()">
+        <i class="fa fa-plus mr-1" aria-hidden="true"></i> Column
+      </a>
+      <a class="dropdown-item ${myTableObject.isRepeater ? 'disabled' : ''}" click.delegate="deleteRow()">
+        <i class="fa fa-minus mr-1" aria-hidden="true"></i>  Row
+      </a>
+      <a class="dropdown-item" click.delegate="deleteColumn()">
+        <i class="fa fa-minus mr-1" aria-hidden="true"></i> Column
+      </a>
+    </div>
+  </div>
+
+  <div class="btn-group" role="group" if.bind="cell.hasLeftNeighbor()">
+    <button type="button" class="btn btn-outline-primary" 
+      style="border-radius: 0;border-left: none;" click.delegate="cell.mergeCellLeft($event)">
+      <i class="fa fa-caret-square-o-left" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="btn-group" role="group" if.bind="cell.hasRightNeighbor()">
+    <button type="button" class="btn btn-outline-primary" 
+      style="border-radius: 0;border-left: none;" click.delegate="cell.mergeCellRight($event)">
+      <i class="fa fa-caret-square-o-right" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="btn-group" role="group">
+    <div class="btn btn-outline-primary" 
+      style="border-radius: 0;border-left: none;">
+      Width <input type="text" class="input-value ml-1" style="width: 40px;" value.bind="cellWidth"><!--input.delegate="updateBorderSize()">-->
+    </div>
+  </div>
+
+  <div class="btn-group" role="group">
+    <div class="btn btn-outline-primary" 
+      style="border-radius: 0;border-left: none;">
+      Height <input type="text" class="input-value ml-1" style="width: 40px;" value.bind="cellHeight"><!--input.delegate="updateBorderSize()">-->
+    </div>
+  </div>
+
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+      style="border-radius: 0;border-left: none;" 
+      data-toggle="dropdown" aria-expanded="false">
+      <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+    </button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" click.delegate="toggleTableHeaders()">
+        Display Table Headers
+      </a>
+    </div>
+  </div>
+
+</div>
+
+  <div>
+
+    <div class="btn-group" role="group">
+      <div class="btn btn-outline-primary" 
+        style="border-radius: 0;border-left: none;" click.delegate="toggleCellOrTable()">
+        <span if.bind="cellMode"><strong>Cell</strong></span>
+        <span if.bind="!cellMode"><strong>Table</strong></span>
+      </div>
+    </div>
+
+    <div class="btn-group" role="group">
+      <div class="btn btn-outline-primary" 
+        style="border-radius: 0;border-left: none;">
+        Padding <input type="text" class="input-value ml-1" style="width: 40px;" value.bind="padding">
+      </div>
+    </div>
+
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+        style="border-radius: 0;border-left: none;" 
+        data-toggle="dropdown" aria-expanded="false">
+        Border
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" repeat.for="b of borderPositionsList" href="#" click.delegate="borderPositionClick(b)">
+          <i class="fa ${b.checked ? 'fa-check-square-o' : 'fa-square-o'} mr-1" aria-hidden="true"></i> ${b.name}
+        </a>
+      </div>
+    </div>
+
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+        style="border-radius: 0;border-left: none;" 
+        data-toggle="dropdown" aria-expanded="false">
+        Size ${borderSize}
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" repeat.for="s of borderSizes" href="#" click.delegate="updateBorderSizeClicked(s)">
+          ${s}
+        </a>
+      </div>
+    </div>
+
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" 
+        style="border-radius: 0;border-left: none;" 
+        data-toggle="dropdown" aria-expanded="false">
+        Color
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item d-flex align-items-center" href="#" click.delegate="showColorPicker(true)">
+          Border <div class="color-circle ml-1" css="background-color: ${borderColor}"></div>
+        </a>
+        <a class="dropdown-item d-flex align-items-center" href="#" click.delegate="showColorPicker(false)">
+          Background <div class="color-circle ml-1" css="background-color: ${backgroundColor}"></div>
+        </a>
+      </div>
+      <color-picker if.bind="colorPickerVisible" visible.two-way="colorPickerVisible"
+                    color.two-way="pickerColor" 
+                    top.bind="pickerTop" 
+                    left.bind="pickerLeft"></color-picker>
+    </div>
+
+</div>
+
+</template>

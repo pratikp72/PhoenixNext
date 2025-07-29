@@ -1,0 +1,99 @@
+
+<template>
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+  <ux-dialog ref="taskpop"><!-- style="z-index: 2002;">-->
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">Create Task</h4>
+      <i class="fa fa-times fa-lg fa-2x ml-auto mr-2" style="cursor: pointer; float: right;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+
+    <ux-dialog-body>
+
+      <form>
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <!--description-->
+            <label for="descriptionInput" class="form-label">Description</label>
+            <textarea innerhtml.bind="description" style="width: 100%;" rows="3" class="form-control" id="descriptionInput" aria-describedby="description"></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <!--assigned to-->
+            <label for="assignedTextbox">Assigned To</label>
+            <button id="assignedDropdown" type="button" class="btn" style="border:none;
+                                                    padding-top: 0;
+                                                    padding-left: 0;
+                                                    box-shadow: none !important; display: block;"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <input id="assignedTextbox" input.delegate="filterTarget($event)" value.bind="selectedTarget.description"
+                     style="display:inline-block;
+                     width: 75%;
+                     float: left;
+                     border:none;
+                     border-top: 1px solid #ced4da;
+                     border-bottom: 1px solid #ced4da;
+                     border-left: 1px solid #ced4da;
+                     border-top-right-radius: 0;
+                     border-bottom-right-radius: 0;"
+                     type="text"
+                     class="form-control"
+                     placeholder="Assigned to..."
+                     css="border-color:${ fieldRequired ? '#dc3545' : '#ced4da'}">
+              <i class="fa fa-caret-down"
+                 style="position: relative;
+                        border-top: 1px solid #ced4da;
+                        border-bottom: 1px solid #ced4da;
+                        border-right: 1px solid #ced4da;
+                        border-top-right-radius: 0.25rem;
+                        border-bottom-right-radius: 0.25rem;
+                        height: 38px;
+                        padding: 10px;
+                        float:left;"
+                        css="border-color:${ fieldRequired ? '#dc3545' : '#ced4da'}"></i>
+            </button>
+            <div class="dropdown-menu" style="overflow: scroll; height: 350px;">
+              <a repeat.for="b of filteredTaskTargets" class="dropdown-item" href="#" click.delegate="targetSelected(b)">
+                ${b.description}
+              </a>
+            </div>
+
+
+          </div>
+
+
+          <div class="form-group col-md-4">
+            <!--priority-->
+            <label for="prioritySelect">Priority</label>
+            <select id="prioritySelect" class="form-control"
+                    value.bind="priority" required>
+              <option model.bind="null">Select...</option>
+              <option repeat.for="s of priorityList"
+                      model.bind="s">
+                ${s}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="input-group col-md-12">
+            <label class="pt-1 pr-2">Due Date</label>
+            <abp-datetime-picker icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" value.bind="dueDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button disabled.bind="isSaving" click.delegate="close()">Save</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

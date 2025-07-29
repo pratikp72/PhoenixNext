@@ -1,0 +1,24 @@
+<template>
+  <div class="col-sm-12 col-md-${data.width} pl-2 pt-2 pr-0">
+
+     <div if.bind="data.editing" class="col position-absolute w-100 h-100" style="z-index: 1000; background-color: rgba(255, 255, 255, 0.8);">
+
+       <button type="button" class="btn btn-danger btn-sm float-right" click.delegate="deleteBlock()">
+         <i class="fa fa-trash" aria-hidden="true"></i>
+       </button>
+
+       <div class="dropdown"><!--if.bind="data.editing" -->
+         <button class="btn btn-secondary btn-sm dropdown-toggle float-right mr-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           <i class="fa fa-arrows-h" aria-hidden="true"></i>${data.width}
+         </button>
+         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+           <a repeat.for="w of widthList" class="dropdown-item" href="#" click.delegate="setWidth(w)">${w}</a>
+         </div>
+       </div>
+
+     </div>
+
+
+    <compose view-model="./${data.blockType}" model.bind="data" containerless></compose>
+  </div>
+</template>

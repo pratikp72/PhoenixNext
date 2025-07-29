@@ -1,0 +1,44 @@
+<template>
+  <div style="vertical-align: top;">
+      <h5 style="display: inline-block;" data-bind="text: $data.sections()[$index()].name"></h5>
+      <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle"
+                  data-toggle="dropdown" aria-expanded="false">
+              <!-- ko text: $data.sections()[$index()].selectedItem().name --><!--/ko--> <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu"
+              style="min-width: 215px;"
+              role="menu"
+              data-bind="with: $data.sections()[$index()]">
+              <!-- ko foreach: items -->
+                  <li>
+                      <a href="#"
+                         data-bind="click: $parent.setSelected">
+                          <i class="fa fa-eye fa-fw"
+                             data-bind="click: $root.showItemDetails"></i>
+                          <!-- ko text: name --><!--/ko-->
+                     </a>
+                  </li>
+              <!--/ko-->
+          </ul>
+      </div>
+      <a class="btn btn-danger" href="#" data-bind="click: $data.removeSection.bind($data, $data.sections()[$index()])">
+          <i class="fa fa-trash-o fa-lg"></i></a>
+
+
+      <!-- with: $data.sections()[$index()].selectedItem() -->
+          <!-- ko if: $parent.selectedItem().isTasked  -->
+          <a class="btn btn-warning" style="vertical-align: top;" href="#"
+             data-bind="click: $parent.selectedItem().task">
+              <i class="fa fa-paper-plane fa-lg"></i></a>
+          <!--/ko-->
+
+          <!-- ko ifnot: $parent.selectedItem().isTasked -->
+          <a class="btn btn-default" style="vertical-align: top;" href="#"
+             data-bind="click: $parent.selectedItem().task">
+              <i class="fa fa-paper-plane-o fa-lg"></i></a>
+          <!--/ko-->
+      <!--/ko-->
+
+  </div>
+</template>

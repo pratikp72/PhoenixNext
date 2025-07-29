@@ -1,0 +1,486 @@
+<template>
+
+  <!-- <require from="../formbuilder/charts/chart-bar"></require> -->
+
+  <style>
+    .page-selected {
+      border: 1px dashed #007bff;
+    }
+    .point-three-border{
+      border: 1px solid rgba(0, 0, 0, 0.3);
+    }
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active{
+        box-shadow:none !important;
+        outline:0px !important;
+    }
+    .btn-outline-primary:hover {
+      color: #fff;
+      background-color: #007bff !important;
+      border-color: #007bff;
+    }
+    .marquee-selected{
+      color: #fff;
+      background-color: #007bff !important;
+    }
+
+    .data-button{
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      padding-right: 0.3rem;
+    }
+    .data-button-dropdown{
+      padding-left: 0;
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+
+    .flex-fill{
+      flex: 1 1 auto;
+    }
+
+    .form-type{
+      color: grey;
+    }
+    .table-cell-options{
+      position: absolute;
+      border-radius: 4px;
+      border: 1px solid #007bff;
+      background-color: white;
+      box-shadow: #007bff 3px 3px 10px 0px;
+      z-index: 2000;
+    }
+    .container-class{
+      height: 1056px; 
+      width: 816px; 
+      /* width: 75%;  */
+      display: block;
+    }
+
+    textarea{
+      min-height:unset !important;
+    }
+
+    .column-box{
+      border-radius: 0.25rem;
+      padding: 10px 20px;
+      display: inline-block;
+      margin-right: 1.25rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid #007bff;
+      color: #007bff;
+      max-width: fit-content;
+      position: relative;
+    }
+
+    .close-button{
+      position: absolute;
+      top: 4px;
+      right: 6px;
+    }
+
+    .jumbotron-fill{
+      flex: 1 1 auto;
+      margin-bottom: 0;
+      border-radius: 0.25rem;
+    }
+
+    /* .container{
+      background-color: transparent;
+    } */
+  </style>
+
+  <div class="row">
+
+    <div id="formList" show.bind="sidebarExpanded" class="col-md-3 pr-0" style="overflow-y:auto; height: 90vh; position: fixed;">
+
+      <!-- <div class="d-flex align-items-center mb-1">
+        <button type="button" class="btn ${barForms ? 'btn-primary' : 'btn-outline-secondary'} mr-1" 
+          disabled.bind="barFormsDisabled"
+          click.delegate="tabClicked('forms')"><i class="fa fa-files-o" aria-hidden="true"></i> Reports</button>
+      </div> -->
+
+      <div show.bind="barForms">
+        <div class="d-flex align-items-center mb-1">
+          <select value.bind="selectedReport" class="form-control mr-1 flex-fill">
+            <option model.bind="null">Reports...</option>
+            <option repeat.for="r of reports" model.bind="r" >${r.ReportName}</option>
+          </select>
+
+
+          <button class="btn btn-outline-primary" type="button" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" click.delegate="newReport('table')">
+              <i class="fa fa-table fa-fw" aria-hidden="true"></i>New Table</a>
+            <a class="dropdown-item" href="#" click.delegate="newReport('chart-bar')">
+              <i class="fa fa-bar-chart fa-fw" aria-hidden="true"></i>New Bar Chart</a>
+            <a class="dropdown-item" href="#" click.delegate="newReport('chart-line')">
+              <i class="fa fa-line-chart fa-fw" aria-hidden="true"></i>New Line Chart</a>
+          </div>
+
+
+        </div>
+
+      </div>
+
+  
+
+      <div if.bind="reportObject" class="accordion" id="accordionExample">
+
+        <div repeat.for="c of categories" class="card point-three-border">
+          <div class="card-header">
+            <h2 class="mb-0">
+              <button class="btn btn-link btn-block text-left" type="button" 
+                style="font-size: 1.2rem;font-weight: 500;line-height: 1.2;"
+                data-toggle="collapse" data-target.bind="c.dataTarget" aria-expanded="true" 
+                click.delegate="categoryClicked(c)">
+                <i class="fa fa-database mr-1" aria-hidden="true"></i>${c.name}
+                <i class="fa ${c.expanded ? 'fa-angle-down' : 'fa-angle-up'} float-right" aria-hidden="true"></i>
+              </button>
+            </h2>
+          </div>
+      
+          <div id.bind="c.collapseId" class="collapse" data-parent="#accordionExample">
+            <ul class="list-group list-group-flush">
+
+              <li repeat.for="rc of c.items" 
+                  draggable="true"
+                  dragstart.trigger="drag($event, rc)"
+                  class="list-group-item 
+                          ${rc.selected ? 'active' : ''} 
+                          d-flex align-items-center">
+                    <span class="mr-1">${rc.ColumnFriendlyName}</span>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+
+
+
+      </div>
+    </div>
+
+    <div class="col-md-${sidebarExpanded ? '9' : '12'} ml-auto" 
+      style="overflow-y:auto; height: 90vh;" scrolltop.bind="pageTop">
+
+      <!--TOOLBARS-->
+      <div style="position: sticky; top: 0; z-index: 2000; padding-bottom: 4px;">
+
+        <div class="d-flex align-items-center">
+  
+          <!--filename-->
+          <div class="d-flex pt-2 px-2 align-items-center">
+            <span class="h4 mb-0 mr-2" style="color: #007bff" contenteditable="true" innerhtml.bind="reportObject.Report.ReportName"></span>
+            <i if.bind="reportObject.Report != null" class="fa ${showFormatting ? 'fa-chevron-down' : 'fa-chevron-up'} text-muted" aria-hidden="true" click.delegate="toggleFormatting()"></i> 
+          </div>
+
+          <div class="btn-group ml-auto mr-2" style="background-color: white;" role="group" aria-label="Toolbar">
+            <button type="button" class="btn btn-success" disabled.bind="reportObject.Report==null" click.delegate="runReport()">
+              <i class="fa fa-check mr-1" aria-hidden="true"></i>Run</button>            
+          </div>
+
+          <div class="btn-group" style="background-color: white;" role="group">
+            <button type="button" disabled.bind="reportObject.Report==null" class="btn btn-primary" click.delegate="save()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+            <button type="button" disabled.bind="reportObject.Report==null" class="btn btn-primary dropdown-toggle dropdown-toggle-split pl-0" data-toggle="dropdown" aria-expanded="false">
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!--formatting-->
+      <template if.bind="showFormatting">
+
+        <div class="form-row">
+          <div class="form-group col">
+            <label>Report Title</label>
+            <input type="text" class="form-control" 
+              value.bind="reportObject.Report.ReportTitle" placeholder="report title">
+          </div>
+          <div class="form-group col">
+            <label>Subtitle</label>
+            <input type="text" class="form-control" 
+              value.bind="reportObject.Report.ReportSubTitle" placeholder="subtitle">
+          </div>
+          <div class="form-group col">
+            <label>Paper Orientation</label>
+            <select value.bind="reportObject.Report.PaperOrientation" class="form-control">
+              <option repeat.for="r of paperOrientationList" model.bind="r" >${r}</option>
+            </select>
+          </div>
+        </div>
+
+        <div if.bind="isChart">
+          <div class="form-row">
+            <div class="form-group col">
+              <label>Width</label>
+              <input type="number" class="form-control" 
+                value.bind="reportObject.Report.Json.item.width" placeholder="width">
+            </div>
+            <div class="form-group col">
+              <label>Height</label>
+              <input type="number" class="form-control" 
+                value.bind="reportObject.Report.Json.item.height" placeholder="height">
+            </div>
+          </div>
+  
+          <div class="form-row">
+            <div class="form-group col">
+              <compose ref="chartref" view-model="../formbuilder/charts/${reportObject.Report.Json.fileName}" model.bind="reportObject.Report.Json" containerless></compose>
+            </div>
+          </div>
+        </div>
+        
+
+      </template>
+
+
+
+
+
+      <div if.bind="reportObject.Report==null" class="row mb-2">
+        <div class="col">
+          <div class="card">
+            <div class="card-body d-flex flex-wrap" class="column-box">
+
+              <div if.bind="reportObject.Columns.length == 0" 
+                  class="jumbotron jumbotron-fill">
+
+                  <h1 class="display-4">No Report Selected...</h1>
+                  <p class="lead">Select a report from the picker to the left, or create a new one with the plus button!</p>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+      <div if.bind="reportObject.Report != null" class="row mb-2">
+        <div class="col">
+          <div class="card">
+            <div class="card-header d-flex align-items-center">
+              <i class="fa fa-database mr-1" aria-hidden="true"></i> Data Columns
+
+              <button class="btn ${isDistinctQuery ? 'btn-primary' : 'btn-outline-secondary'} ml-auto mr-2" 
+                type="button" id="button-addon1" click.delegate="toggleDistinctQuery()">
+                <i class="fa ${isDistinctQuery ? 'fa-check-square-o' : 'fa-square-o'} mr-1" aria-hidden="true"></i>
+                Distinct
+              </button>
+
+            </div>
+            <div id="report-columns" class="card-body d-flex flex-wrap" class="column-box" 
+                drop.trigger="drop($event)" dragover.trigger="allowDrop($event)">
+
+              <div reorderable-repeat.for="c of reportObject.Columns" class="column-box">
+
+                <div class="font-weight-bold mr-1 d-inline-block text-uppercase">${c.OD_ReportAvailableColumns.TableFriendlyName}</div>
+                <div class="d-inline-block text-uppercase">${c.OD_ReportAvailableColumns.ColumnFriendlyName}</div>
+
+                <!--date formatting-->
+                <div if.bind="c.data.IsDate" class="input-group mb-1">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">
+                      <i class="fa fa-calendar mr-1" aria-hidden="true"></i>Format</label>
+                  </div>
+                  <select value.bind="c.dateFormat" class="custom-select" change.delegate="c.updateTimeUnit(getCurrentChartJsObject())">
+                    <option repeat.for="f of timeFormats" model.bind="f">${f}</option>
+                  </select>
+                </div>
+
+                <!--X or Y??-->
+                <div if.bind="reportObject.Report.Json != null" class="btn-group d-flex mb-1" role="group">
+                  <button type="button" class="btn btn-outline-secondary" click.delegate="c.toggleXAxis(getCurrentChartJsObject(), reportObject)">
+                    X Axis
+                    <i class="fa ${c.isX ? 'fa-check-square-o' : 'fa-square-o'} mr-1" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary" click.delegate="c.toggleYAxis(getCurrentChartJsObject(), reportObject)">
+                    Y Axis
+                    <i class="fa ${c.isY ? 'fa-check-square-o' : 'fa-square-o'} mr-1" aria-hidden="true"></i>
+                  </button>
+                </div>
+
+                <!--Axis scale-->
+                <div if.bind="reportObject.Report.Json != null && !c.data.IsDate" class="input-group d-flex">
+                  <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon1" click.delegate="c.toggleBeginAtZero(getCurrentChartJsObject(), reportObject)">Begin at Zero
+                      <i class="fa ${c.beginAtZero ? 'fa-check-square-o' : 'fa-square-o'} mr-1" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <input if.bind="!c.beginAtZero" type="number" class="form-control" input.delegate="c.updateScale(getCurrentChartJsObject(), reportObject)"
+                      style="width: 85px;" placeholder="min" aria-describedby="button-addon1" value.bind="c.minScaleValue">
+                  <input if.bind="!c.beginAtZero" type="number" class="form-control" input.delegate="c.updateScale(getCurrentChartJsObject(), reportObject)"
+                      style="width: 85px;" placeholder="max" aria-describedby="button-addon1" value.bind="c.maxScaleValue">
+                </div>
+                
+
+
+
+                <i class="fa fa-times close-button ml-auto" aria-hidden="true" click.delegate="removeColumn(c, 'column')"></i>
+
+
+              </div>
+
+              <div if.bind="reportObject.Columns.length == 0" 
+                  class="jumbotron jumbotron-fill">
+                  <h1 class="display-4">Drag columns here...</h1>
+                  <p class="lead">Reports are made up of data columns. Drag some here from the left!</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div if.bind="reportObject.Report != null" class="row mb-2">
+        <div class="col">
+          <div class="card">
+            <div class="card-header d-flex align-items-center" style="padding-top: 5px; padding-bottom: 5px;">
+              <i class="fa fa-filter mr-1" aria-hidden="true"></i> Filters
+
+
+              <div class="input-group ml-auto" style="max-width: 320px;">
+                <div class="input-group-prepend">
+                  <button class="btn ${useDateRange ? 'btn-primary' : 'btn-outline-secondary'}" 
+                    type="button" id="button-addon1" click.delegate="toggleDateRange()">
+                    <i class="fa ${useDateRange ? 'fa-check-square-o' : 'fa-square-o'} mr-1" aria-hidden="true"></i>
+                    <i class="fa fa-calendar mr-1" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <input disabled.bind="!useDateRange" value.bind="startDate" style="padding-right: 0;" type="date" class="form-control" placeholder="start date..." aria-describedby="button-addon1">
+                <input disabled.bind="!useDateRange" value.bind="endDate" style="padding-right: 0;" type="date" class="form-control" placeholder="end date..." aria-describedby="button-addon1">
+              </div>
+
+
+            </div>
+            <div id="report-filters" class="card-body d-flex flex-wrap"
+                drop.trigger="drop($event)" dragover.trigger="allowDrop($event)">
+
+              <div repeat.for="f of reportObject.Filters"
+                    class="column-box">
+
+                    <div if.bind="!$first" class="btn-group mr-1" role="group">
+                      <button type="button" class="btn btn-outline-primary btn-sm ${f.previousOperatorAnd ? 'active' : ''}"
+                        click.delegate="f.togglePrevious()">AND</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm ${f.previousOperatorOr ? 'active' : ''}"
+                        click.delegate="f.togglePrevious()">OR</button>
+                    </div>
+
+                    <div class="font-weight-bold mr-1 pb-2 d-inline-block text-uppercase">${f.data.OD_ReportAvailableColumns.TableFriendlyName}</div>
+                    <div class="d-inline-block text-uppercase">${f.data.OD_ReportAvailableColumns.ColumnFriendlyName}</div>
+
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <select value.bind="f.currentFilter" class="custom-select">
+                          <option repeat.for="v of f.currentFilterValues" model.bind="v">${v.friendlyOperator}</option>
+                        </select>
+                      </div>
+                      <input type.bind="f.inputType" class="form-control" placeholder="value" value.bind="f.data.Value" aria-describedby="basic-addon1">
+                    </div>
+
+                    <i class="fa fa-times close-button ml-auto" aria-hidden="true" click.delegate="removeColumn(f, 'filter')"></i>
+              </div>
+
+              <div if.bind="reportObject.Filters.length == 0" 
+                  class="jumbotron jumbotron-fill">
+
+                  <h1 class="display-4">Drag filters here...</h1>
+                  <p class="lead">Reports can contain additional data columns that filter your report results. Drag some here from the left!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="col pl-0">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-sort mr-1" aria-hidden="true"></i>Order
+            </div>
+            <div id="report-order" class="card-body d-flex flex-wrap" 
+                  drop.trigger="drop($event)" dragover.trigger="allowDrop($event)">
+
+              <div repeat.for="o of reportObject.OrderBy"
+                  class="column-box">
+                  <div class="font-weight-bold mr-1 d-inline-block text-uppercase">${o.data.OD_ReportAvailableColumns.TableFriendlyName}</div>
+                  <div class="d-inline-block text-uppercase">${o.data.OD_ReportAvailableColumns.ColumnFriendlyName}</div>
+
+                  <div class="btn-group d-flex" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm ${o.sortAscending ? 'active' : ''}"
+                      click.delegate="o.toggleSort()">ASC</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm ${!o.sortAscending ? 'active' : ''}"
+                      click.delegate="o.toggleSort()">DESC</button>
+                  </div>
+                  <i class="fa fa-times close-button ml-auto" aria-hidden="true" click.delegate="removeColumn(o, 'order')"></i>
+              </div>
+
+              <div if.bind="reportObject.OrderBy.length == 0" 
+                  class="jumbotron jumbotron-fill">
+
+                  <h1 class="display-4">Drag ording columns here...</h1>
+                  <p class="lead">Reports can contain additional data columns that order (or sort) your report results. Drag some here from the left!</p>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+
+      <!-- <div if.bind="reportObject.Report != null" class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-sort mr-1" aria-hidden="true"></i>Order
+            </div>
+            <div id="report-order" class="card-body d-flex flex-wrap" 
+                  drop.trigger="drop($event)" dragover.trigger="allowDrop($event)">
+
+              <div repeat.for="o of reportObject.OrderBy"
+                  class="column-box">
+                  <div class="font-weight-bold mr-1 d-inline-block text-uppercase">${o.data.OD_ReportAvailableColumns.TableFriendlyName}</div>
+                  <div class="d-inline-block text-uppercase">${o.data.OD_ReportAvailableColumns.ColumnFriendlyName}</div>
+                  <div class="btn-group d-flex" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm ${o.sortAscending ? 'active' : ''}"
+                      click.delegate="o.toggleSort()">ASC</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm ${!o.sortAscending ? 'active' : ''}"
+                      click.delegate="o.toggleSort()">DESC</button>
+                  </div>
+                  <i class="fa fa-times close-button ml-auto" aria-hidden="true" click.delegate="removeColumn(o, 'order')"></i>
+              </div>
+
+              <div if.bind="reportObject.OrderBy.length == 0" 
+                  class="jumbotron jumbotron-fill">
+
+                  <h1 class="display-4">Drag ording columns here...</h1>
+                  <p class="lead">Reports can contain additional data columns that order (or sort) your report results. Drag some here from the left!</p>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+
+
+
+
+    </div>
+  </div>
+</template>

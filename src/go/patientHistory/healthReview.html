@@ -1,0 +1,32 @@
+<template>
+
+  <require from="../customElements/myCheckbox"></require>
+
+  <div class="col-md-12">
+    <div repeat.for="h of history.ros" class="card mb-2">
+      <div class="card-header py-0">
+        <div class="d-inline-block align-middle py-2 h4 m-1">${h.category}</div>
+        <my-checkbox repeat.for="d of h.data"
+                     if.bind="d.visible && $index == 0"
+                     class="d-inline-block m-1 float-right text-primary"
+                     selected.bind="d.selected"
+                     value.bind="d.name"
+                     editing.bind="d.editing"
+                     click.delegate="d.select()"></my-checkbox>
+      </div>
+      <div if.bind="h.displayBody" class="card-body">
+
+        <div class="row row-cols-2">
+          <div repeat.for="d of h.data"
+               if.bind="d.visible && $index > 0"
+               class="col">
+            <my-checkbox selected.bind="d.selected"
+                         value.bind="d.name"
+                         editing.bind="d.editing"
+                         click.delegate="d.select()"></my-checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

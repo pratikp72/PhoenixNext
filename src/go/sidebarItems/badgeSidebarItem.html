@@ -1,0 +1,58 @@
+<template>
+
+  <style>
+    .sidebar-item-disabled .nav-link{
+      color: #adb5bd;
+      pointer-events: none;
+      background-color: #fff;
+    }
+  </style>
+
+  <li if.bind="!item.moreMenu" id.bind="item.id" style="height: 65px; width: 71px;" class="${item.disabled ? 'sidebar-item-disabled' : ''}">
+    <a href="#" click.delegate="togglePicker(item.togglePickerValue)"  class="nav-link py-3 border-top" title.bind="item.title" data-bs-toggle="tooltip" data-bs-placement="right">
+
+      <span class="fa-stack">
+        <template if.bind="item.iconStack">
+          <i class="fa ${item.icon} fa-stack-2x"></i>
+          <i class="fa ${item.iconStack} fa-stack-1x text-light"></i>
+        </template>
+        <template if.bind="!item.iconStack">
+          <i class="fa ${item.icon} fa-stack-2x"></i>
+        </template>
+      </span>
+
+      <span if.bind="item.badgeCount > 0" 
+            class="top-0 start-100 
+            translate-middle 
+            badge rounded-pill 
+            bg-danger text-light" 
+            style="position: relative;
+            left: 16px;
+            bottom: 40px;">
+        ${item.badgeCount}
+      </span>
+    </a>
+  </li>
+
+  <div if.bind="item.moreMenu" style="height: 67px; width: 71px; background-color: #f8f9fa; border: 1px solid #dee2e6;" class="${item.disabled ? 'sidebar-item-disabled' : ''}">
+    <a href="#" click.delegate="togglePicker(item.togglePickerValue)"  class="nav-link py-3 border-top" title.bind="item.title" data-bs-toggle="tooltip" data-bs-placement="right">
+      <span if.bind="item.iconStack" class="fa-stack">
+        <i class="fa ${item.icon} fa-stack-2x"></i>
+        <i class="fa ${item.iconStack} fa-stack-1x text-light"></i>
+      </span>
+      <i if.bind="!item.iconStack" class="fa ${item.icon} fa-2x"></i>
+      <span if.bind="item.badgeCount > 0" 
+            class="top-0 start-100 
+            translate-middle badge 
+            rounded-pill bg-danger 
+            text-light" 
+            style="position: relative;
+            left: 16px;
+            bottom: 40px;">
+        ${item.badgeCount}
+      </span>
+    </a>
+  </div>
+
+
+</template>

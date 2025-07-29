@@ -1,0 +1,82 @@
+
+<template>
+    <ux-dialog ref="rulesdialog">
+        <ux-dialog-header>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4>Rules for ${pdfTemplate.Name}</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-days" role="tab" aria-controls="pills-home" aria-selected="true" click.delegate="setActiveRule('DAYS')">Days</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-procedures" role="tab" aria-controls="pills-profile" aria-selected="false" click.delegate="setActiveRule('PROCEDURE')">Procedures</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <template if.bind="errorMessage">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <span class="text-danger">${errorMessage}</span>
+                    </div>
+                </div>
+            </template>
+        </ux-dialog-header>
+        <ux-dialog-body>
+
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-days" role="tabpanel" aria-labelledby="pills-home-tab">
+
+                    <form>
+                        <div class="form-group">
+                            <label for="inputDaysPdfValid">Days PDF Valid</label>
+                            <input value.bind="daysValue" type="number" class="form-control" id="inputDaysPdfValid" aria-describedby="emailHelp" placeholder="Enter days">
+                            <small id="daysPdfValidHelp" class="form-text text-muted">Enter how many days this PDF will be valid before being displayed to the patient again.</small>
+                        </div>
+                        <button click.delegate="saveClicked()" disabled.bind="saving" class="btn btn-outline-secondary">Save</button>
+                        <button click.delegate="deleteClicked()" disabled.bind="saving" class="btn btn-outline-secondary">Delete</button>
+                    </form>
+
+                </div>
+                <div class="tab-pane fade" id="pills-procedures" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+                    <form>
+                        <div class="form-group">
+                            <label for="inputProcedureCode">Show PDF For Procedure Code</label>
+                            <input value.bind="procedureValue" type="text" class="form-control" id="inputProcedureCode" aria-describedby="emailHelp" placeholder="Enter Procedure Code">
+                            <small id="procedureInputHelp" class="form-text text-muted">If the patient has undergone this procedure within the below range of weeks, this PDF will be displayed.</small>
+                        </div>
+
+                        <label for="inputFrom">Weeks Since Procedure:</label>
+
+                        <div class="form-row">
+                            <div class="form-group col-sm-6">
+                                <label for="inputFrom">From</label>
+                                <input value.bind="procedureFromValue" type="number" class="form-control" id="inputFrom" placeholder="Enter Weeks From">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="inputTo">To</label>
+                                <input value.bind="procedureToValue" type="number" class="form-control" id="inputTo" placeholder="Enter Weeks To">
+                            </div>
+                        </div>
+
+                        <button click.delegate="saveClicked()" disabled.bind="saving" class="btn btn-outline-secondary">Save</button>
+                        <button click.delegate="deleteClicked()" disabled.bind="saving" class="btn btn-outline-secondary">Delete</button>
+                    </form>
+
+                </div>
+            </div>
+
+        </ux-dialog-body>
+<!--        <ux-dialog-footer>-->
+<!--            <button click.delegate="saveClicked()">Save</button>-->
+<!--            <button click.delegate="deleteClicked()">Delete</button>-->
+<!--        </ux-dialog-footer>-->
+
+    </ux-dialog>
+</template>

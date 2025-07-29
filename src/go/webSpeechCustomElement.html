@@ -1,0 +1,4 @@
+<template>
+  <i class="fa ${enabled ? 'fa-microphone' : 'fa-microphone-slash'} fa-2x" style="position: absolute; right: 20px; padding: 10px;" css="color:${buttonColor}" aria-hidden="true" click.delegate="speechClicked()"></i> <!--click.delegate="startButton($event)"></i>-->
+  <textarea ref="domtextarea" rows="10" style="width: 100%; height: 100%;" value.bind="textArea" blur.trigger="blurred()"></textarea>
+</template>

@@ -1,0 +1,57 @@
+<template>
+    <div class="card-header py-0">
+      <span class="d-inline float-left py-2 h6">MED ALLERGY <small class="text-muted">${meds.length}</small></span>
+      <ul class="nav nav-tabs card-header-tabs justify-content-end pr-4">
+        <li class="nav-item">
+          <a class="nav-link active" class.bind="displayMeds ? 'active' : ''"  href="#" click.delegate="medsTabClicked(true)">Meds</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" class.bind="!displayMeds ? 'active' : ''" click.delegate="medsTabClicked(false)">Allergies</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body overflow-auto p-0">
+      <div if.bind="displayMeds" class="tableFixHeadLight" style="height: auto;">
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th scope="col" style="background: #f7f7f7; border-top: none;" class="${home.currentBoard.editing ? 'tableFixHeadLightEditing' : ''}">Med</th>
+            <th scope="col" style="background: #f7f7f7; width: 25%;" class="${home.currentBoard.editing ? 'tableFixHeadLightEditing' : ''}">Last Refill</th>
+            <th scope="col" style="background: #f7f7f7;" class="${home.currentBoard.editing ? 'tableFixHeadLightEditing' : ''}">Status</th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="m of meds">
+            <tr hammer-swipe.call="rowSwipe($event, m)"
+                css="background-color: ${m.isEven() ? '#f2f2f2' : ''}"><!--#f2f2f2-->
+              <td>${m.description}</td>
+              <td>${m.lastRefill}</td>
+              <td>${m.status}</td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+
+      <!--allergies-->
+      <div if.bind="!displayMeds" class="tableFixHeadLight">
+        <table class="table table-striped table-sm">
+          <thead>
+          <tr>
+            <th scope="col">Allergy</th>
+            <th scope="col">Reaction</th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="a of allergies">
+            <tr hammer-swipe.call="rowSwipe($event, a)"
+                css="background-color: ${a.isEven() ? '#f2f2f2' : ''}"><!--#f2f2f2-->
+              <td>${a.description}</td>
+              <td>${a.reaction}</td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+</template>

@@ -1,0 +1,24 @@
+<template>
+
+  <!-- <form> -->
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label>Enable E-Prescribe</label>
+          <select value.bind="erxEnabled" class="form-control">
+            <option model.bind="null">Choose...</option>
+            <option model.bind="true">Enabled</option>
+            <option model.bind="false">Disabled</option>
+          </select>
+        </div>
+        <div if.bind="erxEnabled" class="form-group col-md-6">
+          <label> E-RX Username</label>
+          <input type="text" class="form-control ${user.eRxUserID.length==0 || user.eRxUserID == null ? 'is-invalid' : ''}" 
+            value.bind="user.eRxUserID" aria-describedby="usernameError" placeholder="some e-prescribe username">
+          <div id="usernameError" class="invalid-feedback">
+            E-Prescribe username is required
+          </div>
+        </div>
+      </div> 
+    <!-- </form> -->
+
+</template>

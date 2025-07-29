@@ -1,0 +1,38 @@
+<template>
+
+  <!-- <require from="../webSpeechCustomElement"></require> -->
+  <require from="../examRowCustomAttribute"></require>
+
+
+  <div class="card-header d-flex align-items-center" style="height: 44px;">
+    <h6 class="mb-0 mr-2">${title}</h6>
+
+    <div class="dropdown mr-2" style="position: inherit;">
+      <button class="btn btn-outline-primary dropdown-toggle" style="padding: 4px 12px 4px 12px;" disabled.bind="locked" type="button" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-plus mr-1" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item px-3" href="#" click.delegate="previousClick()"><i class="fa fa-arrow-circle-left fa-fw pr-2" aria-hidden="true"></i>Previous Exam</a>
+      </div>
+    </div>
+
+    <!-- <div class="dropdown" style="position: inherit;">
+      <button class="btn btn-outline-primary dropdown-toggle" 
+              style="padding: 4px 12px 4px 12px;" 
+              disabled.bind="home.saveQueue.isSaving" 
+              type="button" data-toggle="dropdown" aria-expanded="false">
+        <i class="fa fa-list-alt" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu" 
+           style="overflow: scroll; max-height: 350px;">
+        <a class="dropdown-item px-3" repeat.for="f of home.examGoForms" href="#" 
+          click.delegate="home.openGoForm(f)">
+            <i class="fa fa fa-list-alt text-secondary fa-fw pr-2" aria-hidden="true"></i>${f.Description}</a>
+      </div>
+    </div> -->
+
+  </div>
+  <div ref="cardbody" class="card-body p-1 overflow-hidden">
+    <textarea examrow readonly.bind="locked" rows="10" style="width: 100%; height: 100%; overflow-y: scroll; border: none; resize: none;" value.bind="examText" blur.trigger="trySave()"></textarea><!--css="height:${textareaHeight}px;"-->
+  </div>
+</template>

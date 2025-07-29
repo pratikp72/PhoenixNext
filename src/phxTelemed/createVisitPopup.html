@@ -1,0 +1,65 @@
+
+<template>
+<!--  <ux-dialog ref="taskdialog" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">-->
+  <ux-dialog>
+    <ux-dialog-header>
+      <!--      <i class.bind="iconClass" aria-hidden="true"-->
+      <!--         css="color: ${color};"-->
+      <!--         style="padding: 5px 5px 5px 0px;-->
+      <!--           vertical-align: baseline;"></i>-->
+      <h4 style="display: inline-block; margin-bottom: 0px;">Create Visit</h4>
+
+      <i class="fa fa-times fa-lg" style="cursor: pointer; float: right;" click.delegate="cancel()"></i>
+
+    </ux-dialog-header>
+
+<!--    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">-->
+    <ux-dialog-body>
+
+      <form>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="visittype">Visit Type</label>
+            <select id="visittype" class="form-control"
+                    value.bind="selectedVisitType" required>
+              <option model.bind="null">Select...</option>
+              <option repeat.for="v of visitTypes"
+                      model.bind="v">
+                ${v}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="bodypart">Body Part</label>
+            <select id="bodypart" class="form-control"
+                    value.bind="selectedBodypart" required>
+              <option model.bind="null">Select...</option>
+              <option repeat.for="b of bodyParts"
+                      model.bind="b">
+                ${b}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="bodyside">Body Side</label>
+            <select id="bodyside" class="form-control"
+                    value.bind="selectedBodyside" required>
+              <option model.bind="null">Select...</option>
+              <option repeat.for="s of bodySides"
+                      model.bind="s">
+                ${s}
+              </option>
+            </select>
+          </div>
+        </div>
+      </form>
+
+
+    </ux-dialog-body>
+    <ux-dialog-footer>
+<!--    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">-->
+            <button click.delegate="close()">OK</button>
+      <!--      <button click.delegate="cancel()">Cancel</button>-->
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

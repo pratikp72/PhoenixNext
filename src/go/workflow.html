@@ -1,0 +1,72 @@
+<template>
+
+  <require from="./customElements/myCheckbox"></require>
+
+  <div id="workflow" class="card h-100" style="width: 460px; box-shadow: 2px 5px .25rem rgba(0,0,0, 0.3);">
+    <div class="card-header d-flex pl-3 pr-2">
+      <i class="fa fa-cubes fa-2x pr-2" aria-hidden="true"></i>
+
+      <select value.bind="selectedProvider" class="form-control" change.delegate="providerSelected()">
+        <option model.bind="null">Choose...</option>
+        <option repeat.for="p of providers" model.bind="p" >${p.ProviderEntity}</option>
+      </select>
+
+      <i class="fa fa-user fa-2x px-2" aria-hidden="true" click.delegate="openProviderPref()"></i>
+
+      <div class="input-group ml-auto">
+        <abp-datetime-picker style="width: 120px;" icon-base="font-awesome" with-date-icon="false" element.bind="datepicker" value.bind="flowdate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar()"> <i class="fa fa-calendar"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div if.bind="displayPref" class="card-body">
+      <!--DISPLAY PROVIDER PREF-->
+      <h4>Workflow Preference</h4>
+      <small class="form-text text-muted">Select which encounter elements you wish to include in your workflow calculation.</small>
+      <div class="row row-cols-2">
+        <div repeat.for="h of providerPref.prefs"
+             class="col">
+          <my-checkbox selected.bind="h.selected"
+                       value.bind="h.name"
+                       editing.bind="h.editing"
+                       click.delegate="h.select()"></my-checkbox>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary float-right" click.delegate="openProviderPref()">Done</button>
+    </div>
+
+    <div if.bind="!displayPref" style="overflow-y: scroll;">
+      <div repeat.for="r of rows" class="card mx-2 mt-2 mb-0 ${r.status ? 'alert-success' : 'alert-danger'}">
+        <div class="card-body h5 mb-0 p-2">
+          <div class="d-flex align-items-center">
+            <div click.delegate="r.toggleReason()"><i class="fa fa-cube pr-1" aria-hidden="true"></i>
+              ${r.date}
+              <i if.bind="!r.status" class="fa fa-caret-down px-1" aria-hidden="true"></i>
+            </div>
+            <div class="ml-auto" click.delegate="loadPatient(r)">
+              ${r.name}
+              <i class="fa fa-folder-open-o px-1" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div if.bind="r.displayReason" class="text-muted py-2">${r.reason}</div>
+        </div>
+      </div>
+      <!--NO ROWS FOUND??-->
+      <div if.bind="rows.length == 0" class="card mx-2 mt-2 mb-0">
+        <div class="card-body h5 mb-0 p-2">
+          <div class="d-flex align-items-center justify-content-center">
+            <div class="text-secondary">No rows found.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <i if.bind="displaySpinner" class="fa fa-spinner fa-pulse fa-3x fa-fw" style="margin: auto;"></i>
+
+  </div>
+
+  <i class="fa fa-caret-left fa-3x" style="position: absolute; top: 280px; left: -16px;"></i>
+
+</template>

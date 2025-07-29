@@ -1,0 +1,85 @@
+<template>
+
+  <style>
+    .fa-disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-md-4 pr-0" css="height: ${height}px;" style="overflow-y:auto;">
+      <div class="accordion" id="accordionExample">
+
+        <div repeat.for="group of list" class="card">
+          <div class="card-header" id.bind="group.headingId">
+            <div class="mb-0 d-inline-block w-100">
+              <button class="btn btn-block text-left py-0" type="button"
+                      style="font-size: 1.2rem;font-weight: 500;line-height: 1.2;"
+                      data-toggle="collapse" data-target.bind="group.dataTarget"
+                      aria-expanded="true" aria-controls.bind="group.collapseId"
+                      click.delegate="selectGroup(group)"><!--btn-link -->
+                ${group.description}
+                <i class="fa ${group.expanded ? 'fa-angle-down' : 'fa-angle-up'} float-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div id.bind="group.collapseId" class="collapse ${group.expanded ? 'show' : ''}" aria-labelledby.bind="group.headingId" data-parent="#accordionExample">
+            <ul class="list-group">
+              <li repeat.for="i of group.items" class="list-group-item ${i.selected ? 'active' : ''}" click.delegate="itemClick(i, group)">${i.description}</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PICKLIST Maintenance-->
+    <div class="col-md-8">
+      <div class="card" css="height: ${height}px;">
+        <div class="card-header">
+
+          <div class="form-group mb-0 d-inline-block w-25">
+            <select value.bind="selectedProvider" class="form-control custom-select ${providerInvalid ? 'is-invalid' : ''} ${selectedItem.providerRequired ? '' : 'fa-disabled'}" change.delegate="providerSelected()">
+              <option model.bind="null">Provider...</option>
+              <option scheduleprovider repeat.for="p of home.allProviders" model.bind="p" >${p.ProviderEntity}</option>
+            </select>
+          </div>
+
+
+          <i class="fa fa-plus text-primary fa-2x float-right ${!canAddItem ? 'fa-disabled' : '' }" aria-hidden="true" click.delegate="addClick()"></i>
+        </div>
+        <div class="card-body" style="overflow-y:auto;">
+          <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Description1</th>
+              <th if.bind="selectedItem.displayDescription2Column" scope="col">Description2</th>
+              <th if.bind="selectedItem.displayBodypartColumn" scope="col">
+                <div class="dropdown">
+                  <button class="btn btn-link dropdown-toggle p-0 font-weight-bold text-dark" type="button" data-toggle="dropdown" aria-expanded="false">
+                    ${selectedBodypartFilter}
+                  </button>
+                  <div class="dropdown-menu">
+                    <a repeat.for="b of bodyparts" class="dropdown-item" href="#" click.delegate="filterListByBodypart(b)">${b}</a>
+                  </div>
+                </div>
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr repeat.for="l of selectedItem.items">
+              <td style="vertical-align: middle;"><button type="button" class="btn btn-primary" click.delegate="editItem(l)">Edit</button></td>
+              <td style="vertical-align: middle;">${l.data.Description1}</td>
+              <td if.bind="selectedItem.displayDescription2Column" style="vertical-align: middle;">${l.data.Description2}</td>
+              <td if.bind="selectedItem.displayBodypartColumn" style="vertical-align: middle;">${l.data.BodyPart}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,30 @@
+<template>
+  <div class="card-header pr-1" style="height: 44px;">
+    <h6 class="float-left mb-0"><i class="fa fa-list pr-2" aria-hidden="true"></i>Case Manager <small class="text-muted">${rows.length}</small></h6>
+    <a class="btn btn-default float-right ${locked ? 'disabled' : ''}" href="#" style="padding: 0 50px 0 0; margin-top: -7px;">
+      <i class="fa fa-plus fa-2x text-primary"  click.delegate="addAuth()"></i></a>
+  </div>
+  <div class="card-body p-0" style="overflow-y: scroll;">
+    <div repeat.for="s of rows" class="card-body p-2 position-relative ${s.data.State == 'ACTIVE' ? 'alert-success' : 'alert-danger'}" style="border-bottom: 1px solid #cbcbcb;">
+
+      <h5 class="d-flex">
+        <div class="font-weight-bold pr-2">
+          <i class="fa fa-calendar pr-1" aria-hidden="true"></i>${s.caseDate}
+          <i class="fa fa-address-card-o ml-2" aria-hidden="true" click.delegate="contactsClicked(s)"></i>
+        </div>
+        <i class="fa fa-angle-right fa-2x ml-auto alert-link pl-4 pr-2" style="position: absolute; right: 10px; font-weight: normal;" click.delegate="edit(s)"></i>
+      </h5>
+      <div class="mb-2 d-flex">
+        <div class="flex-fill pr-2">
+          <span class="pr-1 font-weight-bold"><i class="fa fa-calendar-o pr-1" aria-hidden="true"></i>Injury Date:</span><span>${s.injuryDate}</span>
+        </div>
+        <div class="flex-fill pr-2">
+          <span class="pr-1 text-uppercase font-weight-bold">${s.bodypart}</span>
+        </div>
+      </div>
+      <p class="card-text text-muted">${s.data.CaseInjDetail}</p>
+
+    </div>
+  </div>
+</template>
+

@@ -1,0 +1,31 @@
+<template>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <small id="daysInWeekHelp" class="form-text text-muted">Days in week</small>
+      <div repeat.for="d of daysInWeek" class="form-check" id="daysInWeekHelp">
+        <input class="form-check-input" type="checkbox" checked.bind="d.selected" id="defaultCheck1">
+        <label class="form-check-label" for="defaultCheck1">
+          ${d.day}
+        </label>
+      </div>
+    </div>
+    <div class="form-group col-md-4">
+      <small id="slotIncrements" class="form-text text-muted">Appointment slot minutes</small>
+      <input type="number" placeholder="minutes" class="form-control" value.bind="slotIncrementMinutes" aria-describedby="slotIncrements">
+    </div>
+    <div class="form-group col-md-4">
+      <small id="startTimeOfDay" class="form-text text-muted">Day start time</small>
+      <input ref="inputStartTime" type="time" class="form-control" 
+        value.bind="startTime" 
+        aria-describedby="startTimeOfDay">
+
+      <small id="endTimeOfDay" class="form-text text-muted">Day end time</small>
+      <input ref="inputEndTime" type="time" class="form-control" 
+        value.bind="endTime" 
+        aria-describedby="endTimeOfDay">
+
+    </div>
+
+    <button class="btn btn-primary ml-auto mr-2" type="button" click.delegate="save()">Save</button>
+  </div>
+</template>

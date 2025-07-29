@@ -1,0 +1,30 @@
+<template>
+
+  <style>
+    .dialog-header-content{
+      display: flex !important;
+    }
+  </style>
+
+
+  <ux-dialog ref="genpicklist" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">${header}</h4>
+      <i class="fa fa-times fa-2x ml-auto mr-2" style="cursor: pointer;" click.delegate="cancel()"></i>
+    </ux-dialog-header>
+    <ux-dialog-body>
+      <div class="row">
+        <div class="col-md-12">
+          ${description}
+          <select value.bind="selectedItem" class="form-control" id="exampleFormControlSelect1">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="p of items" model.bind="p" >${p.description}</option>
+          </select>
+        </div>
+      </div>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button click.delegate="ok()">OK</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

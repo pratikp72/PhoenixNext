@@ -1,0 +1,61 @@
+
+<template>
+  <ux-dialog css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header>
+      <h4 style="display: inline-block; margin-bottom: 0px;">Procedure</h4>
+    </ux-dialog-header>
+    <ux-dialog-body style="position: absolute;width: 100%;height: 70%;">
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control"
+               placeholder="search code or description..."
+               aria-label="search code or description..."
+               aria-describedby="button-addon2" value.bind="searchString">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary"
+                  type="button" id="button-addon2" click.delegate="searchClicked()">Search</button>
+        </div>
+      </div>
+
+      <div class="tableFixHeadLight" css="height: ${popupHeight - 198}px;">
+        <table class="table table-sm">
+          <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Desc</th>
+            <th scope="col"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="s of searchResults">
+            <tr click.delegate="rowClicked(s)" class.bind="s.selected ? 'table-primary' : 'table-light'">
+              <td>${s.code}</td>
+              <td>${s.description}</td>
+              <td>
+
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span if.bind="s.modifier">${s.modifier}</span>
+                    <span if.bind="!s.modifier">MOD</span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <template repeat.for="m of modifiers">
+                      <a class="dropdown-item" href="#" click.delegate="setSelectedModifier(s, m)">${m}</a>
+                    </template>
+                  </div>
+                </div>
+
+              </td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+
+    </ux-dialog-body>
+    <ux-dialog-footer style="position: absolute; width: 100%; bottom: 0; padding-right: 15px;">
+      <button click.delegate="close()">OK</button>
+      <button click.delegate="cancel()">Cancel</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

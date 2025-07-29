@@ -1,0 +1,127 @@
+<template>
+
+  <style>
+    .form-group {
+      margin-bottom: 0.5rem;
+    }
+    .demo-icon-select > div{
+      border-left: 1px solid grey;
+      border-top: 1px solid grey;
+      border-bottom: 1px solid grey;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      background-color: white;
+    }
+
+    .demo-icon{
+      border-left: 1px solid grey;
+      border-right: 1px solid grey;
+    }
+
+    .demo-top-icon{
+      border-right: 1px solid grey;
+    }
+
+
+    .photo {
+      width: 100%;
+      float: left;
+    }
+
+    .player {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width:200px;
+    }
+
+  </style>
+
+  <div id="demotop" class="card border-left-0 h-100" css="width:${currentWidth}px;" style="box-shadow: 5px 5px 4px rgba(0,0,0,0.25); border-top-left-radius: 0;">
+
+  <div ref="demo" class="row p-0 m-0 h-100">
+
+
+    <div class="d-flex flex-column" style="width: 4.5rem; background-color: #DFE1E5;">
+      <div class="py-0 pl-2 pr-0" style="border-right: 1px solid grey;">
+        <div style="height: 6px;">
+
+        </div>
+      </div>
+      <div class="text-center py-0 pl-2 pr-0 ${demographicsVisible ? 'demo-icon-select' : 'demo-top-icon'}">
+        <div class="py-2"><!--<div class="${demographicsVisible ? 'demo-icon-select' : ''} py-2">-->
+          <a href="#" click.delegate="toggleNavigation('demographics')"  class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Dashboard">
+            <i class="fa fa-user fa-2x"></i>
+          </a>
+        </div>
+      </div>
+      <div class="text-center py-0 pl-2 pr-0 ${visitsVisible ? 'demo-icon-select' : 'demo-icon'}" style="border-left: 1px solid grey;">
+        <div class="py-2">
+          <a href="#" click.delegate="toggleNavigation('visits')"  class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Dashboard">
+            <i class="fa fa-calendar fa-2x"></i>
+          </a>
+        </div>
+      </div>
+      <div class="text-center py-0 pl-2 pr-0 ${pastHistoryVisible ? 'demo-icon-select' : 'demo-icon'}" style="border-left: 1px solid grey;">
+        <div class="py-2"> 
+          <a href="#" click.delegate="toggleNavigation('history')"  class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fa fa-heartbeat fa-2x"></i>
+          </a>
+        </div>
+      </div>
+      <div class="text-center py-0 pl-2 pr-0 ${filesVisible ? 'demo-icon-select' : 'demo-icon'}" style="border-left: 1px solid grey;">
+        <div class="py-2"> 
+          <a href="#" click.delegate="toggleNavigation('files')"  class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fa fa-folder fa-2x"></i>
+          </a>
+        </div>
+      </div>
+      <div class="text-center py-0 pl-2 pr-0 ${patientAlertVisible ? 'demo-icon-select' : 'demo-icon'}" style="border-left: 1px solid grey;">
+        <div class="py-2"> 
+          <a href="#" click.delegate="toggleNavigation('alert')"  class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fa fa-exclamation-triangle fa-2x"></i>
+          </a>
+        </div>
+      </div>
+      <div class="flex-grow-1" style="border-left: 1px solid grey; border-right: 1px solid grey;">
+      </div>
+    </div>
+
+
+
+
+
+    <div style="flex: 1;"><!-- class="col-md-10 pr-0">-->
+        <!--TOGGLE DIFFERENT SECTIONS HERE-->
+      <!--VISIT PICKER-->
+      <compose if.bind="visitsVisible" view-model="./visitPicker" model.bind="patientVisits" containerless></compose>
+
+      <div if.bind="demographicsVisible" class="container-fluid h-100 w-100">
+
+        <div class="row h-100">
+          <div class="col px-3 pt-2 pb-3">
+            <compose view-model="./patientDetails" model.bind="$this" containerless></compose>
+          </div>
+        </div>
+      </div>
+
+      <div if.bind="pastHistoryVisible" class="px-3 py-2">
+        <!--PAST MEDICAL HISTORY-->
+        <compose view-model="./patientHistory/patientHistory" model.bind="$this" containerless></compose>
+      </div>
+
+      <div if.bind="filesVisible" class="px-3 py-2">
+        <!--File Folder-->
+        <compose view-model="./fileFolder" model.bind="$this" containerless></compose>
+      </div>
+
+      <div if.bind="patientAlertVisible" class="px-3 py-2">
+        <!--File Folder-->
+        <compose view-model="./patientHistory/patientAlert" model.bind="$this" containerless></compose>
+      </div>
+
+    </div>
+  </div>
+  </div>
+
+</template>

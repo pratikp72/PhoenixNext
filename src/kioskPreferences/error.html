@@ -1,0 +1,22 @@
+
+<template>
+    <ux-dialog>
+        <ux-dialog-header>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4 class="text-danger">Error</h4>
+                </div>
+            </div>
+        </ux-dialog-header>
+        <ux-dialog-body>
+            <div class="row">
+                <div innerHtml.bind="message" class="col">
+                </div>
+            </div>
+        </ux-dialog-body>
+        <ux-dialog-footer>
+            <button click.delegate="okClicked()">Ok</button>
+        </ux-dialog-footer>
+
+    </ux-dialog>
+</template>

@@ -1,0 +1,136 @@
+<template>
+
+  <require from="./container"></require>
+  <require from="./tools/text-toolbar"></require>
+
+  <style>
+    .page-selected {
+      border: 1px dashed #007bff;
+    }
+    .point-three-border{
+      border: 1px solid rgba(0, 0, 0, 0.3);
+    }
+    .btn-outline-primary:focus,
+    .btn-outline-primary:active{
+        box-shadow:none !important;
+        outline:0px !important;
+    }
+    .btn-outline-primary:hover {
+      color: #fff;
+      background-color: #007bff !important;
+      border-color: #007bff;
+    }
+    .marquee-selected{
+      color: #fff;
+      background-color: #007bff !important;
+    }
+
+    .submit-button{
+      cursor: pointer;
+      position: fixed;
+      z-index: 1000;
+      top: 16px;
+      right: 16px;
+    }
+
+    .submit-button-parent-toolbar{
+      float: right;
+      margin-right: 10px;
+      right: 10px;
+      top: 10px;
+      position: sticky;
+    }
+
+    .preference-toolbar{
+      float: right;
+      margin-right: 10px;
+      right: 10px;
+      top: 10px;
+      position: sticky;
+    }
+
+    textarea{
+      min-height:unset !important;
+    }
+
+    .no-lr-margin{
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .no-lr-padding{
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+
+
+
+  </style>
+
+  <div ref="viewerHeader" class="row ${fullWidth ? 'no-lr-margin': ''}" 
+        style="background-color: #e8e8e8; overflow-y: auto;" css="height: ${scrollHeight}px;">
+
+    <div class="col-md-12 ml-auto ${fullWidth ? 'no-lr-padding' : ''}" style="padding-top: 1rem;">
+
+      <!--PREF TOOLBAR-->
+      <div class="d-flex align-items-center preference-toolbar">
+        <div if.bind="showPreferenceToolbar" class="input-group">
+          <select class="custom-select" value.bind="selectedPreference">
+            <option model.bind="null">Choose...</option>
+            <option repeat.for="p of preferences" model.bind="p">${p.Description}</option>
+          </select>
+          <div if.bind="showPreferenceToolbarSave" class="input-group-append">
+            <button type="button" class="btn btn-primary" disabled.bind="!selectedPreference" click.delegate="savePreference()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item ${!selectedPreference ? 'disabled' : ''}" href="#" click.delegate="saveAsPreference()"><i class="fa fa-floppy-o mr-1" aria-hidden="true"></i> Save As</a>
+              <a class="dropdown-item" href="#" click.delegate="newPreference()"><i class="fa fa-plus mr-1" aria-hidden="true"></i> New</a>
+            </div>
+          </div>
+        </div>
+
+        <button if.bind="showSubmit" type="button" 
+          class="btn btn-primary ml-2" 
+          disabled.bind="!isComplete" click.delegate="save()">Submit</button>  
+
+
+        <div if.bind="showReportToolbar" class="input-group">
+          <button type="button" class="btn btn-outline-primary mr-1" click.delegate="exportReportToExcel()">
+            <i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+          <!-- <button type="button" class="btn btn-outline-primary mr-1" click.delegate="exportReportToPdf()">
+            <i class="fa fa-file-pdf-o" aria-hidden="true"></i></button> -->
+          <button type="button" class="btn btn-outline-primary mr-1" click.delegate="printReport()">
+            <i class="fa fa-print" aria-hidden="true"></i></button>
+        </div>
+
+        <!-- <button if.bind="showSettings" type="button" class="btn ml-2" 
+          click.delegate="showMigrateAssistant()"><i class="fa fa-cog text-muted" aria-hidden="true"></i></button>   -->
+
+      </div>
+      
+
+      <!--PAGE-->
+      <template repeat.for="p of form.pages">
+        <div class="w-100 d-flex page" id.bind="p.id">
+          <container id="mainContainer" ref="mycontainer" 
+          items.bind="p.items" 
+          edit.bind="false"
+          fullwidth.bind="fullWidth"
+          class="ml-auto mr-auto mb-3 page-container ${fullWidth ? 'no-lr-margin' : '' }" 
+          css="height:${pageHeight}px; width:${pageWidth}px;" style="display: block;"></container>
+        </div>
+      </template>
+
+      <div class="d-flex align-items-center">
+        <button if.bind="showSubmit" type="button" 
+        class="btn btn-primary ml-auto mr-2 mb-2" 
+        disabled.bind="!isComplete" click.delegate="save()">Submit</button>  
+      </div>
+
+
+    </div>
+  </div>
+</template>

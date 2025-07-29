@@ -1,0 +1,107 @@
+<template>
+
+
+  <style>
+    .returnToDate input{
+      width: 120px;
+    }
+    .form-control{
+      width: unset;
+    }
+
+    td.last {
+      width: 1px;
+      white-space: nowrap;
+    }
+
+    td.fitwidth {
+      width: 1px;
+      white-space: nowrap;
+    }
+
+    .selected{
+      background-color: #d4edda;
+    }
+
+  </style>
+
+
+  <div class="card" css="height: ${phonecallHeight}px;"><!-- style="height: inherit;">-->
+
+    <div class="card-header d-flex align-items-center">
+      <h4 class="m-0"><i class="fa fa-phone mr-2"></i>Phone Call</h4>
+      <i class="fa fa-close fa-2x ml-auto" click.delegate="cancel()"></i></a>
+    </div>
+
+    <div class="card-body pt-2" style="overflow-y: scroll;">
+
+      <div class="d-flex align-items-center pb-2">
+        <h4 class="m-0"><button type="button" class="btn btn-outline-primary mr-1" click.delegate="searchClicked()">
+          <i class="fa fa-search pr-1" aria-hidden="true"></i></button> ${selectedPatient.NameFirst} ${selectedPatient.NameLast}</h4>
+
+<!--        <select disabled.bind="!patientSelected" value.bind="currentUser" class="form-control mr-2 ml-auto">-->
+<!--          <option model.bind="null">Staff...</option>-->
+<!--          <option repeat.for="u of users" model.bind="u" >${u.UserName}</option>-->
+<!--        </select>-->
+
+        <div class="dropdown mr-2 ml-auto">
+          <button disabled.bind="!patientSelected" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-comment pr-1" aria-hidden="true"></i>Message
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" click.delegate="addMessage()"><i class="fa fa-plus pr-1" aria-hidden="true"></i>New</a>
+            <h6 class="dropdown-header">Custom Messages</h6>
+            <a class="dropdown-item text-truncate" style="max-width: 300px;" repeat.for="c of customMessages" href="#" click.delegate="addMessage(c)">
+              <i class="fa fa-plus pr-1" aria-hidden="true"></i>${c.Description1}</a>
+          </div>
+        </div>
+      </div>
+
+
+<!--      <div class="tableFixHeadLight">-->
+        <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th scope="col" style="width: 175px;">Date</th>
+            <th scope="col">Staff</th>
+            <th scope="col">Message</th>
+            <th scope="col" if.bind="displayDeleteHeader" class="au-animate animate-swipe-row-right"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <template repeat.for="m of messages">
+            <tr if.bind="globals.isTouchDevice" hammer-swipe.call="rowSwipe($event, m)"
+                css="background-color: ${m.selected ? '#d4edda' : '' & signal: 'refresh-row'}"
+                click.delegate="selectRow(m)">
+              <td>${m.date}</td>
+              <td class="fitwidth">${m.staff}</td>
+              <td><textarea class="form-control" style="width: 100%; resize: none; overflow: auto;" rows="3" value.bind="m.message" readonly.bind="m.readonly"></textarea></td>
+              <td if.bind="displayDeleteHeader && !m.displayDelete"></td>
+              <td if.bind="m.displayDelete"
+                  style="background-color: #dd3444;vertical-align: middle;"
+                  class="au-animate animate-swipe-row-left animate-swipe-row-right">
+                <button type="button" class="btn btn-danger" style="display: block; margin: auto;"
+                        click.delegate="deletePhoneClick($index)"><i class="fa fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr if.bind="!globals.isTouchDevice" 
+                css="background-color: ${m.selected ? '#d4edda' : '' & signal: 'refresh-row'}"
+                click.delegate="selectRow(m)">
+              <td>${m.date}</td>
+              <td class="fitwidth">${m.staff}</td>
+              <td><textarea class="form-control" style="width: 100%; resize: none; overflow: auto;" rows="3" value.bind="m.message" readonly.bind="m.readonly"></textarea></td>
+              <td style="vertical-align: middle;">
+                <button type="button" class="btn" style="display: block; margin: auto;"
+                        click.delegate="deletePhoneClick($index)"><i class="fa fa-trash"></i></button>
+              </td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+<!--      </div>-->
+
+
+    </div>
+  </div>
+</template>
+

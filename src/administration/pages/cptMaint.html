@@ -1,0 +1,65 @@
+<template>
+
+<style>
+      .spinner-div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    .spinner-icon {
+        margin-left: 50%;
+        margin-top: 200px;
+    }
+
+</style>
+
+  <div class="spinner-div" if.bind="displaySpinner">
+    <i class="fa fa-spinner fa-pulse fa-3x fa-fw spinner-icon"></i><!--fa-pulse fa-3x fa-fw -->
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex align-items-center">
+      <h4 class="d-inline-block m-0 pt-1">Cpt Maint</h4>
+      <i class="fa fa-filter text-secondary ml-auto mr-1" aria-hidden="true"></i>
+      <input type="text" style="width: 350px;" placeholder="Search Code or Description" class="form-control mr-2" value.bind="filter">
+      <i class="fa fa-plus text-primary fa-2x" aria-hidden="true" click.delegate="add()"></i>
+    </div>
+
+    <div class="card-body p-0" style="overflow-y: auto;" css="height:${height}px;">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Code</th>
+            <th scope="col">MFG Code</th>
+            <th scope="col">Description</th>
+            <th scope="col">Type</th>
+            <th scope="col">Part</th>
+            <th scope="col">Billable</th>
+            <th scope="col">Global</th>
+            <th scope="col">Units</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr repeat.for="u of filteredCodes">
+            <th scope="row"><button type="button" class="btn btn-primary" click.delegate="edit(u)">Edit</button></th>
+            <td style="vertical-align: middle;">${u.CptKey}</td>
+            <td style="vertical-align: middle;">${u.Cpt_Code}</td>
+            <td style="vertical-align: middle;">${u.Description}</td>
+            <td style="vertical-align: middle;">${u.Type}</td>
+            <td style="vertical-align: middle;">${u.Body_Part}</td>
+            <td style="vertical-align: middle;">${u.Billable}</td>
+            <td style="vertical-align: middle;">${u.Global}</td>
+            <td style="vertical-align: middle;">${u.Units}</td>
+            <th scope="row"><button type="button" class="btn btn-danger" click.delegate="delete(u)">      
+              <i class="fa fa-trash" aria-hidden="true"></i></button></th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

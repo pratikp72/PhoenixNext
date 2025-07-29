@@ -1,0 +1,68 @@
+<template>
+  <div class="card h-100">
+    <div class="card-header pt-1">
+<!--      <span class="float-left pr-2">Med Allergy</span>-->
+      <span class="d-inline float-left pt-2">Med Allergy</span>
+
+      <div if.bind="data.editing" class="dropdown">
+
+        <button type="button" class="btn btn-outline-danger float-right" click.delegate="deleteBlock()">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+
+        <button class="btn btn-secondary dropdown-toggle float-right mr-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-arrows-h" aria-hidden="true"></i>${data.width}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a repeat.for="w of widthList" class="dropdown-item" href="#" click.delegate="setWidth(w)">${w}</a>
+        </div>
+      </div>
+
+      <ul class="nav nav-tabs card-header-tabs justify-content-end">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+
+      <table class="table">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First</th>
+          <th scope="col">Last</th>
+          <th scope="col">Handle</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>@mdo</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>Jacob</td>
+          <td>Thornton</td>
+          <td>@fat</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>Larry</td>
+          <td>the Bird</td>
+          <td>@twitter</td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</template>

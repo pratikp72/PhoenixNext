@@ -1,0 +1,127 @@
+
+<template>
+  <ux-dialog style="box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25); margin: 20px;" css="position: absolute; top: ${popupTop}px; left: ${popupLeft}px; width: ${popupWidth}px; height: ${popupHeight}px;">
+    <ux-dialog-header class="py-0">
+      <div class="row">
+        <div class="col-sm-12 d-flex">
+
+          <h4 style="padding-top: 6px;">PT Auth</h4>
+
+          <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+            <button type="button" class="btn" click.delegate="addRow()">
+              <i class="fa fa-plus fa-2x text-primary" aria-hidden="true"></i>
+            </button>
+
+<!--            <button type="button" class="btn btn-primary">2</button>-->
+
+            <div class="btn-group" role="group">
+              <button id="btnGroupDrop1" type="button" class="btn dropdown-toggle pl-0"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-filter fa-2x text-secondary" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                <a repeat.for="s of statusList" class="dropdown-item" href="#" click.delegate="filter(s)">${s}</a>
+              </div>
+            </div>
+
+          </div>
+          <i class="fa fa-times fa-2x ml-auto" click.delegate="cancel()"></i>
+        </div>
+      </div>
+    </ux-dialog-header>
+    <ux-dialog-body class="py-0">
+
+      <table class="table table-sm ptAuthTable">
+        <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Auth Date</th>
+          <th scope="col">Side</th>
+          <th scope="col">Part</th>
+          <th scope="col">Days</th>
+          <th scope="col">Visits</th>
+          <th scope="col">Type</th>
+          <th scope="col">Auth #</th>
+          <th scope="col">CaseID</th>
+          <th scope="col">Comments</th>
+          <th scope="col">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+          <template repeat.for="a of filtered">
+            <tr>
+              <th scope="row"><i class="fa fa-trash-o fa-2x ml-auto text-danger" click.delegate="deleteRow($index)"></i></th>
+              <td>
+                <div class="input-group" style="flex-wrap: inherit; width: 150px;">
+                  <abp-datetime-picker icon-base="font-awesome" with-date-icon="false" element.bind="datepickers[$index].datepicker" value.bind="a.authDate" options.bind="{ format: 'MM/DD/YYYY' }"></abp-datetime-picker>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" click.delegate="openCalendar($index)"> <i class="fa fa-calendar"></i></button>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <!--SIDE-->
+                <select class="ptTableInput" value.bind="a.side">
+                  <option model.bind="null">Select...</option>
+                  <option repeat.for="s of sides"
+                          model.bind="s">
+                    ${s}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <!--PART-->
+                <select class="ptTableInput" value.bind="a.part">
+                  <option model.bind="null">Select...</option>
+                  <option repeat.for="p of parts"
+                          model.bind="p">
+                    ${p}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input class="ptTableInput" type="number" id="authdays" name="authdays" min="1" max="31" value.bind="a.authDays" style="width: 55px;">
+              </td>
+              <td>
+                <input class="ptTableInput" type="number" id="authVisits" name="authVisits" value.bind="a.authVisits" style="width: 55px;">
+              </td>
+              <td>
+                <!--TYPE-->
+                <select class="ptTableInput" value.bind="a.type" style="width: 50px;">
+                  <option model.bind="null">Select...</option>
+                  <option repeat.for="t of types"
+                          model.bind="t">
+                    ${t}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input class="ptTableInput" type="text" id="authNumber" name="authNumber" value.bind="a.authNumber" style="width: 100px;">
+              </td>
+              <td>
+                <input class="ptTableInput" type="text" id="caseId" name="caseId" value.bind="a.caseId" style="width: 75px;">
+              </td>
+              <td>
+                <input class="ptTableInput" type="text" id="comments" name="comments" value.bind="a.comments">
+              </td>
+              <td>
+                <!--STATUS-->
+                <select class="ptTableInput" value.bind="a.status" style="width: 55px;">
+                  <option model.bind="null">Select...</option>
+                  <option repeat.for="s of statusList"
+                          model.bind="s">
+                    ${s}
+                  </option>
+                </select>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+    </ux-dialog-body>
+    <ux-dialog-footer style="left: 0;bottom: 0;right: 0;position: absolute;">
+      <button click.delegate="close()">Save</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

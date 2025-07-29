@@ -1,0 +1,109 @@
+<template>
+  <style>
+    .to-border-left{
+      /* border-top: 1px solid #dee2e6; */
+      /* border-left: 1px solid #dee2e6; */
+      border-bottom: 1px solid #dee2e6;
+      /* border-top-left-radius: 0.25rem;
+      border-bottom-left-radius: 0.25rem; */
+    }
+    .to-border-right{
+      /* border-top: 1px solid #dee2e6;
+      border-right: 1px solid #dee2e6; */
+      border-bottom: 1px solid #dee2e6;
+      /* border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem; */
+    }
+    .recipient-picker{
+      position: absolute;
+      background-color: white;
+      z-index: 2;
+      top: 35px;
+      right: 20px;
+      box-shadow: 5px 10px 7px 1px rgba(1, 1, 1, 0.25)
+    }
+    .send-toolbar{
+      border-top: 1px solid rgba(0,0,0,.125);
+      background-color: rgba(0,0,0,0.03);
+      padding: 0.75rem 1.25rem;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+    }
+
+    .fax-number-input{
+      display: inline-block;
+      width: auto;
+      border: none;
+      height: auto;
+      padding: 0;
+      width: 140px;
+    }
+  </style>
+  <div class="row mx-0 px-2 pb-2">
+    <div class="col-md-12">
+
+      <div class="form-row mx-0">
+
+        <!--RECIPIENT PICKER-->
+        <div if.bind="showRecipientPicker" ref="recipientpicker" class="card recipient-picker">
+          <div class="form-group col-md-12">
+            <small id="nameFirstHelp" class="form-text text-muted">Recipient</small>
+            <div class="input-group">
+              <div class="input-group-prepend">
+
+                <select class="custom-select" value.bind="selectedRecipientType" change.delegate="filterRecipients()" disabled.bind="disableRecipientPicker">
+                  <option model.bind="null">Choose...</option>
+                  <option repeat.for="r of recipientTypes" model.bind="r" >${r}</option>
+                </select>
+
+              </div>
+              <select class="custom-select" value.bind="selectedRecipient" disabled.bind="disableRecipientPicker">
+                <option model.bind="null">Choose...</option>
+                <option repeat.for="r of filteredRecipients" model.bind="r" >${r.name}</option>
+              </select>
+              <div class="input-group-append">
+                <button class="btn ${selectedRecipient ? 'btn-outline-primary' : 'btn-outline-secondary'}" 
+                  click.delegate="addRecipient()"
+                  style="border-color: #ced4da;" type="button" disabled.bind="disableRecipientPicker">
+                  <i class="fa fa-plus" id="faxAddRecipientButton"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--RECIPIENTS-->
+        <div class="form-group col-md-12 d-flex align-items-stretch px-0 py-1 border-bottom">
+          <div class="w-100">
+            <label class="my-1 mx-2 text-muted">To:</label>
+            <template repeat.for="r of faxRecipients">
+              <span click.delegate="removeRecipient($index)" class="p-1 text-primary d-inline-block">${r.name}
+              <i class="fa fa-times float-right" aria-hidden="true"></i>
+              </span>
+            </template>
+            <input type="text" class="form-control fax-number-input" value.bind="phoneInputValue" input.delegate="faxPhoneInput()"></input>
+            <div if.bind="displayPhoneInputButton" class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-primary btn-sm" click.delegate="addRecipientWithPhoneInput()">Add</button>
+              <button type="button" class="btn btn-primary btn-sm" click.delegate="cancelPhoneInput()">X</button>
+            </div>
+          </div>
+          <div>
+            <i class="fa fa-plus p-2 mx-2 text-primary" click.delegate="plusClicked($event)" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <!--FAX ITEMS-->
+        <ul class="list-group list-group-flush w-100">
+          <li repeat.for="i of faxItems" class="list-group-item px-0 d-flex align-items-center">
+            ${i.Description}
+            <i class="fa fa-trash-o ml-auto mx-1 text-danger" click.delegate="removeFaxItem($index)" aria-hidden="true"></i>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+  <div class="send-toolbar d-flex align-items-center">
+    <button class="btn btn-primary ml-auto" disabled.bind="!canSend" click.delegate="sendFax()" type="button">Send</button>
+  </div>
+</template>

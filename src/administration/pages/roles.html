@@ -1,0 +1,63 @@
+<template>
+
+  <require from="../../go/customElements/myCheckbox"></require>
+
+
+  <div class="row">
+    <div class="col-md-3 pr-0" css="height: ${height}px;" style="overflow-y:auto;">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="d-inline-block m-0 pt-1">Roles</h4>
+          <i class="fa fa-plus text-primary fa-2x float-right" aria-hidden="true" click.delegate="newRoleClick()"></i>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li repeat.for="r of roles" class="list-group-item ${r.selected ? 'active' : ''} " click.delegate="roleClick(r)">${r.name}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="card" css="height: ${height}px;">
+        <h5 class="card-header">
+          ${selectedRole.name}
+        </h5>
+        <div class="card-body" style="overflow-y:auto;">
+
+          <div if.bind="!enableEdit" style="position: absolute;
+          background-color: #ffffffd4;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          top: 0;
+          z-index: 5000;"></div>
+
+            <div class="form-group">
+              <label for="userid">Role Access</label>
+              <div id="userid" class="d-flex flex-row flex-wrap align-items-center" style="border: 1px solid #ced4da;border-radius: 0.25rem;">
+                <div repeat.for="area of selectedRole.areas"
+                     class="p-2 text-primary"
+                     click.delegate="deleteArea(area)">
+                  <span class="p-1 bg-light">
+                    ${area.name}
+                    <i class="fa fa-times float-right" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <div class="dropdown p-2 ml-auto">
+                  <button class="btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-plus text-primary" aria-hidden="true"></i>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a repeat.for="a of areas" class="dropdown-item" href="#" click.delegate="addArea(a)">${a.name}</a>
+                  </div>
+                </div>
+              </div>
+              <small id="emailHelp" class="form-text text-muted">Add area to role...</small>
+            </div>
+
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-primary float-right" click.delegate="update()">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

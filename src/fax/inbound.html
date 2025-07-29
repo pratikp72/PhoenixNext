@@ -1,0 +1,83 @@
+<template>
+
+  <style>
+    .fa-disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  </style>
+
+
+
+      <div class="card border-0"><!-- css="height: ${height}px;">-->
+        <div class="card-header d-flex align-items-center">
+
+          <i class="fa ${filewatcherType == 'fax' ? 'fa-fax' : 'fa-print'} fa-2x mr-2" aria-hidden="true"></i>
+
+          <div class="form-group w-25 mb-0 mr-1">
+            <select value.bind="confidenceFilter" class="form-control custom-select" change.delegate="confidenceSelected()">
+              <option model.bind="null">Confidence...</option><!--model.bind="null"-->
+              <option repeat.for="c of confidenceList" model.bind="c" >${c}</option>
+            </select>
+          </div>
+
+          <div class="form-group w-25 mb-0 mr-1">
+            <select value.bind="folderFilter" class="form-control custom-select" change.delegate="folderSelected()">
+              <option model.bind="null">Folder...</option>
+              <option repeat.for="f of inboundFaxFolders" model.bind="f" >${f.FullPath}</option>
+            </select>
+          </div>
+
+          <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-cog" aria-hidden="true"></i> 
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item ${!canAutoImport ? 'disabled' : ''}" href="#" click.delegate="autoAttach()">
+                <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Auto-attach</a>
+              <a class="dropdown-item ${!canAutoImport ? 'disabled' : ''}" href="#" click.delegate="autoAttach(true)">
+                <i class="fa fa-thumb-tack" aria-hidden="true"></i> Auto-attach & Task</a>
+              <a class="dropdown-item ${!canAutoImport ? 'disabled' : ''}" href="#" click.delegate="deleteSelectedItems()">                
+                <i class="fa fa-trash-o" aria-hidden="true"></i> Delete Item</a></a>
+              <a class="dropdown-item ${!canAutoImport ? 'disabled' : ''}" href="#" click.delegate="moveToPending()">                
+                <i class="fa fa-share" aria-hidden="true"></i> Move to pending</a></a>
+              <a class="dropdown-item ${!canAutoImport ? 'disabled' : ''}" href="#" click.delegate="reprocess()">                
+                <i class="fa fa-refresh" aria-hidden="true"></i> Reprocess</a></a>
+            </div>
+          </div>
+
+          <i class="fa fa-times fa-2x ml-auto mr-1" aria-hidden="true" click.delegate="close()"></i>
+        </div>
+        <div class="card-body px-0 pt-0" style="overflow-y:auto;">
+          <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col"></th>
+              <th scope="col">File</th>
+              <th scope="col">Patient</th>        
+              <th scope="col">Date</th>         
+            </tr>
+            </thead>
+            <tbody>
+            <tr repeat.for="fax of faxes" class="${fax.successClass}">
+              <td style="vertical-align: middle; padding-left: 20px !important;">
+                <i class="${fax.checked ? 'fa fa-check-square-o' : 'fa fa-square-o'}" aria-hidden="true" click.delegate="toggleCheck(fax, $event)"></i>
+              </td>
+              <td style="vertical-align: middle;">
+                <i class="fa fa-arrow-circle-left ${!fax.sendToFolder ? 'fa-disabled' : ''}" aria-hidden="true" click.delegate="addToFolder(fax, $event)"></i>
+              </td>
+              <td style="vertical-align: middle;" click.delegate="openPatientFolder(fax.data, $event)">${fax.data.DisplayName}</td>
+              <td style="vertical-align: middle;">${fax.data.Meta.PatientName}</td>
+              <td style="vertical-align: middle;">${fax.date}</td>
+              <td style="vertical-align: middle; padding-right: 20px !important;">                
+                <i class="fa fa-file-pdf-o" aria-hidden="true" click.delegate="viewPdf(fax, $event)"></i>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+</template>

@@ -1,0 +1,60 @@
+
+<template>
+    <div class="row" style="padding: 10px;">
+      <div class="col-12">
+        <div class="row" repeat.for="option of options">
+          <template if.bind="option.showName && option.showThis">
+            <input type="hidden" value.bind="$root" >
+            <div class="col-12">
+              <b>${option.friendlyName}:</b> <span if.bind="shouldShowOption(option) & signal: 'update-options'">${getFormattedValue(option) & signal: 'update-options'}</span>
+            </div>
+          </template>
+        </div>
+        <!--
+        <div class="row">
+          <div class="col-12">
+            <b>DOB:</b> <span if.bind="options.data.patientDOB.showThis === true">${patient.DOB}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <b>Employer:</b> <span if.bind="options.data.employerName.showThis === true">${employer.NameEmployer}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <b>Insurance:</b> <span if.bind="options.data.insuranceName.showThis === true">${patient.OD_Insurance.OD_InsuranceCompany.Name}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <b>Plan Type:</b> <span if.bind="options.data.insurancePlanType.showThis === true">${patient.OD_Insurance.PlanType}</span>
+          </div>
+        </div>
+        -->
+        <template if.bind="shouldShowPaymentGroups(options) === true">
+          <template repeat.for="group of paymentGroups">
+            <div class="row">
+              <div class="col-12">
+                <b>${group.name}:</b> ${group.amount}
+              </div>
+            </div>
+          </template>
+        </template>
+        <template if.bind="paymentInfo && paymentInfo.insurance_profile && paymentInfo.insurance_profile.primary && paymentInfo.insurance_profile.primary.product_name">
+            <div class="row">
+              <div class="col-12">
+                <b>Product Name:</b> ${paymentInfo.insurance_profile.primary.product_name}
+              </div>
+            </div>
+        </template>
+        <template if.bind="paymentInfo && paymentInfo.insurance_profile && paymentInfo.insurance_profile.primary && paymentInfo.insurance_profile.primary.insurance_name">
+          <div class="row">
+            <div class="col-12">
+              <b>Insurance Name:</b> ${paymentInfo.insurance_profile.primary.insurance_name}
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+</template>

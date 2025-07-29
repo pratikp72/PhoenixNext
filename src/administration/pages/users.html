@@ -1,0 +1,33 @@
+<template>
+  <div class="card">
+    <div class="card-header d-flex align-items-center">
+      <h4 class="d-inline-block m-0 pt-1">Users</h4>
+      <i class="fa fa-filter text-secondary ml-auto mr-1" aria-hidden="true"></i>
+      <input type="text" style="width: 250px;" placeholder="LastName..." class="form-control mr-2" value.bind="filter">
+      <i class="fa fa-plus text-primary fa-2x" aria-hidden="true" click.delegate="add()"></i>
+    </div>
+
+    <div class="card-body p-0" style="overflow-y: auto;" css="height:${height}px;">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">User Name</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr repeat.for="u of filteredUsers">
+            <th scope="row"><button type="button" class="btn btn-primary" click.delegate="edit(u)">Edit</button></th>
+            <td style="vertical-align: middle;">${u.UserName}</td>
+            <td style="vertical-align: middle;">${u.FirstName}</td>
+            <td style="vertical-align: middle;">${u.LastName}</td>
+            <td style="vertical-align: middle;">${u.role}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
