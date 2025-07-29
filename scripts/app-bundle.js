@@ -5277,11 +5277,11 @@ define('chatbot/action-buttons',['exports', 'aurelia-event-aggregator', 'aurelia
 
       this.eventAggregator = eventAggregator;
       this.http = httpService;
+      this.apiUrl = 'http://imenso-002-site5.atempurl.com/chatbot';
     }
 
     ActionButtons.prototype.selectAction = function selectAction(action) {
       if (action === 'office-visits') {
-
         this.handleChatbotOfficeVisits();
       } else if (action === 'office-visits-static') {
         this.handleStaticOfficeVisitsOpenPatient();
@@ -5298,20 +5298,27 @@ define('chatbot/action-buttons',['exports', 'aurelia-event-aggregator', 'aurelia
       });
 
       var self = this;
-      this.callChatbotAPI('Open office visits for Chuck Easttom').then(function (response) {
+      var apiOptions = {
+        patientId: this.getPatientIdByName('Chuck Easttom'),
+        audioFile: new File(['dummy audio content'], 'WhatsAppAudio_20_03.35.70e8f613.opus', { type: 'audio/opus' }) };
+
+      this.callChatbotAPI('Open office visits for Chuck Easttom', apiOptions).then(function (response) {
+        var responseText = typeof response === 'string' ? response : JSON.stringify(response);
+
         self.eventAggregator.publish('message-sent', {
-          message: response,
+          message: responseText,
           type: 'assistant'
         });
 
         self.eventAggregator.publish('office-visits-requested', {
           patientName: 'Chuck Easttom',
-          apiResponse: response
+          patientId: apiOptions.patientId,
+          apiResponse: responseText
         });
       }).catch(function (error) {
         console.error('Error calling chatbot API:', error);
         self.eventAggregator.publish('message-sent', {
-          message: 'Sorry, I encountered an error processing your request.',
+          message: 'Sorry, I encountered an error processing your request. Please try again.',
           type: 'assistant'
         });
       });
@@ -5336,29 +5343,98 @@ define('chatbot/action-buttons',['exports', 'aurelia-event-aggregator', 'aurelia
     };
 
     ActionButtons.prototype.callChatbotAPI = function callChatbotAPI(content) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
       var self = this;
       return new Promise(function (resolve, reject) {
         try {
+          console.log('ActionButtons: Making API call to:', self.apiUrl);
+          console.log('Content:', content);
+          console.log('Options:', options);
+
           var formData = new FormData();
-          formData.append('Content', content);
+
+          formData.append('Content', content || '');
+
+          if (options.audioFile instanceof File) {
+            formData.append('AudioFile', options.audioFile);
+          }
+
+          if (options.providerId && typeof options.providerId === 'number') {
+            formData.append('ProviderId', options.providerId.toString());
+          }
+
+          if (options.patientId && typeof options.patientId === 'number') {
+            formData.append('PatientId', options.patientId.toString());
+          }
+
+          console.log('ActionButtons FormData contents:');
+          for (var _iterator = formData.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+            var _ref;
+
+            if (_isArray) {
+              if (_i >= _iterator.length) break;
+              _ref = _iterator[_i++];
+            } else {
+              _i = _iterator.next();
+              if (_i.done) break;
+              _ref = _i.value;
+            }
+
+            var pair = _ref;
+
+            console.log(pair[0] + ': ' + pair[1]);
+          }
 
           var config = {
             processData: false,
-            contentType: false
+            contentType: false,
+            timeout: 30000,
+            headers: {
+              'Accept': 'application/json, text/plain, */*'
+            }
           };
 
-          self.http.postNoAuth('http://imenso-002-site5.atempurl.com/chatbot', formData, function (response) {
-
-            resolve(response);
+          self.http.postNoAuth(self.apiUrl, formData, function (response) {
+            console.log('ActionButtons: API Response received:', response);
+            try {
+              if (typeof response === 'string') {
+                var jsonResponse = JSON.parse(response);
+                resolve(jsonResponse);
+              } else {
+                resolve(response);
+              }
+            } catch (parseError) {
+              console.log('ActionButtons: Response is not JSON, returning as-is');
+              resolve(response);
+            }
           }, config, function (error) {
-
-            console.error('HTTP Error:', error);
-            reject(new Error('API call failed: ' + (error.responseText || error.statusText)));
+            console.error('ActionButtons HTTP Error:', {
+              status: error.status,
+              statusText: error.statusText,
+              responseText: error.responseText,
+              readyState: error.readyState
+            });
+            reject(new Error('API call failed: ' + error.status + ' - ' + (error.statusText || 'Network Error')));
           });
         } catch (error) {
+          console.error('ActionButtons: Exception in API call:', error);
           reject(error);
         }
       });
+    };
+
+    ActionButtons.prototype.getPatientIdByName = function getPatientIdByName(patientName) {
+      var patientMap = {
+        'Chuck Easttom': 1000000013,
+        'Sandra McCune': 1000000014
+      };
+
+      return patientMap[patientName] || null;
+    };
+
+    ActionButtons.prototype.getCurrentProviderId = function getCurrentProviderId() {
+      return 1;
     };
 
     return ActionButtons;
@@ -5410,14 +5486,18 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
             this.isRecording = false;
             this.waveformInterval = null;
             this.isLoading = false;
-
+            this.audioFile = null;
+            this.apiUrl = 'http://imenso-002-site5.atempurl.com/chatbot';
             this.useRealAPI = true;
+            this.maxRetries = 2;
         }
 
         ChatInput.prototype.attached = function attached() {
             try {
                 this.waveBars = this.element.querySelectorAll('.wave-bar');
-            } catch (error) {}
+            } catch (error) {
+                console.warn('Wave bars not found:', error);
+            }
         };
 
         ChatInput.prototype.toggleRecording = function toggleRecording() {
@@ -5425,6 +5505,8 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
 
             if (this.isRecording) {
                 this.startWaveformAnimation();
+
+                this.audioFile = new File(['dummy audio content'], 'WhatsAppAudio_20_03.35.70e8f613.opus', { type: 'audio/opus' });
             } else {
                 this.stopWaveformAnimation();
                 if (!this.chatText.trim()) {
@@ -5459,145 +5541,276 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         };
 
         ChatInput.prototype.onTranscribeClick = function onTranscribeClick() {
-            console.log('Transcribe clicked');
+            console.log('Transcribe clicked - feature to be implemented');
         };
 
         ChatInput.prototype.sendMessage = function sendMessage() {
-            if (this.chatText && this.chatText.trim()) {
-                console.log('Sending message:', this.chatText);
+            var _this = this;
 
-                this.isLoading = true;
-
-                this.eventAggregator.publish('message-sent', {
-                    message: this.chatText,
-                    type: 'user'
-                });
-
-                var userMessage = this.chatText;
-
-                this.chatText = '';
-
-                var self = this;
-                var apiCall = this.useRealAPI ? this.callChatbotAPI(userMessage) : this.callChatbotAPIMock(userMessage);
-
-                apiCall.then(function (response) {
-                    self.eventAggregator.publish('message-sent', {
-                        message: response,
-                        type: 'assistant'
-                    });
-
-                    if (userMessage.toLowerCase().includes('office visits')) {
-                        var patientName = self.extractPatientName(userMessage);
-                        if (patientName) {
-                            self.handleOfficeVisitsRequest(patientName, response);
-                        }
-                    }
-                }).catch(function (error) {
-                    console.error('Error calling chatbot API:', error);
-
-                    if (self.useRealAPI) {
-                        console.log('Real API failed, trying mock response...');
-                        self.callChatbotAPIMock(userMessage).then(function (mockResponse) {
-                            self.eventAggregator.publish('message-sent', {
-                                message: mockResponse + '\n\n(Note: Using simulated response due to API connection issue)',
-                                type: 'assistant'
-                            });
-                        });
-                    } else {
-                        self.eventAggregator.publish('message-sent', {
-                            message: 'Sorry, I encountered an error processing your request.',
-                            type: 'assistant'
-                        });
-                    }
-                }).then(function () {
-                    self.isLoading = false;
-                });
+            if (!this.chatText && !this.audioFile) {
+                return;
             }
+
+            if (this.isLoading) {
+                console.log('Already processing a message...');
+                return;
+            }
+
+            console.log('Sending message:', this.chatText);
+
+            this.isLoading = true;
+
+            this.eventAggregator.publish('message-sent', {
+                message: this.chatText || 'Voice message',
+                type: 'user'
+            });
+
+            var userMessage = this.chatText || '';
+
+            this.chatText = '';
+
+            var apiOptions = {
+                audioFile: this.audioFile,
+                providerId: 1,
+                patientId: 1000000013 };
+            this.audioFile = null;
+            this.callChatbotAPIWithRetry(userMessage, 0, apiOptions).then(function (response) {
+                _this.handleSuccessfulResponse(response, userMessage);
+            }).catch(function (error) {
+                _this.handleAPIError(error, userMessage);
+            }).finally(function () {
+                _this.isLoading = false;
+            });
+        };
+
+        ChatInput.prototype.callChatbotAPIWithRetry = function callChatbotAPIWithRetry(content, retryCount) {
+            var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var self = this;
+            return new Promise(function (resolve, reject) {
+                self.callChatbotAPI(content, options).then(resolve).catch(function (error) {
+                    console.error('API call failed (attempt ' + (retryCount + 1) + '):', error);
+
+                    if (retryCount < self.maxRetries) {
+                        console.log('Retrying... (' + (retryCount + 1) + '/' + self.maxRetries + ')');
+                        setTimeout(function () {
+                            self.callChatbotAPIWithRetry(content, retryCount + 1, options).then(resolve).catch(reject);
+                        }, 1000 * (retryCount + 1));
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
         };
 
         ChatInput.prototype.callChatbotAPI = function callChatbotAPI(content) {
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
             var self = this;
             return new Promise(function (resolve, reject) {
                 try {
+                    console.log('Making API call to:', self.apiUrl);
+                    console.log('Content:', content);
+                    console.log('Options:', options);
 
                     var formData = new FormData();
-                    formData.append('Content', content);
+
+                    formData.append('Content', content || '');
+
+                    if (options.audioFile instanceof File) {
+                        formData.append('AudioFile', options.audioFile);
+                    }
+
+                    if (options.providerId && typeof options.providerId === 'number') {
+                        formData.append('ProviderId', options.providerId.toString());
+                    }
+
+                    if (options.patientId && typeof options.patientId === 'number') {
+                        formData.append('PatientId', options.patientId.toString());
+                    }
+
+                    console.log('FormData contents:');
+                    for (var _iterator = formData.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                        var _ref;
+
+                        if (_isArray) {
+                            if (_i >= _iterator.length) break;
+                            _ref = _iterator[_i++];
+                        } else {
+                            _i = _iterator.next();
+                            if (_i.done) break;
+                            _ref = _i.value;
+                        }
+
+                        var pair = _ref;
+
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
 
                     var config = {
                         processData: false,
-                        contentType: false
+                        contentType: false,
+                        timeout: 30000,
+                        headers: {
+                            'Accept': 'application/json, text/plain, */*'
+                        }
                     };
 
-                    self.http.postNoAuth('http://imenso-002-site5.atempurl.com/chatbot', formData, function (response) {
-                        resolve(response);
+                    self.http.postNoAuth(self.apiUrl, formData, function (response) {
+                        console.log('API Response received:', response);
+                        try {
+                            if (typeof response === 'string') {
+                                var jsonResponse = JSON.parse(response);
+                                resolve(jsonResponse);
+                            } else {
+                                resolve(response);
+                            }
+                        } catch (parseError) {
+                            console.log('Response is not JSON, returning as-is');
+                            resolve(response);
+                        }
                     }, config, function (error) {
-                        console.error('HTTP Error:', error);
-                        reject(new Error('API call failed: ' + (error.responseText || error.statusText)));
+                        console.error('HTTP Error details:', {
+                            status: error.status,
+                            statusText: error.statusText,
+                            responseText: error.responseText,
+                            readyState: error.readyState
+                        });
+                        reject(new Error('API call failed: ' + error.status + ' - ' + (error.statusText || 'Network Error')));
                     });
                 } catch (error) {
+                    console.error('Exception in API call:', error);
                     reject(error);
                 }
             });
         };
 
-        ChatInput.prototype.callChatbotAPIFallback = function callChatbotAPIFallback(content) {
-            return new Promise(function (resolve, reject) {
-                try {
-                    var formData = new FormData();
-                    formData.append('Content', content);
+        ChatInput.prototype.handleSuccessfulResponse = function handleSuccessfulResponse(response, userMessage) {
+            console.log('Processing successful API response');
 
-                    var xhr = new XMLHttpRequest();
-
-                    xhr.onload = function () {
-                        if (xhr.status === 200) {
-                            resolve(xhr.responseText);
-                        } else {
-                            reject(new Error('HTTP error! status: ' + xhr.status));
-                        }
-                    };
-
-                    xhr.onerror = function () {
-                        reject(new Error('Network error occurred'));
-                    };
-
-                    xhr.open('POST', 'http://imenso-002-site5.atempurl.com/chatbot', true);
-                    xhr.send(formData);
-                } catch (error) {
-                    reject(error);
-                }
+            this.eventAggregator.publish('message-sent', {
+                message: response,
+                type: 'assistant'
             });
+
+            this.handleSpecialResponses(userMessage, response);
+        };
+
+        ChatInput.prototype.handleAPIError = function handleAPIError(error, userMessage) {
+            var _this2 = this;
+
+            console.error('Final API error after retries:', error);
+
+            if (this.useRealAPI) {
+                console.log('API failed, using mock response as fallback...');
+                this.callChatbotAPIMock(userMessage).then(function (mockResponse) {
+                    _this2.eventAggregator.publish('message-sent', {
+                        message: mockResponse + '\n\n(Note: Using simulated response due to API connection issue)',
+                        type: 'assistant'
+                    });
+                    _this2.handleSpecialResponses(userMessage, mockResponse);
+                }).catch(function (mockError) {
+                    console.error('Mock API also failed:', mockError);
+                    _this2.publishErrorMessage();
+                });
+            } else {
+                this.publishErrorMessage();
+            }
+        };
+
+        ChatInput.prototype.publishErrorMessage = function publishErrorMessage() {
+            this.eventAggregator.publish('message-sent', {
+                message: 'Sorry, I encountered an error processing your request. Please try again.',
+                type: 'assistant'
+            });
+        };
+
+        ChatInput.prototype.handleSpecialResponses = function handleSpecialResponses(userMessage, response) {
+            if (userMessage.toLowerCase().includes('office visits')) {
+                var contextInfo = this.extractContextFromMessage(userMessage);
+                if (contextInfo.patientName) {
+                    this.handleOfficeVisitsRequest(contextInfo.patientName, response);
+                }
+            }
+
+            if (userMessage.toLowerCase().includes('hip bursitis')) {
+                this.eventAggregator.publish('protocol-added', {
+                    protocol: 'Hip Bursitis',
+                    response: response
+                });
+            }
         };
 
         ChatInput.prototype.callChatbotAPIMock = function callChatbotAPIMock(content) {
             return new Promise(function (resolve, reject) {
                 setTimeout(function () {
-                    if (content.toLowerCase().includes('office visits')) {
-                        var patientMatch = content.match(/office visits for (.+?)$/i);
-                        var name = patientMatch ? patientMatch[1] : 'the patient';
+                    try {
+                        var response = '';
+                        var lowerContent = content.toLowerCase();
 
-                        resolve('Here are the office visits for ' + name + ':\n\n' + '• 01/15/2025 at 9:00 AM - Scheduled\n' + '• 01/18/2025 at 2:30 PM - Completed\n' + '• 01/22/2025 at 11:15 AM - Scheduled\n' + '• 01/25/2025 at 3:45 PM - Pending\n\n' + 'Would you like me to help with any of these appointments?');
-                    } else if (content.toLowerCase().includes('hip bursitis')) {
-                        resolve('Hip Bursitis Protocol has been added to the patient\'s treatment plan. The protocol includes:\n\n' + '• Anti-inflammatory medication\n' + '• Physical therapy exercises\n' + '• Ice therapy instructions\n' + '• Follow-up appointment scheduled');
-                    } else if (content.toLowerCase().includes('patient count')) {
-                        resolve('Dr. Smith saw 127 patients last month. Here\'s the breakdown:\n\n' + '• Week 1: 32 patients\n' + '• Week 2: 35 patients\n' + '• Week 3: 28 patients\n' + '• Week 4: 32 patients');
-                    } else if (content.toLowerCase().includes('compliance') || content.toLowerCase().includes('mips')) {
-                        resolve('Your current MIPS compliance score is 85/100. Areas for improvement:\n\n' + '• Quality measures: 92/100\n' + '• Cost measures: 78/100\n' + '• Improvement activities: 85/100\n' + '• Promoting interoperability: 84/100');
-                    } else {
-                        resolve('I can help you with that request. What would you like me to do next?');
+                        if (lowerContent.includes('office visits')) {
+                            var patientMatch = content.match(/office visits for (.+?)$/i);
+                            var name = patientMatch ? patientMatch[1].trim() : 'the patient';
+
+                            response = 'Here are the office visits for ' + name + ':\n\n' + '• 01/15/2025 at 9:00 AM - Scheduled\n' + '• 01/18/2025 at 2:30 PM - Completed\n' + '• 01/22/2025 at 11:15 AM - Scheduled\n' + '• 01/25/2025 at 3:45 PM - Pending\n\n' + 'Would you like me to help with any of these appointments?';
+                        } else if (lowerContent.includes('hip bursitis')) {
+                            response = 'Hip Bursitis Protocol has been added to the patient\'s treatment plan. The protocol includes:\n\n' + '• Anti-inflammatory medication (Ibuprofen 600mg TID)\n' + '• Physical therapy exercises (3x weekly)\n' + '• Ice therapy instructions (15-20 min, 3-4x daily)\n' + '• Follow-up appointment scheduled in 2 weeks\n\n' + 'The protocol has been saved to the patient\'s chart.';
+                        } else if (lowerContent.includes('patient count') || lowerContent.includes('dr. smith')) {
+                            response = 'Dr. Smith saw 127 patients last month. Here\'s the breakdown:\n\n' + '• Week 1: 32 patients\n' + '• Week 2: 35 patients\n' + '• Week 3: 28 patients\n' + '• Week 4: 32 patients\n\n' + 'This represents a 12% increase from the previous month.';
+                        } else if (lowerContent.includes('compliance') || lowerContent.includes('mips')) {
+                            response = 'Your current MIPS compliance score is 85/100. Areas breakdown:\n\n' + '• Quality measures: 92/100 ✅\n' + '• Cost measures: 78/100 ⚠️\n' + '• Improvement activities: 85/100\n' + '• Promoting interoperability: 84/100\n\n' + 'Recommendation: Focus on cost optimization measures to improve overall score.';
+                        } else if (lowerContent.includes('close note')) {
+                            response = 'Office note has been successfully closed and saved to the patient\'s electronic health record. The note is now available for review and billing purposes.';
+                        } else if (lowerContent.includes('generate note')) {
+                            response = 'New office note has been generated based on the current patient encounter. The note includes:\n\n' + '• Chief complaint and history\n' + '• Physical examination findings\n' + '• Assessment and plan\n' + '• Recommended follow-up\n\n' + 'Please review and sign the note to complete the documentation.';
+                        } else {
+                            response = 'I understand your request. How can I assist you further with this matter?';
+                        }
+
+                        resolve(response);
+                    } catch (error) {
+                        reject(error);
                     }
-                }, 1000);
+                }, Math.random() * 1000 + 500);
             });
         };
 
-        ChatInput.prototype.extractPatientName = function extractPatientName(message) {
-            var match = message.match(/office visits for (.+?)$/i);
-            return match ? match[1].trim() : null;
+        ChatInput.prototype.extractContextFromMessage = function extractContextFromMessage(message) {
+            var context = {};
+
+            var patientMatch = message.match(/(?:for|patient)\s+(.+?)(?:\s|$)/i);
+            if (patientMatch) {
+                var patientName = patientMatch[1].trim();
+
+                context.patientId = this.getPatientIdByName(patientName);
+                context.patientName = patientName;
+            }
+
+            return context;
+        };
+
+        ChatInput.prototype.getPatientIdByName = function getPatientIdByName(patientName) {
+            var patientMap = {
+                'Chuck Easttom': 1000000013,
+                'Sandra McCune': 1000000014
+            };
+
+            return patientMap[patientName] || null;
+        };
+
+        ChatInput.prototype.getCurrentProviderId = function getCurrentProviderId() {
+            return null;
+        };
+
+        ChatInput.prototype.getCurrentPatientId = function getCurrentPatientId() {
+            return null;
         };
 
         ChatInput.prototype.handleOfficeVisitsRequest = function handleOfficeVisitsRequest(patientName, apiResponse) {
             this.eventAggregator.publish('office-visits-requested', {
                 patientName: patientName,
-                apiResponse: apiResponse
+                apiResponse: apiResponse,
+                timestamp: new Date()
             });
         };
 
@@ -5612,6 +5825,7 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
 
         ChatInput.prototype.detached = function detached() {
             this.stopWaveformAnimation();
+            this.isLoading = false;
         };
 
         return ChatInput;
