@@ -5383,7 +5383,7 @@ define('chatbot/assistance-header',["exports"], function (exports) {
   };
 });;
 define('text!chatbot/assistance-header.html',[],function(){return "<template><div class=\"header\"><div class=\"logo\"><div class=\"logo-circle\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z\" fill=\"white\"/></svg></div></div><h2>How may I help you?</h2></div></template>";});;
-define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-framework'], function (exports, _aureliaEventAggregator, _aureliaFramework) {
+define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-framework', '../helpers/http'], function (exports, _aureliaEventAggregator, _aureliaFramework, _http) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -5400,15 +5400,18 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
     var _class, _class2, _temp;
 
     var ChatInput = exports.ChatInput = (0, _aureliaFramework.autoinject)(_class = (_temp = _class2 = function () {
-        function ChatInput(element, eventAggregator) {
+        function ChatInput(element, eventAggregator, httpService) {
             _classCallCheck(this, ChatInput);
 
             this.element = element;
             this.eventAggregator = eventAggregator;
+            this.http = httpService;
             this.chatText = '';
             this.isRecording = false;
             this.waveformInterval = null;
             this.isLoading = false;
+
+            this.useRealAPI = true;
         }
 
         ChatInput.prototype.attached = function attached() {
@@ -5431,11 +5434,10 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         };
 
         ChatInput.prototype.startWaveformAnimation = function startWaveformAnimation() {
-            var _this = this;
-
             if (this.waveBars && this.waveBars.length > 0) {
+                var self = this;
                 this.waveformInterval = setInterval(function () {
-                    _this.waveBars.forEach(function (bar) {
+                    self.waveBars.forEach(function (bar) {
                         var height = Math.floor(Math.random() * 16) + 4;
                         bar.style.height = height + 'px';
                     });
@@ -5476,7 +5478,9 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
                 this.chatText = '';
 
                 var self = this;
-                this.callChatbotAPI(userMessage).then(function (response) {
+                var apiCall = this.useRealAPI ? this.callChatbotAPI(userMessage) : this.callChatbotAPIMock(userMessage);
+
+                apiCall.then(function (response) {
                     self.eventAggregator.publish('message-sent', {
                         message: response,
                         type: 'assistant'
@@ -5490,10 +5494,21 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
                     }
                 }).catch(function (error) {
                     console.error('Error calling chatbot API:', error);
-                    self.eventAggregator.publish('message-sent', {
-                        message: 'Sorry, I encountered an error processing your request.',
-                        type: 'assistant'
-                    });
+
+                    if (self.useRealAPI) {
+                        console.log('Real API failed, trying mock response...');
+                        self.callChatbotAPIMock(userMessage).then(function (mockResponse) {
+                            self.eventAggregator.publish('message-sent', {
+                                message: mockResponse + '\n\n(Note: Using simulated response due to API connection issue)',
+                                type: 'assistant'
+                            });
+                        });
+                    } else {
+                        self.eventAggregator.publish('message-sent', {
+                            message: 'Sorry, I encountered an error processing your request.',
+                            type: 'assistant'
+                        });
+                    }
                 }).then(function () {
                     self.isLoading = false;
                 });
@@ -5501,26 +5516,37 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         };
 
         ChatInput.prototype.callChatbotAPI = function callChatbotAPI(content) {
+            var self = this;
+            return new Promise(function (resolve, reject) {
+                try {
+
+                    var formData = new FormData();
+                    formData.append('Content', content);
+
+                    var config = {
+                        processData: false,
+                        contentType: false
+                    };
+
+                    self.http.postNoAuth('http://imenso-002-site5.atempurl.com/chatbot', formData, function (response) {
+                        resolve(response);
+                    }, config, function (error) {
+                        console.error('HTTP Error:', error);
+                        reject(new Error('API call failed: ' + (error.responseText || error.statusText)));
+                    });
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        };
+
+        ChatInput.prototype.callChatbotAPIFallback = function callChatbotAPIFallback(content) {
             return new Promise(function (resolve, reject) {
                 try {
                     var formData = new FormData();
                     formData.append('Content', content);
 
                     var xhr = new XMLHttpRequest();
-
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === 4) {
-                            if (xhr.status === 200) {
-                                resolve(xhr.responseText);
-                            } else {
-                                reject(new Error('HTTP error! status: ' + xhr.status));
-                            }
-                        }
-                    };
-
-                    xhr.onerror = function () {
-                        reject(new Error('Network error occurred'));
-                    };
 
                     xhr.onload = function () {
                         if (xhr.status === 200) {
@@ -5530,18 +5556,36 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
                         }
                     };
 
-                    xhr.withCredentials = false;
+                    xhr.onerror = function () {
+                        reject(new Error('Network error occurred'));
+                    };
+
                     xhr.open('POST', 'http://imenso-002-site5.atempurl.com/chatbot', true);
-
-                    try {
-                        xhr.setRequestHeader('Content-Type', 'multipart/form-data');
-                    } catch (e) {}
-
-                    xhr.setRequestHeader('Accept', '*/*');
                     xhr.send(formData);
                 } catch (error) {
                     reject(error);
                 }
+            });
+        };
+
+        ChatInput.prototype.callChatbotAPIMock = function callChatbotAPIMock(content) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    if (content.toLowerCase().includes('office visits')) {
+                        var patientMatch = content.match(/office visits for (.+?)$/i);
+                        var name = patientMatch ? patientMatch[1] : 'the patient';
+
+                        resolve('Here are the office visits for ' + name + ':\n\n' + '• 01/15/2025 at 9:00 AM - Scheduled\n' + '• 01/18/2025 at 2:30 PM - Completed\n' + '• 01/22/2025 at 11:15 AM - Scheduled\n' + '• 01/25/2025 at 3:45 PM - Pending\n\n' + 'Would you like me to help with any of these appointments?');
+                    } else if (content.toLowerCase().includes('hip bursitis')) {
+                        resolve('Hip Bursitis Protocol has been added to the patient\'s treatment plan. The protocol includes:\n\n' + '• Anti-inflammatory medication\n' + '• Physical therapy exercises\n' + '• Ice therapy instructions\n' + '• Follow-up appointment scheduled');
+                    } else if (content.toLowerCase().includes('patient count')) {
+                        resolve('Dr. Smith saw 127 patients last month. Here\'s the breakdown:\n\n' + '• Week 1: 32 patients\n' + '• Week 2: 35 patients\n' + '• Week 3: 28 patients\n' + '• Week 4: 32 patients');
+                    } else if (content.toLowerCase().includes('compliance') || content.toLowerCase().includes('mips')) {
+                        resolve('Your current MIPS compliance score is 85/100. Areas for improvement:\n\n' + '• Quality measures: 92/100\n' + '• Cost measures: 78/100\n' + '• Improvement activities: 85/100\n' + '• Promoting interoperability: 84/100');
+                    } else {
+                        resolve('I can help you with that request. What would you like me to do next?');
+                    }
+                }, 1000);
             });
         };
 
@@ -5571,7 +5615,7 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         };
 
         return ChatInput;
-    }(), _class2.inject = [Element, _aureliaEventAggregator.EventAggregator], _temp)) || _class;
+    }(), _class2.inject = [Element, _aureliaEventAggregator.EventAggregator, _http.http], _temp)) || _class;
 });;
 define('text!chatbot/chat-input.html',[],function(){return "<template><div class=\"chat-input-container\"><div class=\"chat-input-top\"><label class=\"chat-placeholder\" show.bind=\"!chatText && !isRecording\">Ask POGO AI...</label><div class=\"voice-input\" class.bind=\"isRecording ? 'show' : ''\"><div class=\"recording-indicator\"><span class=\"recording-dot\"></span> <span class=\"recording-text\">Listening...</span></div><div class=\"waveform\"><div class=\"wave-bar\" repeat.for=\"i of 10\"></div></div></div><textarea value.bind=\"chatText\" class=\"chat-textarea\" keydown.delegate=\"handleKeyPress($event)\" placeholder=\"\" style.bind=\"isRecording ? 'display: none' : 'display: block'\">\r\n      </textarea></div><div class=\"chat-divider\"></div><div class=\"chat-input-bottom\"><button class=\"transcribe-label-btn\" click.delegate=\"onTranscribeClick()\"><svg class=\"clip-icon\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M16.5 6.5L7 16c-1.1 1.1-1.1 2.9 0 4s2.9 1.1 4 0l9.5-9.5c1.6-1.6 1.6-4.2 0-5.8s-4.2-1.6-5.8 0L6.5 13\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg> Transcribe</button><div class=\"input-controls\"><button class=\"transcribe-btn\" class.bind=\"isRecording ? 'recording' : ''\" click.delegate=\"toggleRecording()\" title=\"${isRecording ? 'Stop recording' : 'Start voice recording'}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z\" fill=\"currentColor\"/><path d=\"M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z\" fill=\"currentColor\"/></svg></button> <button class=\"send-btn\" click.delegate=\"sendMessage()\" title=\"Send message\"><svg class=\"send-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M2.01 21L23 12 2.01 3 2 10l15 2-15 2z\" fill=\"currentColor\"/></svg></button></div></div></div></template>";});;
 define('chatbot/chatbot-api-handler',['exports'], function (exports) {
@@ -6025,7 +6069,6 @@ define('chatbot/floating-chatbot',['exports', 'aurelia-event-aggregator', 'aurel
 
     FloatingChatbot.prototype.handleAction = function handleAction(action) {
       if (action === 'office-visits' || action === 'office-visits-static') {} else {
-
         this.showDetailView = true;
         this.currentDetail = action;
       }
@@ -56508,16 +56551,18 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
       this.eventAggregator = eventAggregator;
 
       console.log('EventAggregator injected successfully:', this.eventAggregator);
+
+      this.setupChatbotIntegration();
     }
 
     Schedule.prototype.setupChatbotIntegration = function setupChatbotIntegration() {
-      var _this = this;
-
       console.log('Setting up chatbot integration...');
+
+      var self = this;
 
       this.eventAggregator.subscribe('office-visits-requested', function (data) {
         console.log('Received office-visits-requested event:', data);
-        _this.handleOfficeVisitsRequest(data.patientName, data.apiResponse);
+        self.handleOfficeVisitsRequest(data.patientName, data.apiResponse);
       });
     };
 
@@ -56531,6 +56576,52 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
       } else {
         console.log('Patient not found in schedule:', patientName);
       }
+    };
+
+    Schedule.prototype.findPatientByName = function findPatientByName(patientName) {
+      if (!this.home.schedule || !Array.isArray(this.home.schedule)) {
+        console.log('No schedule available or schedule is not an array');
+        return null;
+      }
+
+      var nameParts = patientName.toLowerCase().split(' ');
+      console.log('Searching for patient with name parts:', nameParts);
+      console.log('Current schedule has', this.home.schedule.length, 'items');
+
+      if (this.home.schedule.length > 0) {
+        console.log('Sample schedule item:', this.home.schedule[0]);
+      }
+
+      var self = this;
+      return this.home.schedule.find(function (scheduleItem) {
+        var fullName = (scheduleItem.patientName || scheduleItem.fullName || '').toLowerCase();
+        var firstName = '';
+        var lastName = '';
+
+        if (scheduleItem.firstName) {
+          firstName = scheduleItem.firstName.toLowerCase();
+        } else if (scheduleItem.data && scheduleItem.data.Patient && scheduleItem.data.Patient.FirstName) {
+          firstName = scheduleItem.data.Patient.FirstName.toLowerCase();
+        }
+
+        if (scheduleItem.lastName) {
+          lastName = scheduleItem.lastName.toLowerCase();
+        } else if (scheduleItem.data && scheduleItem.data.Patient && scheduleItem.data.Patient.LastName) {
+          lastName = scheduleItem.data.Patient.LastName.toLowerCase();
+        }
+
+        console.log('Checking patient: ' + fullName + ' (' + firstName + ' ' + lastName + ')');
+
+        var matches = nameParts.every(function (part) {
+          return fullName.includes(part) || firstName.includes(part) || lastName.includes(part) || (firstName + ' ' + lastName).includes(part);
+        });
+
+        if (matches) {
+          console.log('Found matching patient:', scheduleItem);
+        }
+
+        return matches;
+      });
     };
 
     Schedule.prototype.activate = function activate(params) {
@@ -56695,7 +56786,6 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
         self.home.schedule = [];
       }
 
-
       self.globals.scheduleDate = newVal;
 
       if (!self.helper.is_today(newVal)) {
@@ -56705,7 +56795,6 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
       }
 
       self.home.loadScheduledProviders(newVal, function () {
-
         self.trySelectLoggedInUser();
       });
     };
@@ -56728,7 +56817,6 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
       for (var i = 0; i < this.home.schedule.length; i++) {
         var aSchedule = this.home.schedule[i];
         if (aSchedule.hasOwnProperty('needsUpdate')) {
-
           this.updateScheduleRow(aSchedule);
         }
       }
@@ -56812,12 +56900,10 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
 
     Schedule.prototype.detached = function detached() {
       clearInterval(this.nearestVisitTimer);
-
       this.saveChanges();
     };
 
     Schedule.prototype.attached = function attached() {
-
       var self = this;
 
       var windowHeight = window.innerHeight;
@@ -56990,7 +57076,6 @@ define('go/schedule',['exports', '../helpers/helper', '../helpers/http', 'aureli
     };
 
     Schedule.prototype.rowClick = function rowClick(r, e) {
-
       var self = this;
 
       if (e.target.localName === 'select') {

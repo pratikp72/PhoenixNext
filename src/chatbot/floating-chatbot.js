@@ -80,15 +80,17 @@ setupEventListeners() {
     this.currentDetail = '';
     this.showMainView = true;
   }
-
-  handleAction(action) {
-    if (action === 'office-visits' || action === 'office-visits-static') {
-    } else {
-  
-      this.showDetailView = true;
-      this.currentDetail = action;
-    }
+handleAction(action) {
+  if (action === 'office-visits' || action === 'office-visits-static') {
+    // These are now handled by the button click logic
+    // office-visits -> chatbot API call -> office-visits-requested event
+    // office-visits-static -> direct patient opening -> open-patient-static event
+  } else {
+    // Handle other actions with detail view as before
+    this.showDetailView = true;
+    this.currentDetail = action;
   }
+}
 
   handleOfficeVisitsRequest(patientName, apiResponse, isStatic, patientData) {
     console.log('FloatingChatbot: Handling office visits request for:', patientName);
