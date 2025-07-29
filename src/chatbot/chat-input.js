@@ -14,8 +14,10 @@ export class ChatInput {
         this.isRecording = false;
         this.waveformInterval = null;
         this.isLoading = false;
-        this.audioFile = null; // To store the selected or recorded audio file
-        
+        this.audioFile = null; // To store the recorded audio file
+        this.mediaRecorder = null;
+        this.audioChunks = []; // To store audio chunks during recording
+
         // API Configuration
         this.apiUrl = 'http://imenso-002-site5.atempurl.com/chatbot';
         this.useRealAPI = true;
@@ -25,22 +27,51 @@ export class ChatInput {
     attached() {
         try {
             this.waveBars = this.element.querySelectorAll('.wave-bar');
+            this.initializeRecorder();
         } catch (error) {
-            console.warn('Wave bars not found:', error);
+            console.warn('Wave bars or recorder initialization failed:', error);
+        }
+    }
+
+    initializeRecorder() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.mediaRecorder.ondataavailable = event => {
+                        this.audioChunks.push(event.data);
+                    };
+                    this.mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(this.audioChunks, { type: 'audio/opus' });
+                        this.audioFile = new File([audioBlob], `recorded_audio_${new Date().toISOString()}.opus`, { type: 'audio/opus' });
+                        this.audioChunks = []; // Clear chunks after recording
+                    };
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                });
+        } else {
+            console.error('MediaRecorder API not supported');
         }
     }
 
     toggleRecording() {
+        if (!this.mediaRecorder) {
+            console.error('Recorder not initialized');
+            return;
+        }
+
         this.isRecording = !this.isRecording;
 
         if (this.isRecording) {
             this.startWaveformAnimation();
-            // Simulate recording and set audio file (replace with actual recording logic)
-            this.audioFile = new File(['dummy audio content'], 'WhatsAppAudio_20_03.35.70e8f613.opus', { type: 'audio/opus' });
+            this.audioChunks = []; // Clear previous chunks
+            this.mediaRecorder.start();
         } else {
+            this.mediaRecorder.stop();
             this.stopWaveformAnimation();
-            if (!this.chatText.trim()) {
-                this.chatText = "Voice message recorded at " + new Date().toLocaleTimeString();
+            if (!this.chatText.trim() && this.audioFile) {
+                this.chatText = `Voice message recorded at ${new Date().toLocaleTimeString()}`;
             }
         }
     }
@@ -413,6 +444,9 @@ export class ChatInput {
 
     detached() {
         this.stopWaveformAnimation();
+        if (this.mediaRecorder) {
+            this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
         this.isLoading = false;
     }
 }

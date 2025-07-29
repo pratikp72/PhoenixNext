@@ -5487,6 +5487,8 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
             this.waveformInterval = null;
             this.isLoading = false;
             this.audioFile = null;
+            this.mediaRecorder = null;
+            this.audioChunks = [];
             this.apiUrl = 'http://imenso-002-site5.atempurl.com/chatbot';
             this.useRealAPI = true;
             this.maxRetries = 2;
@@ -5495,22 +5497,51 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         ChatInput.prototype.attached = function attached() {
             try {
                 this.waveBars = this.element.querySelectorAll('.wave-bar');
+                this.initializeRecorder();
             } catch (error) {
-                console.warn('Wave bars not found:', error);
+                console.warn('Wave bars or recorder initialization failed:', error);
+            }
+        };
+
+        ChatInput.prototype.initializeRecorder = function initializeRecorder() {
+            var _this = this;
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+                    _this.mediaRecorder = new MediaRecorder(stream);
+                    _this.mediaRecorder.ondataavailable = function (event) {
+                        _this.audioChunks.push(event.data);
+                    };
+                    _this.mediaRecorder.onstop = function () {
+                        var audioBlob = new Blob(_this.audioChunks, { type: 'audio/opus' });
+                        _this.audioFile = new File([audioBlob], 'recorded_audio_' + new Date().toISOString() + '.opus', { type: 'audio/opus' });
+                        _this.audioChunks = [];
+                    };
+                }).catch(function (error) {
+                    console.error('Error accessing microphone:', error);
+                });
+            } else {
+                console.error('MediaRecorder API not supported');
             }
         };
 
         ChatInput.prototype.toggleRecording = function toggleRecording() {
+            if (!this.mediaRecorder) {
+                console.error('Recorder not initialized');
+                return;
+            }
+
             this.isRecording = !this.isRecording;
 
             if (this.isRecording) {
                 this.startWaveformAnimation();
-
-                this.audioFile = new File(['dummy audio content'], 'WhatsAppAudio_20_03.35.70e8f613.opus', { type: 'audio/opus' });
+                this.audioChunks = [];
+                this.mediaRecorder.start();
             } else {
+                this.mediaRecorder.stop();
                 this.stopWaveformAnimation();
-                if (!this.chatText.trim()) {
-                    this.chatText = "Voice message recorded at " + new Date().toLocaleTimeString();
+                if (!this.chatText.trim() && this.audioFile) {
+                    this.chatText = 'Voice message recorded at ' + new Date().toLocaleTimeString();
                 }
             }
         };
@@ -5545,7 +5576,7 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         };
 
         ChatInput.prototype.sendMessage = function sendMessage() {
-            var _this = this;
+            var _this2 = this;
 
             if (!this.chatText && !this.audioFile) {
                 return;
@@ -5575,11 +5606,11 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
                 patientId: 1000000013 };
             this.audioFile = null;
             this.callChatbotAPIWithRetry(userMessage, 0, apiOptions).then(function (response) {
-                _this.handleSuccessfulResponse(response, userMessage);
+                _this2.handleSuccessfulResponse(response, userMessage);
             }).catch(function (error) {
-                _this.handleAPIError(error, userMessage);
+                _this2.handleAPIError(error, userMessage);
             }).finally(function () {
-                _this.isLoading = false;
+                _this2.isLoading = false;
             });
         };
 
@@ -5697,21 +5728,21 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
         };
 
         ChatInput.prototype.handleAPIError = function handleAPIError(error, userMessage) {
-            var _this2 = this;
+            var _this3 = this;
 
             console.error('Final API error after retries:', error);
 
             if (this.useRealAPI) {
                 console.log('API failed, using mock response as fallback...');
                 this.callChatbotAPIMock(userMessage).then(function (mockResponse) {
-                    _this2.eventAggregator.publish('message-sent', {
+                    _this3.eventAggregator.publish('message-sent', {
                         message: mockResponse + '\n\n(Note: Using simulated response due to API connection issue)',
                         type: 'assistant'
                     });
-                    _this2.handleSpecialResponses(userMessage, mockResponse);
+                    _this3.handleSpecialResponses(userMessage, mockResponse);
                 }).catch(function (mockError) {
                     console.error('Mock API also failed:', mockError);
-                    _this2.publishErrorMessage();
+                    _this3.publishErrorMessage();
                 });
             } else {
                 this.publishErrorMessage();
@@ -5825,6 +5856,11 @@ define('chatbot/chat-input',['exports', 'aurelia-event-aggregator', 'aurelia-fra
 
         ChatInput.prototype.detached = function detached() {
             this.stopWaveformAnimation();
+            if (this.mediaRecorder) {
+                this.mediaRecorder.stream.getTracks().forEach(function (track) {
+                    return track.stop();
+                });
+            }
             this.isLoading = false;
         };
 
